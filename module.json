@@ -30,13 +30,20 @@
             "icon": "fa-solid fa-table",
             "acl": "pm.any",
             "sub": {
-                "index": {
-                    "id": "index",
-                    "name": "__pm::menu.be.index",
-                    "route": "pm.index",
+                "master": {
+                    "id": "master",
+                    "name": "__pm::menu.be.master.parent",
                     "class": "",
                     "icon": "fa-solid fa-table",
-                    "acl": "pm.manage"
+                    "sub": {
+                        "division": {
+                            "id": "division",
+                            "name": "__pm::menu.be.master.division",
+                            "class": "",
+                            "route": "pm.index",
+                            "icon": "fa-solid fa-building"
+                        }
+                    }
                 }
             }
         }

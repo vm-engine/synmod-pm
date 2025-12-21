@@ -2,7 +2,12 @@
 
 return [
     'be' => [
-        'parent' => 'Pm',
+        'parent' => 'Project Management',
         'index' => 'Pm List',
+        'master' => [
+            'parent' => 'Master Data',
+            'division' => 'Divisions',
+        ],
+
     ],
 ];
