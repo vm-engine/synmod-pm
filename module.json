@@ -1,0 +1,53 @@
+{
+    "id": "pm",
+    "id_case": {
+        "snake": "pm",
+        "pascal": "Pm",
+        "slug": "pm",
+        "studly": "Pm"
+    },
+    "name": "Pm",
+    "description": "Pm Module",
+    "version": "0.1.0",
+    "author": "Adods",
+    "email": "theadods@gmail.com",
+    "url_prefix": "pm",
+    "dependencies": {
+        "npm": {
+            "main": {},
+            "dev": {}
+        },
+        "composer": {
+            "main": {},
+            "dev": {}
+        }
+    },
+    "nav": {
+        "backend": {
+            "name": "__pm::menu.be.parent",
+            "position": 1,
+            "class": "",
+            "icon": "fa-solid fa-table",
+            "acl": "pm.any",
+            "sub": {
+                "index": {
+                    "id": "index",
+                    "name": "__pm::menu.be.index",
+                    "route": "pm.index",
+                    "class": "",
+                    "icon": "fa-solid fa-table",
+                    "acl": "pm.manage"
+                }
+            }
+        }
+    },
+    "acl": {
+        "manage": {
+            "label": "__pm::acl.manage",
+            "create": 1,
+            "read": 1,
+            "update": 1,
+            "delete": 1
+        }
+    }
+}
