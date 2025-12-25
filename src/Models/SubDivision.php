@@ -9,10 +9,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use VmEngine\Pm\Factories\SubDivisionFactory;
+use VmEngine\Synapse\Traits\WithDeleteToken;
+use VmEngine\SynAuth\Traits\HasCreator;
+use VmEngine\SynAuth\Traits\HasUpdater;
 
 class SubDivision extends Model
 {
+    use HasCreator;
     use HasFactory;
+    use HasUpdater;
+    use WithDeleteToken;
 
     protected $fillable = [
         'division_id',

@@ -1,0 +1,33 @@
+Help me create CRUD Page for Client:
+* Use Example List and Example Form as reference
+* Filterable by:
+  * client category
+  * services
+  * status
+  * active
+  * searchable by: company, address, city, director, pic
+* For list:
+  * Use toggler for Active column
+* For forms, there will be 2 columns
+  * Left column for client data
+    * client category (dropdown)
+    * company
+    * address (textarea)
+    * city
+    * director
+    * pic
+    * phone
+    * services (Multiselect, try to use existing synapse multiselect-adv component, and the data is from Services enum class)
+    * social media (textarea)
+    * status (dropdown)
+    * active (toggle, try to use existing synapse toggler component)
+  * Right column for user data:
+    * name (auto fill, same as company)
+    * username
+    * email
+    * password
+  * Active status in client also update active status in user data
+  * If client status is still a prospect, then the user is also always inactive
+  * If client status is updated to active client, then related user is activated
+  * User email always verified
+  * Created user always has role defined in dbconf('pm.client_role_id')

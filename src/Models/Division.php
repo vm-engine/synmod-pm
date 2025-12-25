@@ -10,10 +10,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use VmEngine\Pm\Factories\DivisionFactory;
+use VmEngine\Synapse\Traits\WithDeleteToken;
+use VmEngine\SynAuth\Traits\HasCreator;
+use VmEngine\SynAuth\Traits\HasUpdater;
 
 class Division extends Model
 {
+    use HasCreator;
     use HasFactory;
+    use HasUpdater;
+    use WithDeleteToken;
 
     protected $fillable = [
         'name',

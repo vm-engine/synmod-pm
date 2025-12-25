@@ -7,6 +7,7 @@ return [
         'master' => [
             'parent' => 'Master Data',
             'division' => 'Divisions',
+            'client_category' => 'Client Categories',
         ],
 
     ],

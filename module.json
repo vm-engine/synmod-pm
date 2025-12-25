@@ -40,8 +40,15 @@
                             "id": "division",
                             "name": "__pm::menu.be.master.division",
                             "class": "",
-                            "route": "pm.index",
+                            "route": "pm.master.division",
                             "icon": "fa-solid fa-building"
+                        },
+                        "client_category": {
+                            "id": "client_category",
+                            "name": "__pm::menu.be.master.client_category",
+                            "class": "",
+                            "route": "pm.master.client_category",
+                            "icon": "fa-solid fa-tags"
                         }
                     }
                 }
@@ -49,7 +56,30 @@
         }
     },
     "acl": {
-        "manage": {
+        "master": {
+            "label": "__pm::acl.master.parent",
+            "create": 0,
+            "read": 1,
+            "update": 0,
+            "delete": 0,
+            "sub": {
+                "division": {
+                    "label": "__pm::acl.master.division",
+                    "create": 1,
+                    "read": 1,
+                    "update": 1,
+                    "delete": 1
+                },
+                "client_category": {
+                    "label": "__pm::acl.master.client_category",
+                    "create": 1,
+                    "read": 1,
+                    "update": 1,
+                    "delete": 1
+                }
+            }
+        },
+        "client": {
             "label": "__pm::acl.manage",
             "create": 1,
             "read": 1,
