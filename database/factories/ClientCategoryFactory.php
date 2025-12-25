@@ -19,10 +19,12 @@ class ClientCategoryFactory extends Factory
      */
     public function definition(): array
     {
+        $UserModel = config('auth.providers.users.model');
+
         return [
             'name' => fake()->words(2, true),
             'description' => fake()->sentence(),
-            'created_by' => 1,
+            'created_by' => $UserModel::factory(),
             'updated_by' => null,
         ];
     }

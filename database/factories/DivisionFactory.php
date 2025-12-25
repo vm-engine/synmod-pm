@@ -19,9 +19,11 @@ class DivisionFactory extends Factory
      */
     public function definition(): array
     {
+        $UserModel = config('auth.providers.users.model');
+
         return [
             'name' => fake()->words(2, true),
-            'created_by' => 1,
+            'created_by' => $UserModel::factory(),
             'updated_by' => null,
         ];
     }

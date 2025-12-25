@@ -20,8 +20,10 @@ class ProjectFactory extends Factory
      */
     public function definition(): array
     {
+        $UserModel = config('auth.providers.users.model');
+
         return [
-            'user_id' => 1,
+            'user_id' => $UserModel::factory(),
             'division_id' => Division::factory(),
             'name' => fake()->sentence(4),
             'description' => fake()->paragraph(),
@@ -32,7 +34,7 @@ class ProjectFactory extends Factory
             'source_of_sales' => fake()->numberBetween(1, 6),
             'url' => fake()->url(),
             'status' => fake()->numberBetween(0, 100),
-            'created_by' => 1,
+            'created_by' => $UserModel::factory(),
             'updated_by' => null,
         ];
     }

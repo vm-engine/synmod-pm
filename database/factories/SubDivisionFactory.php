@@ -20,10 +20,12 @@ class SubDivisionFactory extends Factory
      */
     public function definition(): array
     {
+        $UserModel = config('auth.providers.users.model');
+
         return [
             'division_id' => Division::factory(),
             'name' => fake()->words(3, true),
-            'created_by' => 1,
+            'created_by' => $UserModel::factory(),
             'updated_by' => null,
         ];
     }

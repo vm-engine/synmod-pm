@@ -20,8 +20,10 @@ class ClientFactory extends Factory
      */
     public function definition(): array
     {
+        $UserModel = config('auth.providers.users.model');
+
         return [
-            'user_id' => 1,
+            'user_id' => $UserModel::factory(),
             'client_category_id' => ClientCategory::factory(),
             'company' => fake()->company(),
             'address' => fake()->address(),
@@ -42,7 +44,7 @@ class ClientFactory extends Factory
             'status' => fake()->randomElement([Client::STATUS_PROSPECT, Client::STATUS_ACTIVE]),
             'active' => fake()->boolean(90),
             'is_proposal' => fake()->boolean(20),
-            'created_by' => 1,
+            'created_by' => $UserModel::factory(),
             'updated_by' => null,
         ];
     }
