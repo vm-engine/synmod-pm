@@ -4,16 +4,24 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use VmEngine\Pm\Factories\ClientFactory;
+use VmEngine\Synapse\Traits\WithDeleteToken;
+use VmEngine\SynAuth\Traits\HasCreator;
+use VmEngine\SynAuth\Traits\HasUpdater;
 
 class Client extends Model
 {
+    use HasCreator;
     use HasFactory;
+    use HasUpdater;
+    use WithDeleteToken;
 
     // Status constants
     public const STATUS_PROSPECT = 0;
@@ -146,5 +154,33 @@ class Client extends Model
     public function scopeInactive($query)
     {
         return $query->where('active', false);
+    }
+
+    /**
+     * Scope a query to search across multiple client fields.
+     */
+    #[Scope]
+    protected function search(Builder $builder, string $q): void
+    {
+        $builder->whereAny([
+            'company', 'address', 'city', 'director', 'pic',
+        ], 'like', "%{$q}%");
+    }
+
+    /**
+     * Scope a query to filter by services (ANY match).
+     */
+    #[Scope]
+    protected function byServiceAny(Builder $builder, array $services): void
+    {
+        if (empty($services)) {
+            return;
+        }
+
+        $builder->where(function (Builder $q) use ($services) {
+            foreach ($services as $service) {
+                $q->orWhereJsonContains('services', (int) $service);
+            }
+        });
     }
 }

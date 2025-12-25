@@ -1,6 +1,6 @@
 {
     "name": "vm-engine/synmod-pm",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Pm module for Laravel Synapse",
     "keywords": ["laravel", "synapse", "module", "livewire"],
     "type": "synapse-module",

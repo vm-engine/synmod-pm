@@ -16,10 +16,10 @@ use VmEngine\SynAuth\Traits\HasUpdater;
 
 class ClientCategory extends Model
 {
-    use HasFactory;
-    use WithDeleteToken;
     use HasCreator;
+    use HasFactory;
     use HasUpdater;
+    use WithDeleteToken;
 
     protected $fillable = [
         'name',

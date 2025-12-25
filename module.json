@@ -30,6 +30,13 @@
             "icon": "fa-solid fa-table",
             "acl": "pm.any",
             "sub": {
+                "client": {
+                    "id": "client",
+                    "name": "__pm::menu.be.client.index",
+                    "class": "",
+                    "route": "pm.client.index",
+                    "icon": "fa-solid fa-users"
+                },
                 "master": {
                     "id": "master",
                     "name": "__pm::menu.be.master.parent",

@@ -9,10 +9,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use VmEngine\Pm\Factories\ProjectFactory;
+use VmEngine\Synapse\Traits\WithDeleteToken;
+use VmEngine\SynAuth\Traits\HasCreator;
+use VmEngine\SynAuth\Traits\HasUpdater;
 
 class Project extends Model
 {
+    use HasCreator;
     use HasFactory;
+    use HasUpdater;
+    use WithDeleteToken;
 
     protected $fillable = [
         'user_id',

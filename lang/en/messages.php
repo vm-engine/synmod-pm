@@ -10,5 +10,22 @@ return [
     'client_category_created_successfully' => 'Client category created successfully.',
     'client_category_updated_successfully' => 'Client category updated successfully.',
     'client_category_deleted_successfully' => 'Client category deleted successfully.',
+
+    // Client messages
+    'client_created_successfully' => 'Client created successfully.',
+    'client_updated_successfully' => 'Client updated successfully.',
+    'client_deleted_successfully' => 'Client deleted successfully.',
+    'client_status_updated' => 'Client status updated.',
+    'client_not_found' => 'Client not found.',
+
+    // Confirmation messages
+    'delete_confirmation_title' => 'Delete Client',
+    'delete_confirmation_message' => 'Are you sure you want to delete ":company"? This action cannot be undone.',
+    'delete_confirmation_confirm' => 'Yes, Delete',
+    'delete_confirmation_cancel' => 'Cancel',
+
+    // General
     'invalid_delete_token' => 'Invalid delete token.',
+    'error' => 'Error',
+    'success' => 'Success',
 ];

@@ -38,6 +38,21 @@ php artisan mod-pm:migrate-old mysql_old
 php artisan mod-pm:migrate-old mysql_old --skip-missing
 ```
 
+### Client User Status Sync
+```bash
+# Sync all client user active status
+php artisan mod-pm:sync-client-user-status
+
+# With detailed output for each client
+php artisan mod-pm:sync-client-user-status --show-details
+
+# Force update all users regardless of current status
+php artisan mod-pm:sync-client-user-status --force
+
+# Both detailed output and force update
+php artisan mod-pm:sync-client-user-status --force --show-details
+```
+
 ### Module Discovery (in parent Laravel app)
 ```bash
 php artisan synapps:discover       # Discover and register Synapse modules
@@ -113,6 +128,39 @@ The `MigrateOldDataCommand` performs idempotent migration from legacy database:
 - `active` boolean → `status` integer
 - `photo` → `avatar`
 
+### Client CRUD System
+
+The Client CRUD implementation follows Laravel Synapse's standalone page pattern with a Form Object architecture:
+
+**Components:**
+- `ClientList` - Livewire component for client listing with advanced filtering
+- `ClientForm` - Livewire component for create/edit forms
+- `ClientFormObject` - Form class handling business logic and validation
+
+**Key Features:**
+1. **Dual-Model Management**: Creates/updates both Client and User models in single transaction
+2. **Auto User Creation**: Automatically creates user account when creating client
+3. **Role Assignment**: Assigns client role from `dbconf('pm.client_role_id')`
+4. **Status Enforcement**:
+   - Prospect clients → user.active = false (always)
+   - Active clients with active=true → user.active = true
+   - Active clients with active=false → user.active = false
+5. **Email Verification**: All client users have `email_verified_at` set automatically
+6. **Password Handling**: Required on create, optional on edit (blank keeps existing)
+
+**Filtering:**
+- Client categories (multi-select)
+- Services (multi-select ANY match using `whereJsonContains`)
+- Status (prospect/active)
+- Active status (boolean)
+- Full-text search across: company, address, city, director, pic
+
+**Validation:**
+- Follows synapps-auth standards for user fields
+- Password: min 8 chars, mixed case, numbers, symbols
+- Username: Uses `UsernameRule` validation
+- Mode-based username requirement (respects `config('synapps.auth.login_credential')`)
+
 ### Seeders and Factories
 
 **Seeder Idempotency:**
@@ -129,25 +177,47 @@ ClientFactory includes states for different scenarios:
 
 ```
 src/
-├── Console/Commands/     # Artisan commands
-├── Models/              # Eloquent models with relationships
-└── PmServiceProvider.php # Service provider (registers commands)
+├── Console/Commands/
+│   ├── MigrateOldDataCommand.php          # Data migration from legacy DB
+│   └── SyncClientUserStatusCommand.php    # Sync client user active status
+├── Form/
+│   └── ClientFormObject.php               # Client form business logic
+├── Livewire/
+│   ├── ClientList.php                     # Client listing component
+│   ├── ClientForm.php                     # Client form component
+│   └── Master/
+│       ├── Division.php                   # Division master data
+│       └── ClientCategory.php             # Client category master data
+├── Models/
+│   ├── Client.php                         # Client model
+│   ├── ClientCategory.php                 # Client category model
+│   ├── Division.php                       # Division model
+│   ├── SubDivision.php                    # Sub division model
+│   └── Project.php                        # Project model
+├── Enums/
+│   └── Services.php                       # Services enum
+└── PmServiceProvider.php                  # Service provider
 
 database/
-├── migrations/          # Database schema (timestamped)
-├── factories/          # Model factories for testing
-└── seeders/           # Database seeders (idempotent)
+├── migrations/                            # Database schema (timestamped)
+├── factories/                             # Model factories for testing
+└── seeders/                              # Database seeders (idempotent)
 
 routes/
-├── web.php            # Frontend routes
-└── web.backend.php    # Backend admin routes
+├── web.php                               # Frontend routes
+└── web.backend.php                       # Backend admin routes
 
-resources/views/livewire/  # Livewire component views
+resources/views/livewire/
+├── client-list.blade.php                 # Client list view
+├── client-form.blade.php                 # Client form view
+└── master/                               # Master data views
 
-lang/
-├── en/acl.php         # ACL translations
-├── en/labels.php      # Field label translations
-└── en/menu.php        # Menu label translations
+lang/en/
+├── acl.php                               # ACL translations
+├── labels.php                            # Field label translations
+├── menu.php                              # Menu label translations
+├── client.php                            # Client-specific translations
+└── messages.php                          # System messages
 ```
 
 ## Important Conventions

@@ -237,7 +237,7 @@ class MigrateOldDataCommand extends Command
         foreach ($clients as $oldClient) {
             try {
                 // Check if user exists
-                $userExists = DB::table('users')->where('id', $oldClient->user_id)->exists();
+                $userExists = DB::table('users')->where('id', $oldClient->user_id)->first();
 
                 if (! $userExists) {
                     if ($this->option('skip-missing')) {
@@ -272,8 +272,8 @@ class MigrateOldDataCommand extends Command
                         'phone' => $oldClient->phone,
                         'services' => $services,
                         'social_media' => $socialMedia,
-                        'status' => Client::STATUS_ACTIVE, // Default to active for existing clients
-                        'active' => true,
+                        'status' => $userExists->status ? Client::STATUS_ACTIVE : Client::STATUS_PROSPECT, // Default to active for existing clients
+                        'active' => (bool) $userExists->status,
                         'is_proposal' => (bool) $oldClient->is_proposal,
                         'created_at' => $oldClient->created_at,
                         'updated_at' => $oldClient->updated_at,
