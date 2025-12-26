@@ -30,6 +30,13 @@
             "icon": "fa-solid fa-table",
             "acl": "pm.any",
             "sub": {
+                "project": {
+                    "id": "project",
+                    "name": "__pm::menu.be.project.index",
+                    "class": "",
+                    "route": "pm.project.index",
+                    "icon": "fa-solid fa-diagram-project"
+                },
                 "client": {
                     "id": "client",
                     "name": "__pm::menu.be.client.index",
@@ -56,6 +63,13 @@
                             "class": "",
                             "route": "pm.master.client_category",
                             "icon": "fa-solid fa-tags"
+                        },
+                        "project_category": {
+                            "id": "project_category",
+                            "name": "__pm::menu.be.master.project_category",
+                            "class": "",
+                            "route": "pm.master.project_category",
+                            "icon": "fa-solid fa-folder-tree"
                         }
                     }
                 }
@@ -63,6 +77,20 @@
         }
     },
     "acl": {
+        "project": {
+            "label": "__pm::acl.project.label",
+            "create": 1,
+            "read": 1,
+            "update": 1,
+            "delete": 1
+        },
+        "client": {
+            "label": "__pm::acl.client.label",
+            "create": 1,
+            "read": 1,
+            "update": 1,
+            "delete": 1
+        },
         "master": {
             "label": "__pm::acl.master.parent",
             "create": 0,
@@ -83,15 +111,15 @@
                     "read": 1,
                     "update": 1,
                     "delete": 1
+                },
+                "project_category": {
+                    "label": "__pm::acl.master.project_category",
+                    "create": 1,
+                    "read": 1,
+                    "update": 1,
+                    "delete": 1
                 }
             }
-        },
-        "client": {
-            "label": "__pm::acl.manage",
-            "create": 1,
-            "read": 1,
-            "update": 1,
-            "delete": 1
         }
     }
 }

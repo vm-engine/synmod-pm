@@ -1,33 +1,18 @@
-Help me create CRUD Page for Client:
-* Use Example List and Example Form as reference
-* Filterable by:
-  * client category
-  * services
-  * status
-  * active
-  * searchable by: company, address, city, director, pic
-* For list:
-  * Use toggler for Active column
-* For forms, there will be 2 columns
-  * Left column for client data
-    * client category (dropdown)
-    * company
-    * address (textarea)
-    * city
-    * director
-    * pic
-    * phone
-    * services (Multiselect, try to use existing synapse multiselect-adv component, and the data is from Services enum class)
-    * social media (textarea)
-    * status (dropdown)
-    * active (toggle, try to use existing synapse toggler component)
-  * Right column for user data:
-    * name (auto fill, same as company)
-    * username
-    * email
-    * password
-  * Active status in client also update active status in user data
-  * If client status is still a prospect, then the user is also always inactive
-  * If client status is updated to active client, then related user is activated
-  * User email always verified
-  * Created user always has role defined in dbconf('pm.client_role_id')
+Help me create the project pages. I still don't have good reference about the UI/UX
+The base table is `projects`, and i would like to make some adjustments:
+* rename sub_division to sub_division_id
+* remove type_of_client, since now we already have client_categories
+* rename pricing to nominal
+* change status to unsignedTinyInt
+* source_of_sales data are from SalesSources enum
+* add:
+  * services - multidropdown from Services Enum
+  * progress - project completion percentage
+  * client_pic - string, client PIC for the project
+  * client_pic_phone - string
+  * project_start - date
+  * project_end - date
+  * manager - string
+* what do you think we should add or what data usually a project needs that i'm missing
+I'll let you decide on the UI/UX for project list, creation and detail
+* Rather than just edit the project, create a detailed template for project details not just form for editing current project data, including all possible component that we will probably need when extending the module

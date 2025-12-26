@@ -1,0 +1,42 @@
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('projects', function (Blueprint $table) {
+            // Rename old status column to old_status (to preserve old data)
+            $table->renameColumn('status', 'old_status');
+        });
+
+        Schema::table('projects', function (Blueprint $table) {
+            // Add new status column for ProjectStatus enum (after progress)
+            $table->unsignedTinyInteger('status')->default(1)->after('progress');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('projects', function (Blueprint $table) {
+            // Drop the new status column
+            $table->dropColumn('status');
+        });
+
+        Schema::table('projects', function (Blueprint $table) {
+            // Rename old_status back to status
+            $table->renameColumn('old_status', 'status');
+        });
+    }
+};

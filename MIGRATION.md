@@ -93,7 +93,16 @@ The command will:
 - New table: `projects`
 - **Data Transformations:**
   - `sub_division`: Comma-separated string → JSON array of integers
-  - Example: `"1, 2, 3"` → `[1, 2, 3]`
+    - Example: `"1, 2, 3"` → `[1, 2, 3]`
+  - `status`: Old status values mapped to new ProjectStatus enum
+    - `0` → `0` (PROSPECT)
+    - `1` → `1` (PLANNING)
+    - `2` → `2` (IN_PROGRESS)
+    - `3` → `3` (ON_HOLD)
+    - `4, 100` → `4` (COMPLETED) - Legacy value 100 is mapped to COMPLETED
+    - `5` → `5` (CANCELLED)
+    - `6` → `6` (MAINTENANCE)
+    - Any unknown value → `1` (PLANNING)
 
 ## Idempotency
 

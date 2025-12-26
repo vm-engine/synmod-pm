@@ -232,6 +232,26 @@ public function user(): BelongsTo
 }
 ```
 
+### Livewire Component Registration
+**CRITICAL:** All Livewire components MUST be registered in the `PmServiceProvider` class.
+
+When creating a new Livewire component:
+1. Import the component class at the top of `src/PmServiceProvider.php`
+2. Register it in the `registerComponents()` method using `Livewire::component()`
+
+Example:
+```php
+// In PmServiceProvider.php imports
+use VmEngine\Pm\Livewire\Master\ProjectCategory;
+
+// In registerComponents() method
+Livewire::component('pm::master.project-category', ProjectCategory::class);
+```
+
+Component naming convention:
+- Main components: `pm::component-name` (e.g., `pm::client-list`, `pm::project-form`)
+- Master data components: `pm::master.component-name` (e.g., `pm::master.division`)
+
 ### Module Configuration
 The `module.json` file defines:
 - Navigation menus with translation keys (prefix: `__pm::`)

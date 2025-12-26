@@ -12,7 +12,10 @@
       "Bash(vendor/bin/pest:*)",
       "Bash(git tag -a v0.2.0 -m \"$\\(cat <<''EOF''\nRelease v0.2.0\n\nAdded:\n- Client CRUD System with user account integration\n- Advanced filtering \\(categories, services, status, active\\)\n- Full-text search across multiple fields\n- Inline active toggler syncing client and user status\n- Status enforcement logic for prospect/active clients\n- SyncClientUserStatus command \\(--show-details, --force\\)\n- Comprehensive translation system\n- Updated documentation \\(README.md, CLAUDE.md\\)\n\nFixed:\n- User status field usage \\(active → status\\)\n- Form validation for password on edit\n- Array format for synapse-select components\n- Code formatting with Laravel Pint\n\n🤖 Generated with Claude Code\nEOF\n\\)\")",
       "Bash(php artisan make:test:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(git tag:*)",
+      "Bash(php artisan migrate:status:*)",
+      "Bash(php artisan:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

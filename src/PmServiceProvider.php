@@ -12,6 +12,10 @@ use VmEngine\Pm\Livewire\ClientForm;
 use VmEngine\Pm\Livewire\ClientList;
 use VmEngine\Pm\Livewire\Master\ClientCategory;
 use VmEngine\Pm\Livewire\Master\Division;
+use VmEngine\Pm\Livewire\Master\ProjectCategory;
+use VmEngine\Pm\Livewire\ProjectDetail;
+use VmEngine\Pm\Livewire\ProjectForm;
+use VmEngine\Pm\Livewire\ProjectList;
 
 class PmServiceProvider extends ServiceProvider
 {
@@ -35,7 +39,11 @@ class PmServiceProvider extends ServiceProvider
     {
         Livewire::component('pm::client-list', ClientList::class);
         Livewire::component('pm::client-form', ClientForm::class);
+        Livewire::component('pm::project-list', ProjectList::class);
+        Livewire::component('pm::project-form', ProjectForm::class);
+        Livewire::component('pm::project-detail', ProjectDetail::class);
         Livewire::component('pm::master.division', Division::class);
         Livewire::component('pm::master.client-category', ClientCategory::class);
+        Livewire::component('pm::master.project-category', ProjectCategory::class);
     }
 }

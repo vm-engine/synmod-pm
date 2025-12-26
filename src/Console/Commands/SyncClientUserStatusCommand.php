@@ -19,7 +19,7 @@ class SyncClientUserStatusCommand extends Command
     /**
      * The console command description.
      */
-    protected $description = 'Sync all client user active status based on client status and active flag';
+    protected $description = 'Sync all client user active status and name based on client data';
 
     /**
      * Execute the console command.
@@ -54,6 +54,7 @@ class SyncClientUserStatusCommand extends Command
 
         $updated = 0;
         $skipped = 0;
+        $namesSynced = 0;
         $errors = 0;
 
         foreach ($clients as $client) {
@@ -62,27 +63,48 @@ class SyncClientUserStatusCommand extends Command
                 // User should be active only if client status is ACTIVE (1) AND client is active
                 $shouldBeActive = $client->status === Client::STATUS_ACTIVE && $client->active;
                 $currentlyActive = (bool) $client->user->status;
+                $needsNameSync = empty($client->user->name);
 
                 $statusText = $client->status === Client::STATUS_PROSPECT ? 'PROSPECT' : 'ACTIVE';
 
                 if ($showDetails) {
                     $this->line(sprintf(
-                        'Client #%d (%s) | Status: %s | Client Active: %s | User Active: %s -> %s',
+                        'Client #%d (%s) | Status: %s | Client Active: %s | User Active: %s -> %s%s',
                         $client->id,
                         $client->company,
                         $statusText,
                         $client->active ? 'Yes' : 'No',
                         $currentlyActive ? 'Yes' : 'No',
-                        $shouldBeActive ? 'Yes' : 'No'
+                        $shouldBeActive ? 'Yes' : 'No',
+                        $needsNameSync ? ' | Name: Empty' : ''
                     ));
                 }
 
-                if ($force || $shouldBeActive !== $currentlyActive) {
-                    $client->user->update(['status' => $shouldBeActive]);
+                $dataToUpdate = [];
+                $statusNeedsUpdate = $force || $shouldBeActive !== $currentlyActive;
+
+                if ($statusNeedsUpdate) {
+                    $dataToUpdate['status'] = $shouldBeActive;
+                }
+
+                if ($needsNameSync) {
+                    $dataToUpdate['name'] = $client->company;
+                    $namesSynced++;
+                }
+
+                if (! empty($dataToUpdate)) {
+                    $client->user->update($dataToUpdate);
                     $updated++;
 
                     if ($showDetails) {
-                        $this->info("  ✓ Updated user #{$client->user->id}");
+                        $updates = [];
+                        if (isset($dataToUpdate['status'])) {
+                            $updates[] = 'status';
+                        }
+                        if (isset($dataToUpdate['name'])) {
+                            $updates[] = 'name';
+                        }
+                        $this->info('  ✓ Updated user #'.$client->user->id.' ('.implode(', ', $updates).')');
                     }
                 } else {
                     $skipped++;
@@ -117,6 +139,7 @@ class SyncClientUserStatusCommand extends Command
             ['Status', 'Count'],
             [
                 ['Updated', $updated],
+                ['Names synced', $namesSynced],
                 ['Already correct', $skipped],
                 ['Errors', $errors],
                 ['Total processed', $totalClients],

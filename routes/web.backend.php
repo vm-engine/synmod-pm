@@ -5,11 +5,25 @@ use VmEngine\Pm\Livewire\ClientForm;
 use VmEngine\Pm\Livewire\ClientList;
 use VmEngine\Pm\Livewire\Master\ClientCategory;
 use VmEngine\Pm\Livewire\Master\Division;
+use VmEngine\Pm\Livewire\Master\ProjectCategory;
+use VmEngine\Pm\Livewire\ProjectDetail;
+use VmEngine\Pm\Livewire\ProjectForm;
+use VmEngine\Pm\Livewire\ProjectList;
 
 Route::group([], function () {
     Route::get('/', function () {
         return view('pm::livewire.index');
     })->name('index')->middleware('can-access:pm.manage');
+
+    // Project routes
+    Route::get('/project', ProjectList::class)
+        ->name('project.index')->middleware('can-access:pm.project.read');
+    Route::get('/project/create', ProjectForm::class)
+        ->name('project.create')->middleware('can-access:pm.project.create');
+    Route::get('/project/{id}/edit', ProjectForm::class)
+        ->name('project.edit')->middleware('can-access:pm.project.update');
+    Route::get('/project/{id}', ProjectDetail::class)
+        ->name('project.detail')->middleware('can-access:pm.project.read');
 
     // Client routes
     Route::get('/client', ClientList::class)
@@ -24,4 +38,6 @@ Route::group([], function () {
         ->name('master.division')->middleware('can-access:pm.master.division');
     Route::get('/master/client-category', ClientCategory::class)
         ->name('master.client_category')->middleware('can-access:pm.master.client_category');
+    Route::get('/master/project-category', ProjectCategory::class)
+        ->name('master.project_category')->middleware('can-access:pm.master.project_category');
 });

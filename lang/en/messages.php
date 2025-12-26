@@ -10,6 +10,9 @@ return [
     'client_category_created_successfully' => 'Client category created successfully.',
     'client_category_updated_successfully' => 'Client category updated successfully.',
     'client_category_deleted_successfully' => 'Client category deleted successfully.',
+    'project_category_created_successfully' => 'Project category created successfully.',
+    'project_category_updated_successfully' => 'Project category updated successfully.',
+    'project_category_deleted_successfully' => 'Project category deleted successfully.',
 
     // Client messages
     'client_created_successfully' => 'Client created successfully.',
@@ -17,6 +20,12 @@ return [
     'client_deleted_successfully' => 'Client deleted successfully.',
     'client_status_updated' => 'Client status updated.',
     'client_not_found' => 'Client not found.',
+
+    // Project messages
+    'project_created_successfully' => 'Project created successfully.',
+    'project_updated_successfully' => 'Project updated successfully.',
+    'project_deleted_successfully' => 'Project deleted successfully.',
+    'project_not_found' => 'Project not found.',
 
     // Confirmation messages
     'delete_confirmation_title' => 'Delete Client',

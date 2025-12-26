@@ -354,6 +354,9 @@ class MigrateOldDataCommand extends Command
                 // Parse sub_division field (comma-separated string to array)
                 $subDivision = $this->parseSubDivision($oldProject->sub_division);
 
+                // Map old status to new ProjectStatus enum
+                $newStatus = $this->mapProjectStatus($oldProject->status);
+
                 Project::updateOrCreate(
                     ['id' => $oldProject->id],
                     [
@@ -367,7 +370,7 @@ class MigrateOldDataCommand extends Command
                         'pricing' => $oldProject->pricing,
                         'source_of_sales' => $oldProject->source_of_sales,
                         'url' => $oldProject->url,
-                        'status' => $oldProject->status,
+                        'status' => $newStatus,
                         'created_at' => $oldProject->created_at,
                         'updated_at' => $oldProject->updated_at,
                         'created_by' => $createdByExists ? $oldProject->created_by : 1,
@@ -491,5 +494,33 @@ class MigrateOldDataCommand extends Command
         $items = array_filter(array_map('intval', $items));
 
         return ! empty($items) ? array_values($items) : null;
+    }
+
+    /**
+     * Map old project status values to new ProjectStatus enum values.
+     */
+    protected function mapProjectStatus(?int $oldStatus): int
+    {
+        // Map old status values to new ProjectStatus enum
+        // Old system values -> New enum values:
+        // 0 = Prospect -> 0 (PROSPECT)
+        // 1 = Planning -> 1 (PLANNING)
+        // 2 = In Progress -> 2 (IN_PROGRESS)
+        // 3 = On Hold -> 3 (ON_HOLD)
+        // 4 = Completed -> 4 (COMPLETED)
+        // 5 = Cancelled -> 5 (CANCELLED)
+        // 6 = Maintenance -> 6 (MAINTENANCE)
+        // 100 = Completed (legacy value) -> 4 (COMPLETED)
+
+        return match ($oldStatus) {
+            0 => 0, // PROSPECT
+            1 => 1, // PLANNING
+            2 => 2, // IN_PROGRESS
+            3 => 3, // ON_HOLD
+            4, 100 => 4, // COMPLETED (100 is legacy "completed" status)
+            5 => 5, // CANCELLED
+            6 => 6, // MAINTENANCE
+            default => 1, // Default to PLANNING for unknown values
+        };
     }
 }
