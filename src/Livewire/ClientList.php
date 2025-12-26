@@ -205,6 +205,9 @@ class ClientList extends Component
         ])->toArray();
 
         $breadcrumbs = Breadcrumbs::make(
+            label: __('pm::menu.be.parent'),
+            icon: 'fa-solid fa-list',
+        )->add(
             label: __('pm::client.list_title'),
             icon: 'fa-solid fa-users',
         );
@@ -215,6 +218,6 @@ class ClientList extends Component
             'categories' => $categories,
             'services' => $services,
             'breadcrumbs' => $breadcrumbs,
-        ]);
+        ])->title(__('pm::client.list_title'));
     }
 }

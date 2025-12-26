@@ -295,6 +295,9 @@ class ProjectList extends Component
         ];
 
         $breadcrumbs = Breadcrumbs::make(
+            label: __('pm::menu.be.parent'),
+            icon: 'fa-solid fa-list',
+        )->add(
             label: __('pm::project.list_title'),
             icon: 'fa-solid fa-diagram-project',
         );
@@ -310,6 +313,6 @@ class ProjectList extends Component
             'years' => $years,
             'progressRanges' => $progressRanges,
             'breadcrumbs' => $breadcrumbs,
-        ]);
+        ])->title(__('pm::project.list_title'));
     }
 }

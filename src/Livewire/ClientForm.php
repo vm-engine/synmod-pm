@@ -53,11 +53,17 @@ class ClientForm extends Component
             'label' => $s->label(),
         ])->toArray();
 
-        $breadcrumbs = Breadcrumbs::make(__('pm::client.list_title'), backend_route('pm.client.index'), 'fa-solid fa-users')
-            ->add(
-                label: $this->form->client ? __('pm::client.edit_title') : __('pm::client.create_title'),
-                icon: 'fa-solid fa-pen'
-            );
+        $breadcrumbs = Breadcrumbs::make(
+            label: __('pm::menu.be.parent'),
+            icon: 'fa-solid fa-list',
+        )->add(
+            label: __('pm::client.list_title'),
+            url: backend_route('pm.client.index'),
+            icon: 'fa-solid fa-users'
+        )->add(
+            label: $this->form->client ? __('pm::client.edit_title') : __('pm::client.create_title'),
+            icon: 'fa-solid fa-pen'
+        );
 
         synav()->setActiveMenu('pm.client.index');
 
@@ -65,6 +71,6 @@ class ClientForm extends Component
             'categories' => $categories,
             'services' => $services,
             'breadcrumbs' => $breadcrumbs,
-        ]);
+        ])->title($this->form->client ? __('pm::client.edit_title') : __('pm::client.create_title'));
     }
 }

@@ -198,11 +198,17 @@ class ProjectForm extends Component
         ])->toArray();
         $users = $UserModel::select('id as value', 'name as label')->get()->toArray();
 
-        $breadcrumbs = Breadcrumbs::make(__('pm::project.list_title'), backend_route('pm.project.index'), 'fa-solid fa-diagram-project')
-            ->add(
-                label: $this->form->project ? __('pm::project.edit_title') : __('pm::project.create_title'),
-                icon: 'fa-solid fa-pen'
-            );
+        $breadcrumbs = Breadcrumbs::make(
+            label: __('pm::menu.be.parent'),
+            icon: 'fa-solid fa-list',
+        )->add(
+            label: __('pm::project.list_title'),
+            url: backend_route('pm.project.index'),
+            icon: 'fa-solid fa-diagram-project'
+        )->add(
+            label: $this->form->project ? __('pm::project.edit_title') : __('pm::project.create_title'),
+            icon: 'fa-solid fa-pen'
+        );
 
         synav()->setActiveMenu('pm.project.index');
 
@@ -218,6 +224,6 @@ class ProjectForm extends Component
             'riskLevels' => $riskLevels,
             'users' => $users,
             'breadcrumbs' => $breadcrumbs,
-        ]);
+        ])->title($this->form->project ? __('pm::project.edit_title') : __('pm::project.create_title'));
     }
 }

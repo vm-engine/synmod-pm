@@ -86,16 +86,22 @@ class ProjectDetail extends Component
 
     public function render()
     {
-        $breadcrumbs = Breadcrumbs::make(__('pm::project.list_title'), backend_route('pm.project.index'), 'fa-solid fa-diagram-project')
-            ->add(
-                label: $this->project->name,
-                icon: 'fa-solid fa-eye'
-            );
+        $breadcrumbs = Breadcrumbs::make(
+            label: __('pm::menu.be.parent'),
+            icon: 'fa-solid fa-list',
+        )->add(
+            label: __('pm::project.list_title'),
+            url: backend_route('pm.project.index'),
+            icon: 'fa-solid fa-diagram-project'
+        )->add(
+            label: $this->project->name,
+            icon: 'fa-solid fa-eye'
+        );
 
         synav()->setActiveMenu('pm.project.index');
 
         return view('pm::livewire.project-detail', [
             'breadcrumbs' => $breadcrumbs,
-        ]);
+        ])->title(__('pm::project.detail_title').': '.$this->project->name);
     }
 }

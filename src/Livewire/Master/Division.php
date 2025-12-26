@@ -266,6 +266,6 @@ class Division extends Component
 
         return view('pm::livewire.master.division', [
             'breadcrumbs' => $breadcrumbs,
-        ]);
+        ])->title(__('pm::labels.division'));
     }
 }
