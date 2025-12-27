@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace VmEngine\Pm\Livewire;
+namespace VmEngine\Pm\Livewire\Project;
 
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -304,7 +304,7 @@ class ProjectList extends Component
 
         synav()->setActiveMenu('pm.project.index');
 
-        return view('pm::livewire.project-list', [
+        return view('pm::livewire.project.project-list', [
             'divisions' => $divisions,
             'clients' => $clients,
             'services' => $services,

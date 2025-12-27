@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace VmEngine\Pm\Livewire;
+namespace VmEngine\Pm\Livewire\Project;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Attributes\Computed;
@@ -212,7 +212,7 @@ class ProjectForm extends Component
 
         synav()->setActiveMenu('pm.project.index');
 
-        return view('pm::livewire.project-form', [
+        return view('pm::livewire.project.project-form', [
             'divisions' => $divisions,
             'projectCategories' => $projectCategories,
             'initialClient' => $initialClient,
