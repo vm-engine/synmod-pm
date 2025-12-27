@@ -5,20 +5,20 @@ namespace VmEngine\Pm\Enums;
 enum Documents: int
 {
     case PROPOSAL = 0;
-    case SPK = 1;
-    case SOW = 2;
-    case TOR = 3;
-    case USE_CASE = 4;
-    case BLUEPRINT = 5;
-    case INVOICE = 6;
-    case RECEIPT = 7;
-    case BAST = 8;
-    case PANDUAN = 9;
-    case CHANGE_REQUEST = 10;
-    case BACKUP = 11;
-    case UAT = 12;
-    case BA = 13;
-    case SPH = 14;
+    case SPH = 1;
+    case SPK = 2;
+    case SOW = 3;
+    case TOR = 4;
+    case USE_CASE = 5;
+    case BLUEPRINT = 6;
+    case INVOICE = 7;
+    case RECEIPT = 8;
+    case BAST = 9;
+    case PANDUAN = 10;
+    case CHANGE_REQUEST = 11;
+    case BACKUP = 12;
+    case UAT = 13;
+    case BA = 14;
 
     public function label(): string
     {
@@ -41,9 +41,9 @@ enum Documents: int
         };
     }
 
-    public function code(): string
+    public function code($lowercase = false): string
     {
-        return match ($this) {
+        $code = match ($this) {
             Documents::PROPOSAL => '',
             Documents::SPK => 'SPK',
             Documents::SOW => 'SOW',
@@ -59,6 +59,16 @@ enum Documents: int
             Documents::UAT => 'UAT',
             Documents::BA => 'BA',
             Documents::SPH => 'SPH',
+        };
+
+        return $lowercase ? strtolower($code) : $code;
+    }
+
+    public function hasNCIndex(): bool
+    {
+        return match ($this) {
+            Documents::PROPOSAL, Documents::SPH => true,
+            default => false,
         };
     }
 }

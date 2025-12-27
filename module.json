@@ -72,6 +72,13 @@
                             "icon": "fa-solid fa-folder-tree"
                         }
                     }
+                },
+                "config": {
+                    "id": "config",
+                    "name": "__pm::menu.be.config.index",
+                    "class": "",
+                    "route": "pm.config",
+                    "icon": "fa-solid fa-gear"
                 }
             }
         }
@@ -120,6 +127,13 @@
                     "delete": 1
                 }
             }
+        },
+        "config": {
+            "label": "__pm::acl.config.label",
+            "create": 0,
+            "read": 1,
+            "update": 1,
+            "delete": 0
         }
     }
 }

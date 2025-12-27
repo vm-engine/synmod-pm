@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use VmEngine\Pm\Livewire\ClientForm;
 use VmEngine\Pm\Livewire\ClientList;
+use VmEngine\Pm\Livewire\Config;
 use VmEngine\Pm\Livewire\Master\ClientCategory;
 use VmEngine\Pm\Livewire\Master\Division;
 use VmEngine\Pm\Livewire\Master\ProjectCategory;
@@ -40,4 +41,7 @@ Route::group([], function () {
         ->name('master.client_category')->middleware('can-access:pm.master.client_category');
     Route::get('/master/project-category', ProjectCategory::class)
         ->name('master.project_category')->middleware('can-access:pm.master.project_category');
+
+    Route::get('/config', Config::class)
+        ->name('config')->middleware('can-access:pm.config.read');
 });

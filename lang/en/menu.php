@@ -21,6 +21,9 @@ return [
             'client_category' => 'Client Categories',
             'project_category' => 'Project Categories',
         ],
+        'config' => [
+            'index' => 'Configuration',
+        ],
 
     ],
 ];

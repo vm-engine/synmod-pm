@@ -10,6 +10,7 @@ use VmEngine\Pm\Console\Commands\MigrateOldDataCommand;
 use VmEngine\Pm\Console\Commands\SyncClientUserStatusCommand;
 use VmEngine\Pm\Livewire\ClientForm;
 use VmEngine\Pm\Livewire\ClientList;
+use VmEngine\Pm\Livewire\Config;
 use VmEngine\Pm\Livewire\Master\ClientCategory;
 use VmEngine\Pm\Livewire\Master\Division;
 use VmEngine\Pm\Livewire\Master\ProjectCategory;
@@ -45,5 +46,6 @@ class PmServiceProvider extends ServiceProvider
         Livewire::component('pm::master.division', Division::class);
         Livewire::component('pm::master.client-category', ClientCategory::class);
         Livewire::component('pm::master.project-category', ProjectCategory::class);
+        Livewire::component('pm::config', Config::class);
     }
 }
