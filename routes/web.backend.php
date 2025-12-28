@@ -7,9 +7,9 @@ use VmEngine\Pm\Livewire\Config;
 use VmEngine\Pm\Livewire\Master\ClientCategory;
 use VmEngine\Pm\Livewire\Master\Division;
 use VmEngine\Pm\Livewire\Master\ProjectCategory;
-use VmEngine\Pm\Livewire\ProjectDetail;
-use VmEngine\Pm\Livewire\ProjectForm;
-use VmEngine\Pm\Livewire\ProjectList;
+use VmEngine\Pm\Livewire\Project\ProjectDetail;
+use VmEngine\Pm\Livewire\Project\ProjectForm;
+use VmEngine\Pm\Livewire\Project\ProjectList;
 
 Route::group([], function () {
     Route::get('/', function () {
