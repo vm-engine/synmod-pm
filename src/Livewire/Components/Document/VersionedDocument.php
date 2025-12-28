@@ -6,10 +6,13 @@ namespace VmEngine\Pm\Livewire\Components\Document;
 
 use Livewire\Attributes\Computed;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use VmEngine\Pm\Models\Project;
 
 class VersionedDocument extends Component
 {
+    use WithFileUploads;
+
     public Project $project;
 
     public string $documentType;
@@ -17,6 +20,12 @@ class VersionedDocument extends Component
     public string $title;
 
     public string $badge = 'Versioned';
+
+    public $file;
+
+    public string $documentCode = '';
+
+    public string $notes = '';
 
     public function mount(Project $project, string $documentType, string $title, string $badge = 'Versioned'): void
     {
@@ -157,14 +166,33 @@ class VersionedDocument extends Component
         return $mockData[$this->documentType] ?? [];
     }
 
-    public function uploadDocument(): void
+    public function resetUploadForm(): void
     {
-        // TODO: Implement document upload
+        $this->file = null;
+        $this->documentCode = '';
+        $this->notes = '';
+        $this->resetValidation();
+    }
+
+    public function saveDocument(): void
+    {
+        // TODO: Implement actual file upload and database save
+        // Validation rules will be added here
+        // $this->validate([
+        //     'file' => 'required|file|max:10240',
+        //     'documentCode' => 'required|string|max:50',
+        //     'notes' => 'nullable|string|max:500',
+        // ]);
+
         $this->dispatch('notify', [
             'variant' => 'info',
             'title' => 'Coming Soon',
             'message' => 'Document upload functionality will be implemented soon',
         ]);
+
+        // Close modal and reset form
+        $this->dispatch('close-modal-upload-'.$this->documentType);
+        $this->resetUploadForm();
     }
 
     public function downloadDocument(int $documentId): void

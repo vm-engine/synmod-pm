@@ -13,16 +13,19 @@
 
     {{-- Filter/Search Bar --}}
     <div class="flex w-full gap-3">
-        <div class="flex-1 min-w-0">
+        <div class="min-w-0 flex-1">
             <input
-                type="text"
                 class="form-input w-full"
+                type="text"
                 placeholder="Search documents..."
                 wire:model.live.debounce.300ms="documentSearch"
             />
         </div>
         <div class="w-48 flex-shrink-0">
-            <select class="form-input w-full" wire:model.live="filterDocType">
+            <select
+                class="form-input w-full"
+                wire:model.live="filterDocType"
+            >
                 <option value="">All Types</option>
                 <option value="contract">Contract</option>
                 <option value="technical">Technical</option>
@@ -36,43 +39,63 @@
     {{-- Document Groups --}}
     <div class="space-y-3">
         {{-- Contract Documents (Versioned) --}}
-        @livewire('pm::components.document.versioned-document', [
-            'project' => $project,
-            'documentType' => 'contract',
-            'title' => 'Contract Documents',
-            'badge' => 'Versioned'
-        ], key('contract-'.$project->id))
+        @livewire(
+            'pm.components.document.versioned-document',
+            [
+                'project' => $project,
+                'documentType' => 'contract',
+                'title' => 'Contract Documents',
+                'badge' => 'Versioned',
+            ],
+            key('contract-' . $project->id)
+        )
 
         {{-- Technical Documents (Versioned) --}}
-        @livewire('pm::components.document.versioned-document', [
-            'project' => $project,
-            'documentType' => 'technical',
-            'title' => 'Technical Documents',
-            'badge' => 'Versioned'
-        ], key('technical-'.$project->id))
+        @livewire(
+            'pm.components.document.versioned-document',
+            [
+                'project' => $project,
+                'documentType' => 'technical',
+                'title' => 'Technical Documents',
+                'badge' => 'Versioned',
+            ],
+            key('technical-' . $project->id)
+        )
 
         {{-- Financial Documents (Versioned) --}}
-        @livewire('pm::components.document.versioned-document', [
-            'project' => $project,
-            'documentType' => 'financial',
-            'title' => 'Financial Documents',
-            'badge' => 'Versioned'
-        ], key('financial-'.$project->id))
+        @livewire(
+            'pm.components.document.versioned-document',
+            [
+                'project' => $project,
+                'documentType' => 'financial',
+                'title' => 'Financial Documents',
+                'badge' => 'Versioned',
+            ],
+            key('financial-' . $project->id)
+        )
 
         {{-- Deliverables (Multiple Files) --}}
-        @livewire('pm::components.document.multiple-document', [
-            'project' => $project,
-            'documentType' => 'deliverable',
-            'title' => 'Deliverables & Reports',
-            'badge' => 'Multiple Files'
-        ], key('deliverable-'.$project->id))
+        @livewire(
+            'pm.components.document.multiple-document',
+            [
+                'project' => $project,
+                'documentType' => 'deliverable',
+                'title' => 'Deliverables & Reports',
+                'badge' => 'Multiple Files',
+            ],
+            key('deliverable-' . $project->id)
+        )
 
         {{-- Backups (Multiple Files) --}}
-        @livewire('pm::components.document.multiple-document', [
-            'project' => $project,
-            'documentType' => 'backup',
-            'title' => 'Backups & Archives',
-            'badge' => 'Multiple Files'
-        ], key('backup-'.$project->id))
+        @livewire(
+            'pm.components.document.multiple-document',
+            [
+                'project' => $project,
+                'documentType' => 'backup',
+                'title' => 'Backups & Archives',
+                'badge' => 'Multiple Files',
+            ],
+            key('backup-' . $project->id)
+        )
     </div>
 </div>

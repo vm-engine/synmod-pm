@@ -86,21 +86,21 @@
                 </button>
                 <button
                     class="whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors"
-                    @click="activeTab = 'timeline'"
-                    :class="activeTab === 'timeline' ? 'border-brand-500 text-brand-600 dark:text-brand-400' :
-                        'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                >
-                    <span class="fa-solid fa-clock mr-2"></span>
-                    {{ __('pm::project.tab_timeline') }}
-                </button>
-                <button
-                    class="whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors"
                     @click="activeTab = 'documents'"
                     :class="activeTab === 'documents' ? 'border-brand-500 text-brand-600 dark:text-brand-400' :
                         'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
                 >
                     <span class="fa-solid fa-file mr-2"></span>
                     {{ __('pm::project.tab_documents') }}
+                </button>
+                <button
+                    class="whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors"
+                    @click="activeTab = 'timeline'"
+                    :class="activeTab === 'timeline' ? 'border-brand-500 text-brand-600 dark:text-brand-400' :
+                        'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                >
+                    <span class="fa-solid fa-clock mr-2"></span>
+                    {{ __('pm::project.tab_timeline') }}
                 </button>
                 <button
                     class="whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors"

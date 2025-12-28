@@ -2,7 +2,12 @@
     "name": "vm-engine/synmod-pm",
     "version": "0.2.1",
     "description": "Pm module for Laravel Synapse",
-    "keywords": ["laravel", "synapse", "module", "livewire"],
+    "keywords": [
+        "laravel",
+        "synapse",
+        "module",
+        "livewire"
+    ],
     "type": "synapse-module",
     "license": "MIT",
     "authors": [
@@ -15,7 +20,8 @@
         "php": "^8.2",
         "laravel/framework": "^11.0|^12.0",
         "livewire/livewire": "^3.0",
-        "vm-engine/synapse": "@dev"
+        "vm-engine/synapse": "@dev",
+        "vm-engine/synapps-auth": "@dev"
     },
     "require-dev": {
         "laravel/pint": "^1.0"
@@ -36,15 +42,25 @@
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../synapse"
-        }
-    ],
     "config": {
         "allow-plugins": {
             "pestphp/pest-plugin": true
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../synapps-auth",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "../synapse",
+            "options": {
+                "symlink": true
+            }
+        }
+    ]
 }
