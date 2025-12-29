@@ -192,7 +192,8 @@ class ProjectList extends Component
     #[Computed()]
     public function projectList()
     {
-        $query = Project::with(['division', 'client', 'user', 'projectManager']);
+        $query = Project::with(['division', 'client', 'user', 'projectManager', 'documents'])
+            ->withCount('documents');
 
         // SECURITY: If user has client role, only show their own projects
         $user = auth()->user();

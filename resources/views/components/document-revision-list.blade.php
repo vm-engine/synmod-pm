@@ -5,14 +5,14 @@
     <div class="px-5 py-8 text-center sm:px-6">
         <span class="fa-solid fa-file-pdf fa-3x mb-3 text-gray-300 dark:text-gray-700"></span>
         <p class="text-sm text-gray-500 dark:text-gray-500">
-            No documents uploaded yet
+            {{ __('pm::project_document.no_documents_uploaded') }}
         </p>
         <button
             class="btn primary btn-sm mt-3"
             @click="$dispatch('open-modal-upload-{{ $type->code(true) }}'); $wire.dispatch('reset-upload-form')"
         >
             <span class="fa-solid fa-upload mr-2"></span>
-            Upload First Document
+            {{ __('pm::project_document.upload_first_document') }}
         </button>
     </div>
 @else
@@ -56,15 +56,15 @@
                                     class="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
                                     <span>
                                         <span class="fa-solid fa-file-arrow-up mr-1"></span>
-                                        Version {{ $document->version ?? 1 }}
+                                        {{ __('pm::project_document.version') }} {{ $document->version ?? 1 }}
                                     </span>
                                     <span>
                                         <span class="fa-solid fa-calendar mr-1"></span>
-                                        {{ isset($document->updated_at) ? $document->updated_at->format('M d, Y') : 'N/A' }}
+                                        {{ isset($document->updated_at) ? $document->updated_at->format('M d, Y') : __('pm::project_document.na') }}
                                     </span>
                                     <span>
                                         <span class="fa-solid fa-user mr-1"></span>
-                                        {{ $document->creator->name ?? 'Unknown' }}
+                                        {{ $document->creator->name ?? __('pm::project_document.unknown') }}
                                     </span>
                                     <span>
                                         <span class="fa-solid fa-hard-drive mr-1"></span>
@@ -94,7 +94,7 @@
                                 @click="showVersions = !showVersions"
                             >
                                 <span class="fa-solid fa-clock-rotate-left mr-1"></span>
-                                <span x-text="showVersions ? 'Hide' : 'History'"></span>
+                                <span x-text="showVersions ? '{{ __('pm::project_document.hide') }}' : '{{ __('pm::project_document.history') }}'"></span>
                                 @if (count($documents) > 1)
                                     <span class="ml-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs dark:bg-blue-500/20">
                                         {{ count($documents) - 1 }}
@@ -106,16 +106,16 @@
                                 wire:click="uploadNewVersion({{ $document->id ?? 0 }})"
                             >
                                 <span class="fa-solid fa-upload mr-1"></span>
-                                <span class="hidden sm:inline">New Version</span>
+                                <span class="hidden sm:inline">{{ __('pm::project_document.new_version') }}</span>
                             </button>
                             <button
                                 class="btn danger btn-sm"
                                 type="button"
                                 wire:click="$dispatch('confirm-dialog', {
-                                    title: 'Delete Document',
-                                    message: 'Are you sure you want to delete this document? This action cannot be undone.',
-                                    confirmText: 'Delete',
-                                    cancelText: 'Cancel',
+                                    title: '{{ __('pm::project_document.delete_document_title') }}',
+                                    message: '{{ __('pm::project_document.delete_document_message') }}',
+                                    confirmText: '{{ __('pm::labels.delete') }}',
+                                    cancelText: '{{ __('pm::labels.cancel') }}',
                                     confirmColor: 'danger',
                                     icon: 'fa-solid fa-trash',
                                     wireMethod: 'confirmDeleteDocument',
@@ -140,7 +140,7 @@
                 >
                     <div class="rounded-lg bg-gray-50 px-4 py-3 dark:bg-gray-800/50">
                         <h6 class="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Revision History
+                            {{ __('pm::project_document.revision_history') }}
                         </h6>
                         @if (count($documents) > 1)
                             <div class="space-y-2">
@@ -157,12 +157,12 @@
                                                 {{ $document->number }}
                                                 @if ($document->is_current ?? false)
                                                     <span
-                                                        class="ml-2 text-xs text-blue-600 dark:text-blue-400">(Current)</span>
+                                                        class="ml-2 text-xs text-blue-600 dark:text-blue-400">({{ __('pm::project_document.current') }})</span>
                                                 @endif
                                             </div>
                                             <div class="text-xs text-gray-500">
-                                                {{ isset($document->created_at) ? $document->created_at->format('M d, Y g:i A') : 'N/A' }}
-                                                by {{ $document->creator->name ?? 'Unknown' }}
+                                                {{ isset($document->created_at) ? $document->created_at->format('M d, Y g:i A') : __('pm::project_document.na') }}
+                                                by {{ $document->creator->name ?? __('pm::project_document.unknown') }}
                                                 • {{ human_filesize($document->file_info['size']) }}
                                             </div>
                                             @if (isset($document->change_notes) && $document->change_notes)
@@ -175,7 +175,7 @@
                                     <div class="flex flex-shrink-0 gap-2">
                                         <button
                                             class="text-blue-600 hover:text-blue-700 dark:text-blue-400"
-                                            title="Download this version"
+                                            title="{{ __('pm::project_document.download_this_version') }}"
                                             wire:click="downloadVersion({{ $document->id ?? 0 }})"
                                         >
                                             <span class="fa-solid fa-download"></span>
@@ -185,7 +185,7 @@
                             </div>
                         @else
                             <p class="text-sm text-gray-500 dark:text-gray-500">
-                                No version history available
+                                {{ __('pm::project_document.no_version_history') }}
                             </p>
                         @endif
                     </div>

@@ -75,6 +75,37 @@ return [
     'tooltip_delete' => 'Delete',
     'tooltip_upload_version' => 'Upload new version',
 
+    // Empty states
+    'no_files_uploaded' => 'No files uploaded yet',
+    'no_documents_uploaded' => 'No documents uploaded yet',
+    'no_version_history' => 'No version history available',
+
+    // Action buttons
+    'upload_first_file' => 'Upload First File',
+    'upload_first_document' => 'Upload First Document',
+    'add_new_file' => 'Add New File',
+    'new_version' => 'New Version',
+    'hide' => 'Hide',
+    'history' => 'History',
+
+    // File info
+    'untitled' => 'Untitled',
+    'untitled_document' => 'Untitled Document',
+    'default_filename' => 'document.pdf',
+    'na' => 'N/A',
+    'unknown' => 'Unknown',
+    'current' => 'Current',
+
+    // Confirmation dialogs
+    'delete_file_title' => 'Delete File',
+    'delete_file_message' => 'Are you sure you want to delete this file? This action cannot be undone.',
+    'delete_document_title' => 'Delete Document',
+    'delete_document_message' => 'Are you sure you want to delete this document? This action cannot be undone.',
+
+    // Section titles
+    'revision_history' => 'Revision History',
+    'download_this_version' => 'Download this version',
+
     // Document types (from Documents enum)
     'types' => [
         'proposal' => 'Proposal',

@@ -25,7 +25,7 @@ class MultipleDocument extends Component
 
     public string $title;
 
-    public string $badge = 'Multiple Files';
+    public string $badge;
 
     public $file;
 
@@ -38,6 +38,7 @@ class MultipleDocument extends Component
         $this->project = $project;
         $this->documentTypeValue = $documentType->value;
         $this->title = $title;
+        $this->badge = __('pm::project_document.add_new_file');
 
         $this->resetUploadForm();
     }

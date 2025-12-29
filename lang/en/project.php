@@ -194,4 +194,14 @@ return [
     // Confirmations
     'confirm_delete' => 'Are you sure you want to delete this project?',
     'delete_warning' => 'This action cannot be undone.',
+
+    // Empty states
+    'no_projects_found' => 'No Projects Found',
+    'try_different_filters' => 'Try adjusting your filters or search criteria',
+
+    // Documents
+    'documents' => 'Documents',
+    'files' => 'files',
+    'no_documents' => 'No documents uploaded',
+    'document_count_files' => ':count files',
 ];

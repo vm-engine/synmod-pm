@@ -112,4 +112,46 @@ enum Documents: int
             Documents::BA => app(\VmEngine\Pm\Services\Documents\BeritaAcara::class),
         };
     }
+
+    public function color(): string
+    {
+        return match ($this) {
+            Documents::PROPOSAL => 'purple',
+            Documents::SPH => 'indigo',
+            Documents::SPK => 'blue',
+            Documents::SOW => 'cyan',
+            Documents::TOR => 'teal',
+            Documents::USE_CASE => 'green',
+            Documents::BLUEPRINT => 'lime',
+            Documents::INVOICE => 'yellow',
+            Documents::RECEIPT => 'amber',
+            Documents::BAST => 'orange',
+            Documents::PANDUAN => 'red',
+            Documents::CHANGE_REQUEST => 'pink',
+            Documents::BACKUP => 'fuchsia',
+            Documents::UAT => 'violet',
+            Documents::BA => 'rose',
+        };
+    }
+
+    public function icon(): string
+    {
+        return match ($this) {
+            Documents::PROPOSAL => 'fa-file-contract',
+            Documents::SPH => 'fa-file-invoice-dollar',
+            Documents::SPK => 'fa-handshake',
+            Documents::SOW => 'fa-file-lines',
+            Documents::TOR => 'fa-list-check',
+            Documents::USE_CASE => 'fa-diagram-project',
+            Documents::BLUEPRINT => 'fa-sitemap',
+            Documents::INVOICE => 'fa-file-invoice',
+            Documents::RECEIPT => 'fa-receipt',
+            Documents::BAST => 'fa-file-signature',
+            Documents::PANDUAN => 'fa-book',
+            Documents::CHANGE_REQUEST => 'fa-code-pull-request',
+            Documents::BACKUP => 'fa-database',
+            Documents::UAT => 'fa-clipboard-check',
+            Documents::BA => 'fa-file-pen',
+        };
+    }
 }

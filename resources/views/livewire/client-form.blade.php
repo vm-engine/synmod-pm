@@ -116,7 +116,7 @@
                             wire-model="form.services"
                             :options="$services"
                             :multiple="true"
-                            placeholder="Select services"
+                            placeholder="{{ __('pm::client.select_services') }}"
                         />
                         @error('form.services')
                             <p class="form-error-message">{{ $message }}</p>

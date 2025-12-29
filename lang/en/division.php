@@ -2,6 +2,8 @@
 
 return [
     'title' => 'Division Management',
+    'division' => 'Division',
+    'division_name' => 'Division Name',
     'titles' => [
         'delete' => 'Delete Division',
         'delete_sub' => 'Delete Sub Division',

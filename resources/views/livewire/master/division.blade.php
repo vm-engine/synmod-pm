@@ -17,13 +17,13 @@
                         <thead>
                             <tr>
                                 <th class="w-1">
-                                    <p>No.</p>
+                                    <p>{{ __('pm::labels.no') }}</p>
                                 </th>
                                 <th>
-                                    <p>Division</p>
+                                    <p>{{ __('pm::division.division') }}</p>
                                 </th>
                                 <th class="w-1">
-                                    <p>Actions</p>
+                                    <p>{{ __('pm::labels.actions') }}</p>
                                 </th>
                             </tr>
                         </thead>
@@ -45,7 +45,7 @@
                                                     class="form-input"
                                                     type="text"
                                                     wire:model.defer="editText"
-                                                    placeholder="Division Name"
+                                                    placeholder="{{ __('pm::division.division_name') }}"
                                                     wire:loading.attr="disabled"
                                                 />
                                                 <button
@@ -60,7 +60,7 @@
                                                         wire:loading.class="fa-spinner fa-spin"
                                                         wire:target="update({{ $list->id }})"
                                                     ></span>
-                                                    <span class="tooltip">Save</span>
+                                                    <span class="tooltip">{{ __('pm::labels.save') }}</span>
                                                 </button>
                                                 <button
                                                     class="btn danger has-tooltip group ml-2"
@@ -68,7 +68,7 @@
                                                     wire:click="cancelEdit"
                                                 >
                                                     <span class="fa-solid fa-xmark"></span>
-                                                    <span class="tooltip">Cancel</span>
+                                                    <span class="tooltip">{{ __('pm::labels.cancel') }}</span>
                                                 </button>
                                             @else
                                                 <p>{{ $list->name }}</p>
@@ -85,7 +85,7 @@
                                                     wire:click="edit({{ $list->id }})"
                                                 >
                                                     <span class="fa-solid fa-edit"></span>
-                                                    <span class="tooltip">Edit</span>
+                                                    <span class="tooltip">{{ __('pm::labels.edit') }}</span>
                                                 </button>
                                             @endif
                                             @endcanAccess
@@ -106,7 +106,7 @@
                                                 })"
                                             >
                                                 <span class="fa-solid fa-trash"></span>
-                                                <span class="tooltip">Delete</span>
+                                                <span class="tooltip">{{ __('pm::labels.delete') }}</span>
                                             </button>
                                             @endcanAccess
                                         </div>
@@ -130,7 +130,7 @@
                                                         class="form-input"
                                                         type="text"
                                                         wire:model.defer="editSubText"
-                                                        placeholder="Division Name"
+                                                        placeholder="{{ __('pm::division.division_name') }}"
                                                         wire:loading.attr="disabled"
                                                     />
                                                     <button
@@ -145,7 +145,7 @@
                                                             wire:loading.class="fa-spinner fa-spin"
                                                             wire:target="updateSub({{ $sub->id }})"
                                                         ></span>
-                                                        <span class="tooltip">Save</span>
+                                                        <span class="tooltip">{{ __('pm::labels.save') }}</span>
                                                     </button>
                                                     <button
                                                         class="btn danger has-tooltip group ml-2"
@@ -153,7 +153,7 @@
                                                         wire:click="cancelEdit"
                                                     >
                                                         <span class="fa-solid fa-xmark"></span>
-                                                        <span class="tooltip">Cancel</span>
+                                                        <span class="tooltip">{{ __('pm::labels.cancel') }}</span>
                                                     </button>
                                                 @else
                                                     <p>{{ $sub->name }}</p>
@@ -170,7 +170,7 @@
                                                         wire:click="editSub({{ $sub->id }})"
                                                     >
                                                         <span class="fa-solid fa-edit"></span>
-                                                        <span class="tooltip">Edit</span>
+                                                        <span class="tooltip">{{ __('pm::labels.edit') }}</span>
                                                     </button>
                                                 @endif
                                                 @endcanAccess
@@ -191,7 +191,7 @@
                                                 })"
                                                 >
                                                     <span class="fa-solid fa-trash"></span>
-                                                    <span class="tooltip">Delete</span>
+                                                    <span class="tooltip">{{ __('pm::labels.delete') }}</span>
                                                 </button>
                                                 @endcanAccess
                                             </div>
@@ -212,7 +212,7 @@
                                                 class="form-input"
                                                 type="text"
                                                 wire:model.defer="newSubDivision.{{ $list->id }}"
-                                                placeholder="Division Name"
+                                                placeholder="{{ __('pm::division.division_name') }}"
                                                 wire:loading.attr="disabled"
                                             />
                                             <button
@@ -227,7 +227,7 @@
                                                     wire:loading.class="fa-spinner fa-spin"
                                                     wire:target="storeSub({{ $list->id }})"
                                                 ></span>
-                                                <span class="tooltip">Save</span>
+                                                <span class="tooltip">{{ __('pm::labels.save') }}</span>
                                             </button>
                                         </div>
                                     </td>
@@ -246,7 +246,7 @@
                                             class="form-input"
                                             type="text"
                                             wire:model.defer="newDivision"
-                                            placeholder="Division Name"
+                                            placeholder="{{ __('pm::division.division_name') }}"
                                             wire:loading.attr="disabled"
                                         />
                                         <button
@@ -261,7 +261,7 @@
                                                 wire:loading.class="fa-spinner fa-spin"
                                                 wire:target="store"
                                             ></span>
-                                            <span class="tooltip">Save</span>
+                                            <span class="tooltip">{{ __('pm::labels.save') }}</span>
                                         </button>
                                     </div>
                                 </td>

@@ -20,7 +20,7 @@
                             <input
                                 class="form-input p-2"
                                 type="text"
-                                placeholder="Search"
+                                placeholder="{{ __('pm::labels.search') }}"
                             >
                         </div>
                     </div>
@@ -31,13 +31,13 @@
                             <thead>
                                 <tr>
                                     <th>
-                                        <p>No.</p>
+                                        <p>{{ __('pm::labels.no') }}</p>
                                     </th>
                                     <th>
-                                        <p>Name</p>
+                                        <p>{{ __('pm::labels.name') }}</p>
                                     </th>
                                     <th>
-                                        <p>Actions</p>
+                                        <p>{{ __('pm::labels.actions') }}</p>
                                     </th>
                                 </tr>
                             </thead>

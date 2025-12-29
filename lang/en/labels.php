@@ -9,4 +9,7 @@ return [
     'code' => 'Code',
     'description' => 'Description',
     'actions' => 'Actions',
+    'no' => 'No.',
+    'search' => 'Search',
+    'download' => 'Download',
 ];
