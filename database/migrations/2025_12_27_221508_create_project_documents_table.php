@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use VmEngine\Pm\Enums\Documents;
 
 return new class extends Migration
 {
@@ -14,7 +13,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('client_id')->constrained('clients')->onDelete('cascade');
             $table->foreignId('project_id')->constrained('projects')->onDelete('cascade');
-            $table->enum('type', Documents::cases());
+            $table->unsignedTinyInteger('type')->comment('Documents enum value');
             $table->string('number');
             $table->text('notes')->nullable();
             $table->string('file_path');

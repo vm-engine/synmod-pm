@@ -1,4 +1,4 @@
-<div x-data="{ pageName: '{{ $project->name }}', isHome: false, activeTab: 'overview' }">
+<div x-data="{ pageName: '{{ $project->name }}', isHome: false, activeTab: '{{ $activeTab }}' }">
     @include('synapps::components.layouts.partials.breadcrumbs')
 
     <!-- Project Header -->

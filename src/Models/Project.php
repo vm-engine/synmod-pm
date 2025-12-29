@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use VmEngine\Pm\Enums\Documents;
 use VmEngine\Pm\Enums\MaintenanceType;
 use VmEngine\Pm\Enums\ProjectPriority;
 use VmEngine\Pm\Enums\ProjectStatus;
@@ -169,6 +171,14 @@ class Project extends Model
     }
 
     /**
+     * Get the documents for this project.
+     */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(ProjectDocument::class);
+    }
+
+    /**
      * Search projects by query.
      */
     public function scopeSearch(Builder $query, string $q): Builder
@@ -266,5 +276,25 @@ class Project extends Model
     public function progressPercentage(): int
     {
         return $this->progress ?? 0;
+    }
+
+    public function hasProposalDocument(): bool
+    {
+        return $this->documents()->byType(Documents::PROPOSAL)->exists();
+    }
+
+    public function hasSPHDocument(): bool
+    {
+        return $this->documents()->byType(Documents::SPH)->exists();
+    }
+
+    public function hasSPKDocument(): bool
+    {
+        return $this->documents()->byType(Documents::SPK)->exists();
+    }
+
+    public function hasInvoiceDocument(): bool
+    {
+        return $this->documents()->byType(Documents::INVOICE)->exists();
     }
 }

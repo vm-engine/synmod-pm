@@ -4,10 +4,16 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Livewire\Components\Document;
 
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rules\File;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use VmEngine\Pm\Enums\Documents;
 use VmEngine\Pm\Models\Project;
+use VmEngine\Pm\Models\ProjectDocument;
+use VmEngine\Pm\Services\Documents\Base;
 
 class VersionedDocument extends Component
 {
@@ -15,11 +21,13 @@ class VersionedDocument extends Component
 
     public Project $project;
 
-    public string $documentType;
+    public int $documentTypeValue;
 
     public string $title;
 
     public string $badge = 'Versioned';
+
+    public bool $revisionMode = false;
 
     public $file;
 
@@ -27,236 +35,357 @@ class VersionedDocument extends Component
 
     public string $notes = '';
 
-    public function mount(Project $project, string $documentType, string $title, string $badge = 'Versioned'): void
+    public int $version = 1;
+
+    public function mount(Project $project, Documents $documentType, string $title): void
     {
         $this->project = $project;
-        $this->documentType = $documentType;
+        $this->documentTypeValue = $documentType->value;
         $this->title = $title;
-        $this->badge = $badge;
+
+        $this->resetUploadForm();
+    }
+
+    /**
+     * Get the document type enum instance.
+     */
+    protected function getDocumentType(): ?Documents
+    {
+        return Documents::tryFrom($this->documentTypeValue);
+    }
+
+    /**
+     * Get the document handler singleton instance.
+     */
+    protected function getDocumentHandler(): Base
+    {
+        return $this->getDocumentType()->handler();
+    }
+
+    /**
+     * Check if the current user is authorized to access documents.
+     */
+    protected function canAccessDocument(): bool
+    {
+        $user = auth()->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        // Dev role has full access
+        if ($user->isDev()) {
+            return true;
+        }
+
+        // Get user's highest role level
+        $userRoles = $user->roles()->get();
+        $highestLevel = $userRoles->min('level'); // Lower level = higher privilege
+
+        // Admin or higher (level < 10)
+        if ($highestLevel < 10) {
+            return true;
+        }
+
+        // Client role with matching client_id
+        if ($user->hasRole('client')) {
+            // Check if user's client matches the project's client
+            $client = \VmEngine\Pm\Models\Client::where('user_id', $user->id)->first();
+
+            return $client && $client->id === $this->project->client_id;
+        }
+
+        return false;
     }
 
     #[Computed()]
     public function documents()
     {
-        // TODO: Replace with actual query when ProjectDocument model is implemented
-        // return $this->project->documents()
-        //     ->where('document_type', $this->documentType)
-        //     ->with(['versions', 'uploader'])
-        //     ->get();
+        $documentType = $this->getDocumentType();
+        if (! $documentType) {
+            return collect();
+        }
 
-        return collect($this->getMockDocuments());
-    }
-
-    /**
-     * Get mock documents for UI demonstration
-     * TODO: Remove this method when implementing actual document storage
-     */
-    private function getMockDocuments(): array
-    {
-        $mockUser = (object) ['name' => auth()->user()->name ?? 'John Doe'];
-
-        $mockData = [
-            'contract' => [
-                (object) [
-                    'id' => 1,
-                    'title' => 'Project Agreement 2025',
-                    'description' => 'Main contract agreement for the project',
-                    'file_extension' => 'pdf',
-                    'current_version' => 3,
-                    'updated_at' => now()->subDays(5),
-                    'uploader' => $mockUser,
-                    'file_size_formatted' => '2.5 MB',
-                    'versions_count' => 3,
-                    'versions' => [
-                        (object) [
-                            'id' => 3,
-                            'version_number' => 3,
-                            'original_filename' => 'contract_v3_final.pdf',
-                            'uploaded_at' => now()->subDays(5),
-                            'uploader' => $mockUser,
-                            'file_size_formatted' => '2.5 MB',
-                            'is_current' => true,
-                            'change_notes' => 'Updated payment terms and timeline',
-                        ],
-                        (object) [
-                            'id' => 2,
-                            'version_number' => 2,
-                            'original_filename' => 'contract_v2_revised.pdf',
-                            'uploaded_at' => now()->subDays(15),
-                            'uploader' => $mockUser,
-                            'file_size_formatted' => '2.3 MB',
-                            'is_current' => false,
-                            'change_notes' => 'Revised scope of work',
-                        ],
-                        (object) [
-                            'id' => 1,
-                            'version_number' => 1,
-                            'original_filename' => 'contract_v1_draft.pdf',
-                            'uploaded_at' => now()->subDays(30),
-                            'uploader' => $mockUser,
-                            'file_size_formatted' => '2.1 MB',
-                            'is_current' => false,
-                            'change_notes' => null,
-                        ],
-                    ],
-                ],
-            ],
-            'technical' => [
-                (object) [
-                    'id' => 2,
-                    'title' => 'Scope of Work (SOW)',
-                    'description' => 'Detailed project scope and requirements',
-                    'file_extension' => 'docx',
-                    'current_version' => 2,
-                    'updated_at' => now()->subDays(10),
-                    'uploader' => $mockUser,
-                    'file_size_formatted' => '1.8 MB',
-                    'versions_count' => 2,
-                    'versions' => [
-                        (object) [
-                            'id' => 4,
-                            'version_number' => 2,
-                            'original_filename' => 'SOW_v2.docx',
-                            'uploaded_at' => now()->subDays(10),
-                            'uploader' => $mockUser,
-                            'file_size_formatted' => '1.8 MB',
-                            'is_current' => true,
-                            'change_notes' => 'Added module breakdown',
-                        ],
-                        (object) [
-                            'id' => 5,
-                            'version_number' => 1,
-                            'original_filename' => 'SOW_v1.docx',
-                            'uploaded_at' => now()->subDays(25),
-                            'uploader' => $mockUser,
-                            'file_size_formatted' => '1.5 MB',
-                            'is_current' => false,
-                            'change_notes' => null,
-                        ],
-                    ],
-                ],
-            ],
-            'financial' => [
-                (object) [
-                    'id' => 3,
-                    'title' => 'Invoice #INV-2025-001',
-                    'description' => 'Down payment invoice',
-                    'file_extension' => 'pdf',
-                    'current_version' => 1,
-                    'updated_at' => now()->subDays(7),
-                    'uploader' => $mockUser,
-                    'file_size_formatted' => '450 KB',
-                    'versions_count' => 1,
-                    'versions' => [
-                        (object) [
-                            'id' => 6,
-                            'version_number' => 1,
-                            'original_filename' => 'invoice_001.pdf',
-                            'uploaded_at' => now()->subDays(7),
-                            'uploader' => $mockUser,
-                            'file_size_formatted' => '450 KB',
-                            'is_current' => true,
-                            'change_notes' => null,
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        return $mockData[$this->documentType] ?? [];
+        return $this->project->documents()
+            ->byType($documentType)
+            ->orderBy('created_at', 'desc')
+            ->get();
     }
 
     public function resetUploadForm(): void
     {
+        $this->revisionMode = false;
         $this->file = null;
-        $this->documentCode = '';
+        $this->documentCode = $this->getDocumentHandler()
+            ->generateDocumentNumber($this->project, $this->getDocumentType());
         $this->notes = '';
+        if (count($this->documents()) > 0) {
+            $this->version = $this->documents()[0]->version + 1;
+        }
         $this->resetValidation();
     }
 
     public function saveDocument(): void
     {
-        // TODO: Implement actual file upload and database save
         // Validation rules will be added here
-        // $this->validate([
-        //     'file' => 'required|file|max:10240',
-        //     'documentCode' => 'required|string|max:50',
-        //     'notes' => 'nullable|string|max:500',
-        // ]);
-
-        $this->dispatch('notify', [
-            'variant' => 'info',
-            'title' => 'Coming Soon',
-            'message' => 'Document upload functionality will be implemented soon',
+        $this->validate([
+            'file' => [
+                'required',
+                File::types(['doc', 'docx', 'pdf', 'xls', 'xlsx', 'ppt', 'pptx'])
+                    ->max(10240),
+            ],
+            'documentCode' => 'required|string|max:100',
         ]);
 
+        $documentType = $this->getDocumentType();
+
+        $this->project->documents()->create([
+            'client_id' => $this->project->client_id,
+            'user_id' => auth()->id(),
+            'type' => $documentType,
+            'number' => $this->documentCode,
+            'notes' => $this->notes,
+            'version' => $this->version,
+            'file_path' => $this->file->storePublicly('projects/'.$this->project->id.'/documents/'.($documentType->code() ?: $documentType->value)),
+            'file_info' => [
+                'original_name' => $this->file->getClientOriginalName(),
+                'size' => $this->file->getSize(),
+                'mime_type' => $this->file->getMimeType(),
+            ],
+            // Additional fields as necessary
+        ]);
+
+        // Call uploaded hook and increment index
+        $this->getDocumentHandler()->uploaded($this->project, $documentType);
+        $this->getDocumentHandler()->incrementIndex($this->project, $documentType);
+
+        $this->dispatch('notify', [
+            'variant' => 'success',
+            'title' => 'Document Uploaded',
+            'message' => 'Document has been uploaded successfully',
+        ]);
+
+        // Dispatch event to refresh parent DocumentManager component
+        $this->dispatch('document-uploaded');
+
         // Close modal and reset form
-        $this->dispatch('close-modal-upload-'.$this->documentType);
+        $this->dispatch('close-modal-upload-'.$documentType->code(true));
         $this->resetUploadForm();
     }
 
-    public function downloadDocument(int $documentId): void
+    public function downloadDocument(int $documentId): StreamedResponse
     {
-        // TODO: Implement document download
-        $this->dispatch('notify', [
-            'variant' => 'info',
-            'title' => 'Coming Soon',
-            'message' => 'Document download functionality will be implemented soon',
-        ]);
+        // Check authorization
+        if (! $this->canAccessDocument()) {
+            $this->dispatch('notify', [
+                'variant' => 'danger',
+                'title' => 'Unauthorized',
+                'message' => 'You do not have permission to download this document',
+            ]);
+
+            abort(403, 'Unauthorized to download this document');
+        }
+
+        $document = $this->project->documents()->find($documentId);
+
+        if (! $document) {
+            $this->dispatch('notify', [
+                'variant' => 'danger',
+                'title' => 'Error',
+                'message' => 'Document not found',
+            ]);
+
+            abort(404);
+        }
+
+        if (! Storage::exists($document->file_path)) {
+            $this->dispatch('notify', [
+                'variant' => 'danger',
+                'title' => 'Error',
+                'message' => 'File not found on storage',
+            ]);
+
+            abort(404);
+        }
+
+        return Storage::download($document->file_path, $document->file_info['original_name'] ?? 'document');
     }
 
     public function uploadNewVersion(int $documentId): void
     {
-        // TODO: Implement new version upload
-        $this->dispatch('notify', [
-            'variant' => 'info',
-            'title' => 'Coming Soon',
-            'message' => 'Version upload functionality will be implemented soon',
-        ]);
+        $documentData = $this->project->documents()->find($documentId);
+        if (! $documentData) {
+            $this->dispatch('notify', [
+                'variant' => 'danger',
+                'title' => 'Error',
+                'message' => 'Document not found',
+            ]);
+
+            return;
+        }
+
+        // Set revision mode and pre-fill form with existing document data
+        $this->revisionMode = true;
+        $this->documentCode = $documentData->number;
+        $this->notes = $documentData->notes ?? '';
+
+        // Calculate next version number
+        $latestVersion = $this->project->documents()
+            ->byType($documentData->type)
+            ->where('number', $documentData->number)
+            ->max('version');
+        $this->version = $latestVersion + 1;
+
+        $this->dispatch('open-modal-upload-'.$documentData->type->code(true));
     }
 
-    public function downloadVersion(int $versionId): void
+    public function downloadVersion(int $versionId): StreamedResponse
     {
-        // TODO: Implement version download
-        $this->dispatch('notify', [
-            'variant' => 'info',
-            'title' => 'Coming Soon',
-            'message' => 'Version download functionality will be implemented soon',
-        ]);
+        return $this->downloadDocument($versionId);
     }
 
     public function restoreVersion(int $versionId): void
     {
-        // TODO: Implement version restore
-        $this->dispatch('notify', [
-            'variant' => 'info',
-            'title' => 'Coming Soon',
-            'message' => 'Version restore functionality will be implemented soon',
+        $oldDocument = $this->project->documents()->find($versionId);
+
+        if (! $oldDocument) {
+            $this->dispatch('notify', [
+                'variant' => 'danger',
+                'title' => 'Error',
+                'message' => 'Document version not found',
+            ]);
+
+            return;
+        }
+
+        if (! Storage::exists($oldDocument->file_path)) {
+            $this->dispatch('notify', [
+                'variant' => 'danger',
+                'title' => 'Error',
+                'message' => 'Original file not found on storage',
+            ]);
+
+            return;
+        }
+
+        // Calculate next version number
+        $latestVersion = $this->project->documents()
+            ->byType($oldDocument->type)
+            ->where('number', $oldDocument->number)
+            ->max('version');
+
+        // Copy the old file to a new location
+        $newFileName = 'projects/'.$this->project->id.'/documents/'.$oldDocument->type->code().'/'.uniqid().'-restored.'.pathinfo($oldDocument->file_path, PATHINFO_EXTENSION);
+        Storage::copy($oldDocument->file_path, $newFileName);
+
+        // Create new document version
+        $this->project->documents()->create([
+            'client_id' => $this->project->client_id,
+            'user_id' => auth()->id(),
+            'type' => $oldDocument->type,
+            'number' => $oldDocument->number,
+            'notes' => 'Restored from version '.$oldDocument->version.'. '.$oldDocument->notes,
+            'version' => $latestVersion + 1,
+            'file_path' => $newFileName,
+            'file_info' => $oldDocument->file_info,
         ]);
+
+        $this->dispatch('notify', [
+            'variant' => 'success',
+            'title' => 'Version Restored',
+            'message' => 'Document version '.$oldDocument->version.' has been restored as version '.($latestVersion + 1),
+        ]);
+
+        // Dispatch event to refresh parent DocumentManager component
+        $this->dispatch('document-uploaded');
     }
 
-    public function confirmDeleteDocument(int $documentId): void
+    public function confirmDeleteDocument(string $deleteToken): void
     {
-        // TODO: Implement document deletion
-        $this->dispatch('notify', [
-            'variant' => 'info',
-            'title' => 'Coming Soon',
-            'message' => 'Document deletion functionality will be implemented soon',
-        ]);
+        try {
+            $id = ProjectDocument::validateDeleteToken($deleteToken);
+            if (! $id) {
+                throw new \Exception('Invalid delete token');
+            }
+
+            $document = ProjectDocument::findOrFail($id);
+
+            // Check if user has permission to delete this document
+            if ($document->project_id !== $this->project->id) {
+                throw new \Exception('Unauthorized to delete this document');
+            }
+
+            // Delete file from storage
+            if (Storage::exists($document->file_path)) {
+                Storage::delete($document->file_path);
+            }
+
+            // Delete document record
+            $document->delete();
+
+            $this->dispatch('notify', [
+                'variant' => 'success',
+                'title' => 'Document Deleted',
+                'message' => 'Document has been deleted successfully',
+            ]);
+
+            // Dispatch event to refresh parent DocumentManager component
+            $this->dispatch('document-uploaded');
+        } catch (\Exception $e) {
+            $this->dispatch('notify', [
+                'variant' => 'danger',
+                'title' => 'Error',
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     public function viewDocument(int $documentId): void
     {
-        // TODO: Implement document view/preview
-        $this->dispatch('notify', [
-            'variant' => 'info',
-            'title' => 'Coming Soon',
-            'message' => 'Document view functionality will be implemented soon',
-        ]);
+        // Check authorization
+        if (! $this->canAccessDocument()) {
+            $this->dispatch('notify', [
+                'variant' => 'danger',
+                'title' => 'Unauthorized',
+                'message' => 'You do not have permission to view this document',
+            ]);
+
+            abort(403, 'Unauthorized to view this document');
+        }
+
+        $document = $this->project->documents()->find($documentId);
+
+        if (! $document) {
+            $this->dispatch('notify', [
+                'variant' => 'danger',
+                'title' => 'Error',
+                'message' => 'Document not found',
+            ]);
+
+            return;
+        }
+
+        if (! Storage::exists($document->file_path)) {
+            $this->dispatch('notify', [
+                'variant' => 'danger',
+                'title' => 'Error',
+                'message' => 'File not found on storage',
+            ]);
+
+            return;
+        }
+
+        // Get temporary URL for viewing (valid for 5 minutes)
+        $url = Storage::temporaryUrl($document->file_path, now()->addMinutes(5));
+
+        // Open in new tab
+        $this->dispatch('open-url', url: $url);
     }
 
     public function render()
     {
-        return view('pm::livewire.components.document.versioned-document');
+        return view('pm::livewire.components.document.versioned-document', [
+            'documentType' => $this->getDocumentType(),
+        ]);
     }
 }

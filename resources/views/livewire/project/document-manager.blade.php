@@ -1,4 +1,7 @@
 <div class="space-y-4">
+    {{-- Confirmation Dialog --}}
+    <x-synapse-confirm-dialog />
+
     {{-- Header Section --}}
     <div class="flex items-center justify-between">
         <div>
@@ -27,75 +30,41 @@
                 wire:model.live="filterDocType"
             >
                 <option value="">All Types</option>
-                <option value="contract">Contract</option>
-                <option value="technical">Technical</option>
-                <option value="financial">Financial</option>
-                <option value="deliverable">Deliverables</option>
-                <option value="backup">Backups</option>
+                @foreach (\VmEngine\Pm\Enums\Documents::cases() as $option)
+                    <option value="{{ $option->value }}">{{ $option->label() }}</option>
+                @endforeach
             </select>
         </div>
     </div>
 
     {{-- Document Groups --}}
     <div class="space-y-3">
-        {{-- Contract Documents (Versioned) --}}
-        @livewire(
-            'pm.components.document.versioned-document',
-            [
-                'project' => $project,
-                'documentType' => 'contract',
-                'title' => 'Contract Documents',
-                'badge' => 'Versioned',
-            ],
-            key('contract-' . $project->id)
-        )
-
-        {{-- Technical Documents (Versioned) --}}
-        @livewire(
-            'pm.components.document.versioned-document',
-            [
-                'project' => $project,
-                'documentType' => 'technical',
-                'title' => 'Technical Documents',
-                'badge' => 'Versioned',
-            ],
-            key('technical-' . $project->id)
-        )
-
-        {{-- Financial Documents (Versioned) --}}
-        @livewire(
-            'pm.components.document.versioned-document',
-            [
-                'project' => $project,
-                'documentType' => 'financial',
-                'title' => 'Financial Documents',
-                'badge' => 'Versioned',
-            ],
-            key('financial-' . $project->id)
-        )
-
-        {{-- Deliverables (Multiple Files) --}}
-        @livewire(
-            'pm.components.document.multiple-document',
-            [
-                'project' => $project,
-                'documentType' => 'deliverable',
-                'title' => 'Deliverables & Reports',
-                'badge' => 'Multiple Files',
-            ],
-            key('deliverable-' . $project->id)
-        )
-
-        {{-- Backups (Multiple Files) --}}
-        @livewire(
-            'pm.components.document.multiple-document',
-            [
-                'project' => $project,
-                'documentType' => 'backup',
-                'title' => 'Backups & Archives',
-                'badge' => 'Multiple Files',
-            ],
-            key('backup-' . $project->id)
-        )
+        @foreach (\VmEngine\Pm\Enums\Documents::cases() as $document)
+            @if ($document->handler()->isActive($project))
+                @if ($document->isVersioned())
+                    {{-- Versioned Document Group --}}
+                    @livewire(
+                        'pm.components.document.versioned-document',
+                        [
+                            'project' => $project,
+                            'documentType' => $document,
+                            'title' => $document->label(),
+                        ],
+                        key($document->code(true) . '-' . $project->id)
+                    )
+                @else
+                    {{-- Multiple Document Group --}}
+                    @livewire(
+                        'pm.components.document.multiple-document',
+                        [
+                            'project' => $project,
+                            'documentType' => $document,
+                            'title' => $document->label(),
+                        ],
+                        key($document->code(true) . '-' . $project->id)
+                    )
+                @endif
+            @endif
+        @endforeach
     </div>
 </div>

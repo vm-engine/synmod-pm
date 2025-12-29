@@ -109,6 +109,14 @@ class Client extends Model
     }
 
     /**
+     * Get the documents for this client.
+     */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(ProjectDocument::class);
+    }
+
+    /**
      * Check if client is a prospect.
      */
     public function isProspect(): bool
@@ -182,5 +190,14 @@ class Client extends Model
                 $q->orWhereJsonContains('services', (int) $service);
             }
         });
+    }
+
+    public function activate(): void
+    {
+        $this->status = self::STATUS_ACTIVE;
+        $this->save();
+
+        $this->user->status = 1;
+        $this->user->save();
     }
 }

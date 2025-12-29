@@ -6,6 +6,7 @@ namespace VmEngine\Pm\Livewire\Project;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Synapse\Services\Helper\Breadcrumbs;
@@ -14,7 +15,7 @@ class ProjectDetail extends Component
 {
     public Project $project;
 
-    public string $activeTab = 'overview';
+    public string $activeTab = 'documents';
 
     public function mount(int $id)
     {
@@ -36,6 +37,21 @@ class ProjectDetail extends Component
     public function setActiveTab(string $tab)
     {
         $this->activeTab = $tab;
+    }
+
+    #[On('document-uploaded')]
+    public function refreshProject(): void
+    {
+        // Refresh the project with all relationships
+        $this->project->refresh();
+        $this->project->load([
+            'division',
+            'client',
+            'user',
+            'projectManager',
+            'creator',
+            'updater',
+        ]);
     }
 
     #[Computed()]
