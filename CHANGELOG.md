@@ -2,6 +2,61 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2025-12-29
+
+### Added
+- **Document Management System**: Complete document upload/download/management functionality
+  - ProjectDocument model with delete token trait and enum casting
+  - Document handlers as stateless singletons with auto-numbering
+  - Versioned documents (SPK, SOW, TOR, etc.) with revision history
+  - Multiple documents (Invoice, Receipt, Backup, etc.) with grid layout
+  - Upload modals with wire:loading states for better UX
+  - File type-specific icons (PDF, Word, Excel, PowerPoint, Archive, Image)
+- **Document Operations**:
+  - Upload with auto-generated document codes
+  - Download with authorization checks
+  - View documents via temporary URLs (valid 5 minutes)
+  - Delete with confirm dialog using delete tokens
+  - Upload new versions for versioned documents
+  - Restore old versions as new versions
+  - Version history display with collapsible sections
+- **Authorization & Security**:
+  - Role-based access control (dev, admin level <10, matching client)
+  - Delete token validation pattern following ClientList
+  - Authorization checks for download and view operations
+  - Project ownership validation on all operations
+- **Event-Driven Architecture**:
+  - Parent component refresh on document changes
+  - Event listeners on ProjectDetail and DocumentManager
+  - Real-time UI updates after upload/delete/restore
+- **UI Components**:
+  - Document group cards with expand/collapse
+  - Document revision list for versioned documents
+  - Document multiple files grid for non-versioned documents
+  - Confirm dialog integration for safe deletions
+  - Alpine.js integration for URL opening in new tabs
+
+### Changed
+- **Livewire V3 Compatibility**: Fixed enum property hydration
+  - Store enum value as public scalar `documentTypeValue`
+  - Reconstruct enum via getter method when needed
+  - Removed stateful properties from components
+- **Service Architecture**: Refactored all document handlers to stateless pattern
+  - Base class accepts Project and Documents as method parameters
+  - All 15 document implementations updated
+  - Singleton pattern with dependency injection
+- **Database Schema**: Migration updated from MySQL ENUM to TINYINT UNSIGNED
+  - Proper integer-backed enum storage
+  - Cast to Documents enum in model
+
+### Fixed
+- Modal naming conflicts between versioned and multiple document components
+- Document manager refresh with static wire:key
+- Confirm dialog appearing multiple times (moved to parent)
+- File upload button not opening modal (code() method consistency)
+- Variable naming inconsistencies in multiple-files-list template
+- Code formatting with Laravel Pint (90 files, 1 style issue)
+
 ## [0.2.1] - 2025-12-25
 
 ### Added
