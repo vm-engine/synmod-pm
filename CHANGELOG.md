@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.3.1] - 2025-12-30
+## [0.4.0] - 2025-12-30
 
 ### Added
 - **Data Migration Command**: `mod-pm:migrate-old` for migrating legacy database
