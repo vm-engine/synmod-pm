@@ -2,6 +2,41 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.1] - 2025-12-30
+
+### Added
+- **Data Migration Command**: `mod-pm:migrate-old` for migrating legacy database
+  - Migrate users, divisions, sub-divisions, clients from old schema
+  - Convert `proposal` table to projects with PROPOSAL documents
+  - Migrate SPH documents with version tracking
+  - Migrate SPK documents with version tracking and deal status
+  - Auto-update project status from PROSPECT to PLANNING when SPK has `is_deal = 1`
+  - Auto-activate clients when SPK has `is_deal = 1`
+  - File migration from `public/document/` to `storage/app/private/projects/{id}/documents/{type}/`
+  - Idempotent operations using `updateOrCreate()` for safe re-runs
+  - Progress tracking with detailed statistics
+  - `--skip-missing` option to skip records with missing references
+
+### Fixed
+- **Document Revision List**: Fixed version history display showing all versions instead of only version 1
+  - Loop through all documents using `$documents->skip(1)`
+  - Properly display version numbers for each historical revision
+- **Project List UI**: Enhanced card-based layout with document badges
+  - Show colorful gradient badges for document types
+  - Display file counter badges for multiple files
+  - Hide document section when no documents exist
+  - Fixed tooltips appearing on individual buttons instead of entire card
+- **Migration Text Cleaning**: Improved name cleaning for proposals
+  - Remove "PROPOSAL", "PENAWARAN", "SURAT", "SPH", "HARGA" words anywhere in text
+  - Word boundary matching to avoid partial word replacements
+  - Multiple space cleanup after word removal
+
+### Changed
+- **Storage Structure**: Files now stored in project-specific folders
+  - Path: `storage/app/private/projects/{project_id}/documents/{doc_type_code}/`
+  - Random hash filenames for security
+  - Proper document type code organization (0, SPH, SPK)
+
 ## [0.3.0] - 2025-12-29
 
 ### Added

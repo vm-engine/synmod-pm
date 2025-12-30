@@ -55,13 +55,15 @@
                             wire:key="project-{{ $project->id }}"
                         >
                             <!-- Card Header -->
-                            <div class="border-b border-gray-100 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-800/50">
+                            <div
+                                class="border-b border-gray-100 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-800/50">
                                 <div class="mb-2 flex items-start justify-between">
                                     <div class="flex-1">
                                         <h4 class="text-lg font-semibold text-gray-900 dark:text-white">
                                             {{ $project->name }}
                                         </h4>
-                                        <div class="mt-1 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                        <div
+                                            class="mt-1 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                             <span class="fa-solid fa-calendar-alt text-xs"></span>
                                             <span>{{ $project->year }}</span>
                                         </div>
@@ -69,7 +71,7 @@
                                     <div class="flex flex-col gap-2">
                                         @php
                                             $statusColor = $project->status ? $project->status->color() : 'gray';
-                                            $statusGradient = match($statusColor) {
+                                            $statusGradient = match ($statusColor) {
                                                 'green' => 'from-green-500 to-emerald-600',
                                                 'blue' => 'from-blue-500 to-cyan-600',
                                                 'yellow' => 'from-yellow-500 to-amber-600',
@@ -90,7 +92,7 @@
                                         </button>
                                         @php
                                             $priorityColor = $project->priority ? $project->priority->color() : 'gray';
-                                            $priorityGradient = match($priorityColor) {
+                                            $priorityGradient = match ($priorityColor) {
                                                 'red' => 'from-red-500 to-pink-600',
                                                 'orange' => 'from-orange-500 to-red-600',
                                                 'yellow' => 'from-yellow-500 to-orange-600',
@@ -117,8 +119,10 @@
                                 <!-- Progress Bar -->
                                 <div class="mb-4">
                                     <div class="mb-1 flex items-center justify-between text-sm">
-                                        <span class="font-medium text-gray-700 dark:text-gray-300">{{ __('pm::project.col_progress') }}</span>
-                                        <span class="font-semibold text-blue-600 dark:text-blue-400">{{ $project->progress }}%</span>
+                                        <span
+                                            class="font-medium text-gray-700 dark:text-gray-300">{{ __('pm::project.col_progress') }}</span>
+                                        <span
+                                            class="font-semibold text-blue-600 dark:text-blue-400">{{ $project->progress }}%</span>
                                     </div>
                                     <div class="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                                         <div
@@ -131,7 +135,8 @@
                                 <!-- Division & Client -->
                                 <div class="mb-4 space-y-2">
                                     <div class="flex items-center gap-2">
-                                        <span class="fa-solid fa-building w-4 text-sm text-gray-500 dark:text-gray-400"></span>
+                                        <span
+                                            class="fa-solid fa-building w-4 text-sm text-gray-500 dark:text-gray-400"></span>
                                         @if ($project->division)
                                             <button
                                                 class="{{ in_array($project->division_id, $filterDivisions)
@@ -147,7 +152,8 @@
                                         @endif
                                     </div>
                                     <div class="flex items-center gap-2">
-                                        <span class="fa-solid fa-user w-4 text-sm text-gray-500 dark:text-gray-400"></span>
+                                        <span
+                                            class="fa-solid fa-user w-4 text-sm text-gray-500 dark:text-gray-400"></span>
                                         @if ($project->client)
                                             <button
                                                 class="{{ in_array($project->client_id, $filterClients)
@@ -174,7 +180,9 @@
                                             <span class="text-xs font-medium text-gray-700 dark:text-gray-300">
                                                 {{ __('pm::project.documents') }}
                                             </span>
-                                            <span class="rounded-full bg-gray-200 px-2 py-0.5 text-xs font-semibold text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+                                            <span
+                                                class="rounded-full bg-gray-200 px-2 py-0.5 text-xs font-semibold text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                                            >
                                                 {{ $project->documents_count }} {{ __('pm::project.files') }}
                                             </span>
                                         </div>
@@ -182,13 +190,15 @@
                                             @foreach ($documentsByType as $type => $docs)
                                                 @php
                                                     $docType = \VmEngine\Pm\Enums\Documents::tryFrom($type);
-                                                    if (!$docType) continue;
+                                                    if (!$docType) {
+                                                        continue;
+                                                    }
                                                     $docColor = $docType->color();
                                                     $docCount = $docs->count();
                                                     $docIcon = $docType->icon();
                                                     $docCode = $docType->code();
                                                     $docLabel = $docType->label();
-                                                    $docGradient = match($docColor) {
+                                                    $docGradient = match ($docColor) {
                                                         'purple' => 'from-purple-500 to-purple-600',
                                                         'indigo' => 'from-indigo-500 to-indigo-600',
                                                         'blue' => 'from-blue-500 to-blue-600',
@@ -207,21 +217,29 @@
                                                         default => 'from-gray-500 to-gray-600',
                                                     };
                                                 @endphp
-                                                <div class="group/doc relative inline-flex items-center gap-1 rounded-lg bg-gradient-to-br {{ $docGradient }} px-2.5 py-1 text-white shadow-sm transition-all hover:shadow-md">
+                                                <div
+                                                    class="group/doc {{ $docGradient }} relative inline-flex items-center gap-1 rounded-lg bg-gradient-to-br px-2.5 py-1 text-white shadow-sm transition-all hover:shadow-md">
                                                     <span class="fa-solid {{ $docIcon }} text-xs"></span>
                                                     <span class="text-xs font-semibold">{{ $docCode }}</span>
                                                     @if ($docCount > 1)
-                                                        <span class="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-white/30 text-[10px] font-bold">
+                                                        <span
+                                                            class="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-white/30 text-[10px] font-bold"
+                                                        >
                                                             {{ $docCount }}
                                                         </span>
                                                     @endif
                                                     <!-- Tooltip -->
-                                                    <span class="pointer-events-none absolute -top-10 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover/doc:opacity-100 dark:bg-gray-700">
+                                                    <span
+                                                        class="pointer-events-none absolute -top-10 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover/doc:opacity-100 dark:bg-gray-700"
+                                                    >
                                                         {{ $docLabel }}
                                                         @if ($docCount > 1)
-                                                            <span class="ml-1 text-gray-300">({{ __('pm::project.document_count_files', ['count' => $docCount]) }})</span>
+                                                            <span
+                                                                class="ml-1 text-gray-300">({{ __('pm::project.document_count_files', ['count' => $docCount]) }})</span>
                                                         @endif
-                                                        <span class="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></span>
+                                                        <span
+                                                            class="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"
+                                                        ></span>
                                                     </span>
                                                 </div>
                                             @endforeach
@@ -231,11 +249,12 @@
                             </div>
 
                             <!-- Card Footer -->
-                            <div class="mt-auto border-t border-gray-100 bg-gray-50 px-4 py-3 dark:border-gray-800 dark:bg-gray-800/30">
+                            <div
+                                class="mt-auto border-t border-gray-100 bg-gray-50 px-4 py-3 dark:border-gray-800 dark:bg-gray-800/30">
                                 <div class="flex items-center justify-end gap-1">
                                     @canAccess('pm.project.read')
                                     <a
-                                        class="group btn-icon primary has-tooltip"
+                                        class="btn-icon primary has-tooltip group"
                                         href="{{ backend_route('pm.project.detail', ['id' => $project->id]) }}"
                                         wire:navigate
                                     >
@@ -245,7 +264,7 @@
                                     @endcanAccess
                                     @canAccess('pm.project.update')
                                     <a
-                                        class="group btn-icon warning has-tooltip"
+                                        class="btn-icon warning has-tooltip group"
                                         href="{{ backend_route('pm.project.edit', ['id' => $project->id]) }}"
                                         wire:navigate
                                     >
@@ -255,7 +274,7 @@
                                     @endcanAccess
                                     @canAccess('pm.project.delete')
                                     <button
-                                        class="group btn-icon danger has-tooltip"
+                                        class="btn-icon danger has-tooltip group"
                                         type="button"
                                         wire:click="$dispatch('confirm-dialog', {
                                             title: '{{ __('pm::project.delete_project') }}',
@@ -278,8 +297,10 @@
                         </div>
                     @empty
                         <div class="col-span-full py-12 text-center">
-                            <div class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
-                                <span class="fa-solid fa-diagram-project text-3xl text-gray-400 dark:text-gray-600"></span>
+                            <div
+                                class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
+                                <span
+                                    class="fa-solid fa-diagram-project text-3xl text-gray-400 dark:text-gray-600"></span>
                             </div>
                             <h3 class="mb-2 text-lg font-medium text-gray-900 dark:text-white">
                                 {{ __('pm::project.no_projects_found') }}
@@ -299,10 +320,10 @@
                         name="limit"
                         wire:model.live="limit"
                     >
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
+                        <option value="12">12</option>
+                        <option value="24">24</option>
+                        <option value="48">48</option>
+                        <option value="120">120</option>
                     </select>
                 </div>
                 <div class="pagination-container flex-1 grow">

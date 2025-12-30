@@ -46,7 +46,7 @@ class ProjectList extends Component
     #[Url()]
     public string $filterProgress = '';
 
-    public int $limit = 10;
+    public int $limit = 12;
 
     public string $sort = 'id';
 
