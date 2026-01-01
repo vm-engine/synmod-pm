@@ -224,6 +224,6 @@ class ProjectForm extends Component
             'riskLevels' => $riskLevels,
             'users' => $users,
             'breadcrumbs' => $breadcrumbs,
-        ])->title($this->form->project ? __('pm::project.edit_title') : __('pm::project.create_title'));
+        ])->title(page_title($this->form->project ? __('pm::project.edit_title') : __('pm::project.create_title')));
     }
 }

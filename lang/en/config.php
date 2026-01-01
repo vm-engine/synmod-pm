@@ -18,7 +18,7 @@ return [
             'number_format' => 'E.g., {DOC_CODE}/{CLIENT_CODE}/{YEAR}/{INDEX}',
         ],
         'help' => [
-            'number_format' => 'Available placeholders: {INDEX}, {PROJECT_CODE}, {DOC_CODE}, {CNC}, {CLIENT_ID}, {MM}, {YYYY}, {YY}',
+            'number_format' => 'Available placeholders: {INDEX}, {PROJECT_CODE}, {DIVISION_CODE}, {DOC_CODE}, {CNC}, {CLIENT_ID}, {MM}, {YYYY}, {YY}',
         ],
         'buttons' => [
             'save' => 'Save Configuration',

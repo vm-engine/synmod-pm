@@ -178,6 +178,6 @@ class ProjectCategory extends Component
 
         return view('pm::livewire.master.project-category', [
             'breadcrumbs' => $breadcrumbs,
-        ])->title(__('pm::project_category.page_title'));
+        ])->title(page_title(__('pm::project_category.list_title')));
     }
 }

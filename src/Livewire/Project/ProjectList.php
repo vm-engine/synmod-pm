@@ -314,6 +314,6 @@ class ProjectList extends Component
             'years' => $years,
             'progressRanges' => $progressRanges,
             'breadcrumbs' => $breadcrumbs,
-        ])->title(__('pm::project.list_title'));
+        ])->title(page_title(__('pm::project.list_title')));
     }
 }

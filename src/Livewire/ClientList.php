@@ -218,6 +218,6 @@ class ClientList extends Component
             'categories' => $categories,
             'services' => $services,
             'breadcrumbs' => $breadcrumbs,
-        ])->title(__('pm::client.list_title'));
+        ])->title(page_title(__('pm::client.list_title')));
     }
 }

@@ -16,11 +16,15 @@ class Division extends Component
 
     public $editText = '';
 
+    public $editCode = '';
+
     public $editSubId = null;
 
     public $editSubText = '';
 
     public $newDivision = '';
+
+    public $newDivisionCode = '';
 
     public $newSubDivision = [];
 
@@ -36,8 +40,14 @@ class Division extends Component
     public function store()
     {
         try {
+            $this->validate([
+                'newDivision' => 'required',
+                'newDivisionCode' => 'required',
+            ]);
+
             ModelsDivision::create([
                 'name' => $this->newDivision,
+                'code' => $this->newDivisionCode,
             ]);
 
             $this->newDivision = '';
@@ -65,13 +75,20 @@ class Division extends Component
         $division = ModelsDivision::findOrFail($id);
         $this->editId = $division->id;
         $this->editText = $division->name;
+        $this->editCode = $division->code;
     }
 
     public function update($id)
     {
         try {
+            $this->validate([
+                'editText' => 'required',
+                'editCode' => 'required',
+            ]);
+
             $division = ModelsDivision::findOrFail($id);
             $division->name = $this->editText;
+            $division->code = $this->editCode;
             $division->save();
 
             $this->cancelEdit();
@@ -266,6 +283,6 @@ class Division extends Component
 
         return view('pm::livewire.master.division', [
             'breadcrumbs' => $breadcrumbs,
-        ])->title(__('pm::labels.division'));
+        ])->title(page_title(__('pm::division.division')));
     }
 }

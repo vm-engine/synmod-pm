@@ -22,7 +22,10 @@
                                 <th>
                                     <p>{{ __('pm::division.division') }}</p>
                                 </th>
-                                <th class="w-1">
+                                <th class="w-1/12">
+                                    <p>{{ __('pm::division.division_code') }}</p>
+                                </th>
+                                <th class="w-1/12">
                                     <p>{{ __('pm::labels.actions') }}</p>
                                 </th>
                             </tr>
@@ -48,35 +51,54 @@
                                                     placeholder="{{ __('pm::division.division_name') }}"
                                                     wire:loading.attr="disabled"
                                                 />
-                                                <button
-                                                    class="btn success has-tooltip group ml-2"
-                                                    type="button"
-                                                    wire:click="update({{ $list->id }})"
-                                                    wire:loading.attr="disabled"
-                                                >
-                                                    <span
-                                                        class="fa-solid fa-check"
-                                                        wire:loading.class.remove="fa-check"
-                                                        wire:loading.class="fa-spinner fa-spin"
-                                                        wire:target="update({{ $list->id }})"
-                                                    ></span>
-                                                    <span class="tooltip">{{ __('pm::labels.save') }}</span>
-                                                </button>
-                                                <button
-                                                    class="btn danger has-tooltip group ml-2"
-                                                    type="button"
-                                                    wire:click="cancelEdit"
-                                                >
-                                                    <span class="fa-solid fa-xmark"></span>
-                                                    <span class="tooltip">{{ __('pm::labels.cancel') }}</span>
-                                                </button>
                                             @else
                                                 <p>{{ $list->name }}</p>
                                             @endif
                                         </div>
                                     </td>
                                     <td>
+                                        <div class="flex items-center">
+                                            @if ($editId == $list->id)
+                                                <input
+                                                    class="form-input"
+                                                    type="text"
+                                                    wire:model.defer="editCode"
+                                                    placeholder="{{ __('pm::division.division_code') }}"
+                                                    wire:loading.attr="disabled"
+                                                />
+                                            @else
+                                                <p>{{ $list->code }}</p>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td>
                                         <div class="text-center">
+                                            @if ($editId == $list->id)
+                                                <div>
+                                                    <button
+                                                        class="btn xs success has-tooltip group"
+                                                        type="button"
+                                                        wire:click="update({{ $list->id }})"
+                                                        wire:loading.attr="disabled"
+                                                    >
+                                                        <span
+                                                            class="fa-solid fa-check"
+                                                            wire:loading.class.remove="fa-check"
+                                                            wire:loading.class="fa-spinner fa-spin"
+                                                            wire:target="update({{ $list->id }})"
+                                                        ></span>
+                                                        <span class="tooltip">{{ __('pm::labels.save') }}</span>
+                                                    </button>
+                                                    <button
+                                                        class="btn xs danger has-tooltip group"
+                                                        type="button"
+                                                        wire:click="cancelEdit"
+                                                    >
+                                                        <span class="fa-solid fa-xmark"></span>
+                                                        <span class="tooltip">{{ __('pm::labels.cancel') }}</span>
+                                                    </button>
+                                                </div>
+                                            @endif
                                             @canAccess('pm.master.division.edit')
                                             @if ($editId != $list->id)
                                                 <button
@@ -122,7 +144,7 @@
                                                 <p>{{ $i . '.' . $i2 }}</p>
                                             </div>
                                         </td>
-                                        <td>
+                                        <td colspan="2">
                                             <div class="flex items-center">
                                                 <i class="fa-solid fa-arrow-turn-down mr-2"></i>
                                                 @if ($editSubId == $sub->id)
@@ -134,7 +156,7 @@
                                                         wire:loading.attr="disabled"
                                                     />
                                                     <button
-                                                        class="btn success has-tooltip group ml-2"
+                                                        class="btn xs success has-tooltip group"
                                                         type="button"
                                                         wire:click="updateSub({{ $sub->id }})"
                                                         wire:loading.attr="disabled"
@@ -148,7 +170,7 @@
                                                         <span class="tooltip">{{ __('pm::labels.save') }}</span>
                                                     </button>
                                                     <button
-                                                        class="btn danger has-tooltip group ml-2"
+                                                        class="btn xs danger has-tooltip group"
                                                         type="button"
                                                         wire:click="cancelEdit"
                                                     >
@@ -205,7 +227,7 @@
                                     <td>
                                         {{ $i . '.' . $i2 }}
                                     </td>
-                                    <td>
+                                    <td colspan="3">
                                         <div class="flex items-center">
                                             <i class="fa-solid fa-arrow-turn-down mr-2"></i>
                                             <input
@@ -249,8 +271,23 @@
                                             placeholder="{{ __('pm::division.division_name') }}"
                                             wire:loading.attr="disabled"
                                         />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="flex items-center">
+                                        <input
+                                            class="form-input"
+                                            type="text"
+                                            wire:model.defer="newDivisionCode"
+                                            placeholder="{{ __('pm::division.division_code') }}"
+                                            wire:loading.attr="disabled"
+                                        />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="flex items-center">
                                         <button
-                                            class="btn btn-icon success has-tooltip group ml-2"
+                                            class="btn success has-tooltip group"
                                             type="button"
                                             wire:click="store"
                                             wire:loading.attr="disabled"
@@ -264,9 +301,6 @@
                                             <span class="tooltip">{{ __('pm::labels.save') }}</span>
                                         </button>
                                     </div>
-                                </td>
-                                <td>
-                                    &nbsp;
                                 </td>
                             </tr>
                         </tbody>

@@ -34,6 +34,7 @@ abstract class Base
             '{MM}' => date('m'),
             '{CNC}' => $cnc,
             '{PROJECT_CODE}' => $project->projectCategory->code,
+            '{DIVISION_CODE}' => $project->division->code,
             '{DOC_CODE}' => $document->code(),
             '{CLIENT_ID}' => sprintf('%03d', $project->client_id),
             '{INDEX}' => sprintf('%03d', $index),

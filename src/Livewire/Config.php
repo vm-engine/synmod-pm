@@ -75,6 +75,6 @@ class Config extends Component
         return view('pm::livewire.config', [
             'breadcrumbs' => $breadcrumbs,
             'configs' => $configs,
-        ])->title(__('pm::menu.be.config.index'));
+        ])->title(page_title(__('pm::menu.be.config.index')));
     }
 }

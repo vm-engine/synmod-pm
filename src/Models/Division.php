@@ -23,6 +23,7 @@ class Division extends Model
 
     protected $fillable = [
         'name',
+        'code',
         'created_by',
         'updated_by',
     ];
@@ -33,6 +34,26 @@ class Division extends Model
     protected static function newFactory(): Factory
     {
         return DivisionFactory::new();
+    }
+
+    /**
+     * Boot the model.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($division) {
+            if (! empty($division->code)) {
+                $division->code = strtoupper($division->code);
+            }
+        });
+
+        static::updating(function ($division) {
+            if ($division->isDirty('code') && ! empty($division->code)) {
+                $division->code = strtoupper($division->code);
+            }
+        });
     }
 
     /**

@@ -71,6 +71,6 @@ class ClientForm extends Component
             'categories' => $categories,
             'services' => $services,
             'breadcrumbs' => $breadcrumbs,
-        ])->title($this->form->client ? __('pm::client.edit_title') : __('pm::client.create_title'));
+        ])->title(page_title($this->form->client ? __('pm::client.edit_title') : __('pm::client.create_title')));
     }
 }

@@ -110,6 +110,6 @@ class ProjectDetail extends Component
 
         return view('pm::livewire.project.project-detail', [
             'breadcrumbs' => $breadcrumbs,
-        ])->title(__('pm::project.detail_title').': '.$this->project->name);
+        ])->title(page_title(__('pm::project.detail_title').': '.$this->project->name));
     }
 }

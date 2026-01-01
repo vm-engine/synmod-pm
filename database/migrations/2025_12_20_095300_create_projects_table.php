@@ -45,7 +45,7 @@ return new class extends Migration
             $table->index('user_id');
             $table->index('division_id');
             $table->index('year');
-            $table->index('type_of_client');
+            // $table->index('type_of_client');
             $table->index('status');
             $table->index(['division_id', 'year']);
             $table->index(['user_id', 'status']);

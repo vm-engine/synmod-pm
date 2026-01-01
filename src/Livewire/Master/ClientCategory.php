@@ -165,6 +165,6 @@ class ClientCategory extends Component
 
         return view('pm::livewire.master.client-category', [
             'breadcrumbs' => $breadcrumbs,
-        ])->title(__('pm::labels.client_category'));
+        ])->title(page_title(__('pm::client_category.title')));
     }
 }
