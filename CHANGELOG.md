@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.1] - 2026-01-01
+
+### Added
+- **Division Code Field**: Added code field to divisions table for custom division codes
+  - New migration: `add_code_field_to_divisions_table`
+  - Allows for custom identification codes for divisions
+- **ResetIndex Command**: New Artisan command for resetting document index numbers
+  - Helps maintain document numbering consistency
+  - Can be used for administrative purposes
+
+### Changed
+- **Internationalization**: Enhanced translation coverage across all components
+  - Updated division form and list translations
+  - Improved config page translations
+  - Better label consistency throughout the module
+
+### Fixed
+- **Code Formatting**: Fixed code style issues across multiple files using Laravel Pint
+  - Fixed class definition and braces positioning in migrations
+  - Fixed blank line handling in language files
+  - Fixed statement formatting in command files
+
 ## [0.4.0] - 2025-12-30
 
 ### Added
