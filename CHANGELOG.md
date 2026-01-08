@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.4] - 2026-01-08
+
+### Changed
+- Update lang
+
 ## [0.4.3] - 2026-01-08
 
 ### Added
