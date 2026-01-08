@@ -298,7 +298,7 @@ class ProjectFormObject extends Form
                 'year' => $this->year ?: (int) date('Y'),
                 'sub_division' => $this->sub_division,
                 'services' => $this->services,
-                'source_of_sales' => $this->source_of_sales,
+                'source_of_sales' => $this->source_of_sales ?? SalesSources::WEB->value,
                 'nominal' => $this->nominal ?: null,
                 'budget' => $this->budget ?: null,
                 'down_payment' => $this->down_payment ?: null,
