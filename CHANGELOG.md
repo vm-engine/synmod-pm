@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.3] - 2026-01-08
+
+### Added
+- **Project Category Master Data Management**: Complete CRUD interface for managing project categories
+  - Enhanced ProjectCategory Livewire component with full management capabilities
+  - New blade view with comprehensive UI for category operations
+  - Added translation keys for project category labels
+
+### Changed
+- **Document Services Enhancement**: Extended document service classes with additional methods
+  - Updated all 15 document service implementations (Proposal, SPH, SPK, SOW, TOR, etc.)
+  - Enhanced Base document service with improved functionality
+  - Added new methods to BackupRequest, Bast, BeritaAcara, Blueprint, ChangeRequest, Invoice, Panduan, Receipt, Uat, and UseCase services
+
+### Improved
+- **Versioned Document View**: Enhanced UI/UX for document version management
+  - Better visual layout and organization
+  - Improved user interaction patterns
+- **Project Model**: Added new functionality to Project model
+- **ProjectDocument Model**: Extended capabilities with new methods
+- **Config Component**: Refined configuration interface
+  - Removed unnecessary code
+  - Improved overall component structure
+- **Client Category View**: Minor UI improvements
+
 ## [0.4.2] - 2026-01-08
 
 ### Fixed
