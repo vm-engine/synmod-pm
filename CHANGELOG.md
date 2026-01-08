@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.2] - 2026-01-08
+
+### Fixed
+- Set Source of Sales default value to WEB when empty
+
 ## [0.4.1] - 2026-01-01
 
 ### Added
