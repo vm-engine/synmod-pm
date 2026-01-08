@@ -97,7 +97,7 @@
                                                     <span class="tooltip">{{ __('pm::labels.cancel') }}</span>
                                                 </button>
                                             @else
-                                                @canAccess('pm.master.client_category.edit')
+                                                @canAccess('pm.master.client_category.update')
                                                 <button
                                                     class="btn-icon warning has-tooltip group"
                                                     type="button"

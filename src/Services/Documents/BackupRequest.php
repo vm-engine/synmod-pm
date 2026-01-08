@@ -18,4 +18,9 @@ class BackupRequest extends Base
     {
         //
     }
+
+    public function deleting(Project $project, Documents $document): void
+    {
+        //
+    }
 }

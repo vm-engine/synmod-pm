@@ -139,6 +139,14 @@ class Project extends Model
     }
 
     /**
+     * Alias
+     */
+    public function category(): BelongsTo
+    {
+        return $this->projectCategory();
+    }
+
+    /**
      * Get the client for this project.
      */
     public function client(): BelongsTo

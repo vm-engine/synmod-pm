@@ -18,7 +18,7 @@ abstract class Base
 
         $format = dbconf('pm.documents.'.$document->code(true).'.number_format');
         $cnc = $project->client->status == Client::STATUS_PROSPECT && $document->hasNCIndex() ? 'NC' : 'C';
-        $index = dbconf('pm.documents.'.$document->code(true).'.next_'.strtolower($cnc).'_index');
+        $index = dbconf('pm.documents.'.$project->category->code.'.'.$document->code().'.next_'.strtolower($cnc).'_index');
 
         return $this->replaceFormat($format, $cnc, $index, $project, $document);
     }
@@ -26,12 +26,18 @@ abstract class Base
     /**
      * Replace format placeholders with actual values.
      */
-    private function replaceFormat(string $format, string $cnc, int $index, Project $project, Documents $document): string
-    {
+    private function replaceFormat(
+        string $format,
+        string $cnc,
+        int $index,
+        Project $project,
+        Documents $document
+    ): string {
         $replacements = [
             '{YYYY}' => date('Y'),
             '{YY}' => date('y'),
             '{MM}' => date('m'),
+            '{MR}' => int2roman(date('n')),
             '{CNC}' => $cnc,
             '{PROJECT_CODE}' => $project->projectCategory->code,
             '{DIVISION_CODE}' => $project->division->code,
@@ -66,4 +72,6 @@ abstract class Base
      * Hook called after a document is uploaded.
      */
     abstract public function uploaded(Project $project, Documents $document): void;
+
+    abstract public function deleting(Project $project, Documents $document): void;
 }

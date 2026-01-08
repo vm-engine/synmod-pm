@@ -145,6 +145,17 @@
                                                     <span class="tooltip">{{ __('pm::labels.delete') }}</span>
                                                 </button>
                                                 @endcanAccess
+                                                @canAccess('pm.master.project_category.update')
+                                                <button
+                                                    class="btn-icon primary has-tooltip group"
+                                                    type="button"
+                                                    wire:click="loadIndexes({{ $category->id }})"
+                                                >
+                                                    <span class="fa-solid fa-list-ol"></span>
+                                                    <span
+                                                        class="tooltip">{{ __('pm::project_category.category_index') }}</span>
+                                                </button>
+                                                @endcanAccess
                                             @endif
                                         </div>
                                     </td>
@@ -215,4 +226,113 @@
             </div>
         </div>
     </div>
+
+    <x-synapse-modal
+        name="document-index"
+        max-width="3xl"
+    >
+        <div class="p-6">
+
+            <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
+                Document Index
+            </h3>
+
+            <form wire:submit.prevent="updateIndexes">
+                <div class="max-h-[700px] overflow-y-auto">
+                    <table class="datatable">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <p>{{ __('pm::config.doc_no_format.fields.label') }}</p>
+                                </th>
+                                <th>
+                                    <p>{{ __('pm::config.doc_no_format.fields.next_c_index') }}</p>
+                                </th>
+                                <th>
+                                    <p>{{ __('pm::config.doc_no_format.fields.next_nc_index') }}</p>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($documentIndexes as $k => $v)
+                                <tr>
+                                    <td>
+                                        <div class="flex items-center">
+                                            {{ $v['label'] }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="flex items-center">
+                                            <input
+                                                class="form-input"
+                                                type="number"
+                                                wire:key="document-index-c-{{ $k }}"
+                                                wire:model.defer="documentIndexes.{{ $k }}.C"
+                                                wire:loading.attr="disabled"
+                                                </div
+                                            >
+                                    </td>
+                                    <td>
+                                        <div class="flex items-center">
+                                            @isset($v['NC'])
+                                                <input
+                                                    class="form-input"
+                                                    type="number"
+                                                    min="1"
+                                                    wire:key="document-index-nc-{{ $k }}"
+                                                    wire:model.defer="documentIndexes.{{ $k }}.NC"
+                                                    wire:loading.attr="disabled"
+                                                />
+                                            @else
+                                                &nbsp;
+                                            @endisset
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                {{-- Footer Actions --}}
+                <div class="flex justify-end gap-2 border-t border-gray-200 pt-4 dark:border-gray-700">
+                    <button
+                        class="btn btn-outline"
+                        type="button"
+                        @click="$dispatch('close-modal-document-index');"
+                        wire:loading.attr="disabled"
+                        wire:target="updateIndexes"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        class="btn primary"
+                        type="button"
+                        wire:click="updateIndexes"
+                        wire:loading.attr="disabled"
+                        wire:target="updateIndexes"
+                    >
+                        <span
+                            class="fa-solid fa-check mr-1"
+                            wire:loading.remove
+                            wire:target="updateIndexes"
+                        ></span>
+                        <span
+                            class="fa-solid fa-spinner fa-spin mr-1"
+                            wire:loading
+                            wire:target="updateIndexes"
+                        ></span>
+                        <span
+                            wire:loading.remove
+                            wire:target="updateIndexes"
+                        >Update</span>
+                        <span
+                            wire:loading
+                            wire:target="updateIndexes"
+                        >Updating...</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </x-synapse-modal>
 </div>

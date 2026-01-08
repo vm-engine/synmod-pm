@@ -1,4 +1,7 @@
-<div x-data @open-url.window="window.open($event.detail.url, '_blank')">
+<div
+    x-data
+    @open-url.window="window.open($event.detail.url, '_blank')"
+>
     <x-pm::document-group-card
         :project="$project"
         :title="$title"
@@ -49,7 +52,11 @@
                     @error('file')
                         <span class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
                     @enderror
-                    <div wire:loading wire:target="file" class="mt-1 text-sm text-blue-600 dark:text-blue-400">
+                    <div
+                        class="mt-1 text-sm text-blue-600 dark:text-blue-400"
+                        wire:loading
+                        wire:target="file"
+                    >
                         <span class="fa-solid fa-spinner fa-spin mr-1"></span>
                         Uploading file...
                     </div>
@@ -92,7 +99,7 @@
                     <button
                         class="btn btn-outline"
                         type="button"
-                        @click="$dispatch('close-modal-upload-{{ $documentType }}')"
+                        @click="$dispatch('close-modal-upload-{{ $documentType->code(true) }}')"
                         wire:loading.attr="disabled"
                         wire:target="saveDocument"
                     >
@@ -105,10 +112,24 @@
                         wire:loading.attr="disabled"
                         wire:target="saveDocument,file"
                     >
-                        <span wire:loading.remove wire:target="saveDocument" class="fa-solid fa-upload mr-1"></span>
-                        <span wire:loading wire:target="saveDocument" class="fa-solid fa-spinner fa-spin mr-1"></span>
-                        <span wire:loading.remove wire:target="saveDocument">Upload Document</span>
-                        <span wire:loading wire:target="saveDocument">Uploading...</span>
+                        <span
+                            class="fa-solid fa-upload mr-1"
+                            wire:loading.remove
+                            wire:target="saveDocument"
+                        ></span>
+                        <span
+                            class="fa-solid fa-spinner fa-spin mr-1"
+                            wire:loading
+                            wire:target="saveDocument"
+                        ></span>
+                        <span
+                            wire:loading.remove
+                            wire:target="saveDocument"
+                        >Upload Document</span>
+                        <span
+                            wire:loading
+                            wire:target="saveDocument"
+                        >Uploading...</span>
                     </button>
                 </div>
             </form>

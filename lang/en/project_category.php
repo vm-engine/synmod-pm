@@ -9,4 +9,5 @@ return [
     'no_categories' => 'No project categories found.',
     'name_placeholder' => 'Enter category name',
     'description_placeholder' => 'Enter category description',
+    'category_index' => 'Category Document Index',
 ];

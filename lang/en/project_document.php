@@ -100,7 +100,7 @@ return [
     'delete_file_title' => 'Delete File',
     'delete_file_message' => 'Are you sure you want to delete this file? This action cannot be undone.',
     'delete_document_title' => 'Delete Document',
-    'delete_document_message' => 'Are you sure you want to delete this document? This action cannot be undone.',
+    'delete_document_message' => 'Are you sure you want to delete this document? <b>WARNING!</b> This action cannot be undone and will delete all documents associated with this document.',
 
     // Section titles
     'revision_history' => 'Revision History',

@@ -22,4 +22,9 @@ class Bast extends Base
             $project->save();
         }
     }
+
+    public function deleting(Project $project, Documents $document): void
+    {
+        //
+    }
 }

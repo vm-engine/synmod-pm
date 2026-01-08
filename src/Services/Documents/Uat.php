@@ -18,4 +18,9 @@ class Uat extends Base
     {
         // TODO
     }
+
+    public function deleting(Project $project, Documents $document): void
+    {
+        // TODO
+    }
 }

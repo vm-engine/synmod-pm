@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 use VmEngine\Pm\Enums\Documents;
 use VmEngine\Pm\Factories\ProjectDocumentFactory;
 use VmEngine\Synapse\Traits\WithDeleteToken;
@@ -38,6 +39,17 @@ class ProjectDocument extends Model
     protected static function newFactory(): Factory
     {
         return ProjectDocumentFactory::new();
+    }
+
+    protected static function booted(): void
+    {
+        parent::booted();
+
+        static::deleting(function ($document) {
+            if (Storage::exists($document->file_path)) {
+                Storage::delete($document->file_path);
+            }
+        });
     }
 
     /**

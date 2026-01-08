@@ -51,14 +51,8 @@ class Config extends Component
                 'key' => $key,
                 'label' => $document->label().' (Code: '.$document->code().')',
                 'format' => dbconf("pm.documents.{$key}.number_format", ''),
-                'next_c_index' => dbconf("pm.documents.{$key}.next_c_index", 1),
             ];
             $this->docConfigs['format'][$key] = $docConfig['format'];
-            $this->docConfigs['next_c_index'][$key] = $docConfig['next_c_index'];
-            if ($document->hasNCIndex()) {
-                $docConfig['next_nc_index'] = dbconf("pm.documents.{$key}.next_nc_index", 1);
-                $this->docConfigs['next_nc_index'][$key] = $docConfig['next_nc_index'];
-            }
             $configs[] = $docConfig;
         }
 

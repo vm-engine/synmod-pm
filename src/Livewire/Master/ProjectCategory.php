@@ -7,25 +7,31 @@ namespace VmEngine\Pm\Livewire\Master;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Component;
+use VmEngine\Pm\Enums\Documents;
 use VmEngine\Pm\Models\ProjectCategory as ModelsProjectCategory;
 use VmEngine\Synapse\Services\Helper\Breadcrumbs;
 
 class ProjectCategory extends Component
 {
-    public $editId = null;
+    public ?int $editId = null;
 
-    public $editName = '';
+    public string $editName = '';
 
-    public $editCode = '';
+    public string $editCode = '';
 
-    public $editDescription = '';
+    public string $editDescription = '';
 
-    public $newName = '';
+    public string $newName = '';
 
-    public $newCode = '';
+    public string $newCode = '';
 
-    public $newDescription = '';
+    public string $newDescription = '';
+
+    public ?int $indexingId = null;
+
+    public array $documentIndexes = [];
 
     public function cancelEdit()
     {
@@ -63,7 +69,8 @@ class ProjectCategory extends Component
             return;
         }
 
-        $this->dispatch('notify',
+        $this->dispatch(
+            'notify',
             variant: 'success',
             title: 'Success',
             message: __('pm::messages.project_category_created_successfully')
@@ -114,7 +121,8 @@ class ProjectCategory extends Component
             return;
         }
 
-        $this->dispatch('notify',
+        $this->dispatch(
+            'notify',
             variant: 'success',
             title: 'Success',
             message: __('pm::messages.project_category_updated_successfully')
@@ -148,17 +156,84 @@ class ProjectCategory extends Component
             return;
         }
 
-        $this->dispatch('notify',
+        $this->dispatch(
+            'notify',
             variant: 'success',
             title: 'Success',
             message: __('pm::messages.project_category_deleted_successfully')
         );
     }
 
+    public function loadIndexes(int $id): void
+    {
+        $this->indexingId = $id;
+
+        try {
+            $category = ModelsProjectCategory::findOrFail($id);
+
+            foreach (Documents::cases() as $document) {
+                $this->documentIndexes[$document->code()] = [
+                    'label' => $document->label().' (Code: '.$document->code().')',
+                    'C' => dbconf('pm.documents.'.$category->code.'.'.$document->code().'.next_c_index', 1),
+                ];
+                if ($document->hasNCIndex()) {
+                    $this->documentIndexes[$document->code()]['NC'] = dbconf('pm.documents.'.$category->code.'.'.$document->code().'.next_nc_index', 1);
+                }
+            }
+
+            $this->dispatch('open-modal-document-index');
+        } catch (Exception $e) {
+            $this->dispatch('notify', [
+                'variant' => 'danger',
+                'title' => 'Error',
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function updateIndexes(): void
+    {
+        try {
+            $category = ModelsProjectCategory::findOrFail($this->indexingId);
+
+            foreach (Documents::cases() as $document) {
+                dbconf([
+                    'pm.documents.'.$category->code.'.'.$document->code().'.next_c_index' => $this->documentIndexes[$document->code()]['C'],
+                ]);
+                if ($document->hasNCIndex()) {
+                    dbconf([
+                        'pm.documents.'.$category->code.'.'.$document->code().'.next_nc_index' => $this->documentIndexes[$document->code()]['NC'],
+                    ]);
+                }
+            }
+
+            $this->dispatch('notify', [
+                'variant' => 'success',
+                'title' => 'Success',
+                'message' => __('pm::config.doc_no_format.messages.save_success_message'),
+            ]);
+
+            $this->dispatch('close-modal-document-index');
+        } catch (Exception $e) {
+            $this->dispatch('notify', [
+                'variant' => 'danger',
+                'title' => 'Error',
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    #[On('close-modal-document-index')]
+    public function resetIndexes(): void
+    {
+        $this->indexingId = null;
+        $this->documentIndexes = [];
+    }
+
     #[Computed()]
     public function categoryList()
     {
-        return ModelsProjectCategory::orderBy('name')->get();
+        return ModelsProjectCategory::all();
     }
 
     public function render()

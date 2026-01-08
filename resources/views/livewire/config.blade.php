@@ -72,12 +72,12 @@
                                             ({{ __('pm::config.doc_no_format.help.number_format') }})
                                         </small>
                                     </th>
-                                    <th class="w-1/12">
+                                    {{-- <th class="w-1/12">
                                         <p>{{ __('pm::config.doc_no_format.fields.next_c_index') }}</p>
                                     </th>
                                     <th class="w-1/12">
                                         <p>{{ __('pm::config.doc_no_format.fields.next_nc_index') }}</p>
-                                    </th>
+                                    </th> --}}
                                 </tr>
                             </thead>
                             <tbody>
@@ -103,7 +103,7 @@
                                                 />
                                             </div>
                                         </td>
-                                        <td>
+                                        {{-- <td>
                                             <div class="flex items-center">
                                                 <input
                                                     class="form-input"
@@ -128,7 +128,7 @@
                                                     />
                                                 @endisset
                                             </div>
-                                        </td>
+                                        </td> --}}
                                     </tr>
                                 @endforeach
                             </tbody>
