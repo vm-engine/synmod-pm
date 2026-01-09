@@ -284,11 +284,11 @@ class ProjectFormObject extends Form
      */
     public function store(): void
     {
-        $this->validate();
+        $validated = $this->validate();
 
-        DB::transaction(function () {
+        DB::transaction(function () use ($validated) {
             Project::create([
-                'user_id' => $this->client_id ? $this->getClientUserId() : auth()->id(),
+                'user_id' => $this->client_id ? $this->getClientUserId() : Auth::id(),
                 'division_id' => $this->division_id,
                 'project_category_id' => $this->project_category_id,
                 'client_id' => $this->client_id,
@@ -328,8 +328,16 @@ class ProjectFormObject extends Form
                 'maintenance_type' => $this->maintenance_type,
                 'quality_score' => $this->quality_score,
                 'client_satisfaction' => $this->client_satisfaction,
-                'created_by' => auth()->id(),
+                'created_by' => Auth::id(),
             ]);
+
+            SynAuth::logActivity(
+                Auth::id(),
+                'pm.project.create',
+                'User '.Auth::user()->name.' created new project. Data: '.json_encode($validated),
+                'project',
+                'pm',
+            );
         });
 
         $this->reset();
@@ -343,6 +351,8 @@ class ProjectFormObject extends Form
         $this->validate();
 
         DB::transaction(function () {
+            $oldData = $this->project->toArray();
+
             $this->project->update([
                 'user_id' => $this->client_id ? $this->getClientUserId() : $this->project->user_id,
                 'division_id' => $this->division_id,
@@ -384,8 +394,16 @@ class ProjectFormObject extends Form
                 'maintenance_type' => $this->maintenance_type,
                 'quality_score' => $this->quality_score,
                 'client_satisfaction' => $this->client_satisfaction,
-                'updated_by' => auth()->id(),
+                'updated_by' => Auth::id(),
             ]);
+
+            SynAuth::logActivity(
+                Auth::id(),
+                'pm.project.update',
+                'User '.Auth::user()->name.' updated project data. Old Data: '.json_encode($oldData).' New Data: '.json_encode($this->project->toArray()),
+                'Project',
+                'pm',
+            );
         });
     }
 

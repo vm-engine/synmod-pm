@@ -58,7 +58,7 @@ abstract class Base
         $project->loadMissing(['client']);
 
         $cnc = $project->client->status == Client::STATUS_PROSPECT && $document->hasNCIndex() ? 'nc' : 'c';
-        $key = 'pm.documents.'.$document->code(true).'.next_'.$cnc.'_index';
+        $key = 'pm.documents.'.$project->category->code.'.'.$document->code().'.next_'.$cnc.'_index';
         $currentIndex = dbconf($key);
         dbconf([$key => $currentIndex + 1]);
     }

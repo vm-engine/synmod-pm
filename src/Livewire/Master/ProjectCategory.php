@@ -50,11 +50,21 @@ class ProjectCategory extends Component
         ]);
 
         try {
-            ModelsProjectCategory::create([
+            $data = [
                 'name' => $this->newName,
                 'code' => $this->newCode,
                 'description' => $this->newDescription,
-            ]);
+            ];
+
+            ModelsProjectCategory::create($data);
+
+            SynAuth::logActivity(
+                Auth::id(),
+                'pm.master.project_category.create',
+                'User '.Auth::user()->name.' created new project category. Name: '.json_encode($data),
+                'master.project_category',
+                'pm',
+            );
 
             $this->newName = '';
             $this->newCode = '';
@@ -97,10 +107,19 @@ class ProjectCategory extends Component
 
         try {
             $category = ModelsProjectCategory::findOrFail($id);
+            $categoryArray = $category->toArray();
             $category->name = $this->editName;
             $category->code = $this->editCode;
             $category->description = $this->editDescription;
             $category->save();
+
+            SynAuth::logActivity(
+                Auth::id(),
+                'pm.master.project_category.update',
+                'User '.Auth::user()->name.' updated project category. Old Data: '.json_encode($categoryArray).' New Data: '.json_encode($category->toArray()),
+                'master.project_category',
+                'pm',
+            );
 
             $this->cancelEdit();
         } catch (ModelNotFoundException) {
@@ -137,7 +156,16 @@ class ProjectCategory extends Component
                 throw new Exception(__('pm::messages.invalid_delete_token'));
             }
             $category = ModelsProjectCategory::findOrFail($id);
+            $categoryArray = $category->toArray();
             $category->delete();
+
+            SynAuth::logActivity(
+                Auth::id(),
+                'pm.master.project_category.delete',
+                'User '.Auth::user()->name.' deleted project category. Name: '.json_encode($categoryArray),
+                'master.project_category',
+                'pm',
+            );
         } catch (ModelNotFoundException) {
             $this->dispatch('notify', [
                 'variant' => 'danger',

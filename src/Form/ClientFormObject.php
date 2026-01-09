@@ -169,9 +169,9 @@ class ClientFormObject extends Form
      */
     public function store(): void
     {
-        $this->validate();
+        $validated = $this->validate();
 
-        DB::transaction(function () {
+        DB::transaction(function () use ($validated) {
             $UserModel = config('auth.providers.users.model');
 
             // Create user
@@ -204,8 +204,16 @@ class ClientFormObject extends Form
                 'social_media' => $this->parseSocialMedia(),
                 'status' => $this->status,
                 'active' => $this->active,
-                'created_by' => auth()->id(),
+                'created_by' => Auth::id(),
             ]);
+
+            SynAuth::logActivity(
+                Auth::id(),
+                'pm.client.create',
+                'User '.Auth::user()->name.' created new client. Data: '.json_encode($validated),
+                'client',
+                'pm',
+            );
         });
 
         $this->reset();
@@ -218,7 +226,9 @@ class ClientFormObject extends Form
     {
         $this->validate();
 
-        DB::transaction(function () {
+        $oldData = $this->client->toArray();
+
+        DB::transaction(function () use ($oldData) {
             // Update user
             $user = $this->client->user;
             $userData = [
@@ -248,8 +258,16 @@ class ClientFormObject extends Form
                 'social_media' => $this->parseSocialMedia(),
                 'status' => $this->status,
                 'active' => $this->active,
-                'updated_by' => auth()->id(),
+                'updated_by' => Auth::id(),
             ]);
+
+            SynAuth::logActivity(
+                Auth::id(),
+                'pm.client.update',
+                'User '.Auth::user()->name.' updated client data. Old Data: '.json_encode($oldData).' New Data: '.json_encode($this->client->toArray()),
+                'client',
+                'pm',
+            );
         });
     }
 

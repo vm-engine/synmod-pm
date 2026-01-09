@@ -139,7 +139,17 @@ class ClientList extends Component
 
             DB::transaction(function () use ($client) {
                 // Delete client first (user will cascade or be handled separately)
+                $clientArray = $client->toArray();
+
                 $client->delete();
+
+                SynAuth::logActivity(
+                    Auth::id(),
+                    'pm.client.delete',
+                    'User '.Auth::user()->name.' deleted client data. Data: '.json_encode($clientArray),
+                    'client',
+                    'pm',
+                );
             });
 
             $this->dispatch('notify', [

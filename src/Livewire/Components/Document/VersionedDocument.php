@@ -67,7 +67,7 @@ class VersionedDocument extends Component
      */
     protected function canAccessDocument(): bool
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         if (! $user) {
             return false;
@@ -139,9 +139,9 @@ class VersionedDocument extends Component
 
         $documentType = $this->getDocumentType();
 
-        $this->project->documents()->create([
+        $data = [
             'client_id' => $this->project->client_id,
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'type' => $documentType,
             'number' => $this->documentCode,
             'notes' => $this->notes,
@@ -153,11 +153,21 @@ class VersionedDocument extends Component
                 'mime_type' => $this->file->getMimeType(),
             ],
             // Additional fields as necessary
-        ]);
+        ];
+
+        $this->project->documents()->create($data);
 
         // Call uploaded hook and increment index
         $this->getDocumentHandler()->uploaded($this->project, $documentType);
         $this->getDocumentHandler()->incrementIndex($this->project, $documentType);
+
+        SynAuth::logActivity(
+            Auth::id(),
+            'pm.project.documents.uploaded',
+            'User '.Auth::user()->name.' uploaded '.$documentType->label().' document. Data: '.json_encode($data),
+            'project.documents',
+            'pm',
+        );
 
         $this->dispatch('notify', [
             'variant' => 'success',
@@ -281,7 +291,7 @@ class VersionedDocument extends Component
         // Create new document version
         $this->project->documents()->create([
             'client_id' => $this->project->client_id,
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'type' => $oldDocument->type,
             'number' => $oldDocument->number,
             'notes' => 'Restored from version '.$oldDocument->version.'. '.$oldDocument->notes,

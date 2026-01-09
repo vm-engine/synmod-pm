@@ -2,9 +2,11 @@
 
 namespace VmEngine\Pm\Livewire;
 
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use VmEngine\Pm\Enums\Documents;
 use VmEngine\Synapse\Services\Helper\Breadcrumbs;
+use VmEngine\SynAuth\Facades\SynAuth;
 
 class Config extends Component
 {
@@ -19,7 +21,7 @@ class Config extends Component
     public function save(): void
     {
         // Check permission
-        if (! auth()->user()->can('pm.config.update')) {
+        if (! Auth::user()->can('pm.config.update')) {
             session()->flash('error', __('synapse::messages.no_permission'));
 
             return;
@@ -34,6 +36,14 @@ class Config extends Component
             //     dbconf(["pm.documents.{$key}.next_nc_index" => $this->docConfigs['next_nc_index'][$key]]);
             // }
         }
+
+        SynAuth::logActivity(
+            Auth::id(),
+            'pm.config.update',
+            'User '.Auth::user()->name.' updated configuration',
+            'config',
+            'pm',
+        );
 
         $this->dispatch('notify', [
             'variant' => 'success',

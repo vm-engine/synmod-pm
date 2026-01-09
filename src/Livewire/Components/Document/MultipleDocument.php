@@ -64,7 +64,7 @@ class MultipleDocument extends Component
      */
     protected function canAccessDocument(): bool
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         if (! $user) {
             return false;
@@ -132,9 +132,9 @@ class MultipleDocument extends Component
 
         $documentType = $this->getDocumentType();
 
-        $this->project->documents()->create([
+        $data = [
             'client_id' => $this->project->client_id,
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'type' => $documentType,
             'number' => $this->documentCode,
             'notes' => $this->notes,
@@ -145,10 +145,21 @@ class MultipleDocument extends Component
                 'size' => $this->file->getSize(),
                 'mime_type' => $this->file->getMimeType(),
             ],
-        ]);
+        ];
+
+        $this->project->documents()->create($data);
 
         // Call uploaded hook
         $this->getDocumentHandler()->uploaded($this->project, $documentType);
+        $this->getDocumentHandler()->incrementIndex($this->project, $documentType);
+
+        SynAuth::logActivity(
+            Auth::id(),
+            'pm.project.documents.uploaded',
+            'User '.Auth::user()->name.' uploaded '.$documentType->label().' document. Data: '.json_encode($data),
+            'project.documents',
+            'pm',
+        );
 
         $this->dispatch('notify', [
             'variant' => 'success',

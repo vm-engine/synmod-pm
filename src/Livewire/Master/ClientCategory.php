@@ -41,6 +41,14 @@ class ClientCategory extends Component
                 'description' => $this->newDescription ?: null,
             ]);
 
+            SynAuth::logActivity(
+                Auth::id(),
+                'pm.master.client_category.create',
+                'User '.Auth::user()->name.' created new client category. Name: '.$this->newName,
+                'master.client_category',
+                'pm',
+            );
+
             $this->newName = '';
             $this->newDescription = '';
         } catch (Exception $e) {
@@ -78,9 +86,19 @@ class ClientCategory extends Component
 
         try {
             $category = ModelsClientCategory::findOrFail($id);
+            $categoryArray = $category->toArray();
+
             $category->name = $this->editName;
             $category->description = $this->editDescription ?: null;
             $category->save();
+
+            SynAuth::logActivity(
+                Auth::id(),
+                'pm.master.client_category.update',
+                'User '.Auth::user()->name.' updated client category. Old Data: '.json_encode($categoryArray).' New Data: '.json_encode($category->toArray()),
+                'master.client_category',
+                'pm',
+            );
 
             $this->cancelEdit();
         } catch (ModelNotFoundException) {
@@ -116,7 +134,16 @@ class ClientCategory extends Component
                 throw new Exception(__('pm::messages.invalid_delete_token'));
             }
             $category = ModelsClientCategory::findOrFail($id);
+            $categoryArray = $category->toArray();
             $category->delete();
+
+            SynAuth::logActivity(
+                Auth::id(),
+                'pm.master.client_category.delete',
+                'User '.Auth::user()->name.' deleted client category. Name: '.json_encode($categoryArray),
+                'master.client_category',
+                'pm',
+            );
         } catch (ModelNotFoundException) {
             $this->dispatch('notify', [
                 'variant' => 'danger',

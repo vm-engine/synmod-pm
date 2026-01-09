@@ -33,7 +33,6 @@
                         type="text"
                         wire:model="documentCode"
                         placeholder="e.g., DOC-001, CONTRACT-2025-001"
-                        @readonly($revisionMode)
                     />
                     @error('documentCode')
                         <span class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>

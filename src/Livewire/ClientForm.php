@@ -11,6 +11,7 @@ use VmEngine\Pm\Form\ClientFormObject;
 use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\ClientCategory;
 use VmEngine\Synapse\Services\Helper\Breadcrumbs;
+use VmEngine\SynAuth\Facades\SynAuth;
 
 class ClientForm extends Component
 {

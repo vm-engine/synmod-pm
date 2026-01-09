@@ -46,10 +46,20 @@ class Division extends Component
                 'newDivisionCode' => 'required',
             ]);
 
-            ModelsDivision::create([
+            $data = [
                 'name' => $this->newDivision,
                 'code' => $this->newDivisionCode,
-            ]);
+            ];
+
+            ModelsDivision::create($data);
+
+            SynAuth::logActivity(
+                Auth::id(),
+                'pm.master.division.create',
+                'User '.Auth::user()->name.' created new division. Name: '.json_encode($data),
+                'master.client_category',
+                'pm',
+            );
 
             $this->newDivision = '';
             $this->newDivisionCode = '';
@@ -89,9 +99,18 @@ class Division extends Component
             ]);
 
             $division = ModelsDivision::findOrFail($id);
+            $divisionArray = $division->toArray();
             $division->name = $this->editText;
             $division->code = $this->editCode;
             $division->save();
+
+            SynAuth::logActivity(
+                Auth::id(),
+                'pm.master.division.update',
+                'User '.Auth::user()->name.' updated division. Old Data: '.json_encode($divisionArray).' New Data: '.json_encode($division->toArray()),
+                'master.division',
+                'pm',
+            );
 
             $this->cancelEdit();
         } catch (ModelNotFoundException) {
@@ -128,8 +147,18 @@ class Division extends Component
                 throw new Exception(__('pm::messages.invalid_delete_token'));
             }
             $division = ModelsDivision::findOrFail($id);
+            $divisionArray = $division->toArray();
+            $subDivisionArray = $division->subDivisions()->get()->toArray();
             $division->subDivisions()->delete();
             $division->delete();
+
+            SynAuth::logActivity(
+                Auth::id(),
+                'pm.master.division.update',
+                'User '.Auth::user()->name.' deleted division and all it\'s sub divisions. Data: '.json_encode($divisionArray).' Sub Divisions: '.json_encode($subDivisionArray),
+                'master.division',
+                'pm',
+            );
         } catch (ModelNotFoundException) {
             $this->dispatch('notify', [
                 'variant' => 'danger',
@@ -164,6 +193,14 @@ class Division extends Component
                 'name' => $this->newSubDivision[$divisionId] ?? '',
             ]);
 
+            SynAuth::logActivity(
+                Auth::id(),
+                'pm.master.division.sub.create',
+                'User '.Auth::user()->name.' created new sub division under '.$division->name.' division. Name: '.($this->newSubDivision[$divisionId] ?? ''),
+                'master.division.sub',
+                'pm',
+            );
+
             $this->newSubDivision[$divisionId] = '';
         } catch (Exception $e) {
             $this->dispatch('notify', [
@@ -195,8 +232,17 @@ class Division extends Component
     {
         try {
             $subDivision = SubDivision::findOrFail($id);
+            $subDivisionArray = $subDivision->toArray();
             $subDivision->name = $this->editSubText;
             $subDivision->save();
+
+            SynAuth::logActivity(
+                Auth::id(),
+                'pm.master.division.sub.update',
+                'User '.Auth::user()->name.' updated sub division. Old Data: '.json_encode($subDivisionArray).' New Data: '.json_encode($subDivision->toArray()),
+                'master.division.sub',
+                'pm',
+            );
 
             $this->cancelEdit();
         } catch (ModelNotFoundException) {
@@ -233,7 +279,16 @@ class Division extends Component
                 throw new Exception(__('pm::messages.invalid_delete_token'));
             }
             $subDivision = SubDivision::findOrFail($id);
+            $subDivisionArray = $subDivision->toArray();
             $subDivision->delete();
+
+            SynAuth::logActivity(
+                Auth::id(),
+                'pm.master.division.sub.delete',
+                'User '.Auth::user()->name.' deleted sub division. Data: '.json_encode($subDivisionArray),
+                'master.division.sub',
+                'pm',
+            );
         } catch (ModelNotFoundException) {
             $this->dispatch('notify', [
                 'variant' => 'danger',

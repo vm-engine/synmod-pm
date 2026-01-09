@@ -172,7 +172,16 @@ class ProjectList extends Component
             $project = Project::findOrFail($id);
 
             DB::transaction(function () use ($project) {
+                $projectArray = $project->toArray();
                 $project->delete();
+
+                SynAuth::logActivity(
+                    Auth::id(),
+                    'pm.project.delete',
+                    'User '.Auth::user()->name.' deleted project data. Data: '.json_encode($projectArray),
+                    'project',
+                    'pm',
+                );
             });
 
             $this->dispatch('notify', [
@@ -196,7 +205,7 @@ class ProjectList extends Component
             ->withCount('documents');
 
         // SECURITY: If user has client role, only show their own projects
-        $user = auth()->user();
+        $user = Auth::user();
         $clientRoleId = dbconf('pm.client_role_id');
         if ($clientRoleId && $user->roles()->where('roles.id', $clientRoleId)->exists()) {
             // Get client record for this user
