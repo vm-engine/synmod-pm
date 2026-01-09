@@ -24,5 +24,5 @@ return [
     ],
     'config' => [
         'label' => 'Configuration',
-    ]
+    ],
 ];
