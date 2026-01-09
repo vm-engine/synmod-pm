@@ -159,7 +159,7 @@ class ClientList extends Component
     #[Computed()]
     public function clientList()
     {
-        $query = Client::with('category', 'user');
+        $query = Client::with('category', 'user', 'projectCategories');
 
         // Apply search
         if (! empty($this->q) && strlen($this->q) > 2) {

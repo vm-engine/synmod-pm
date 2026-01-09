@@ -33,7 +33,7 @@ return [
     // Table columns
     'col_company' => 'Company',
     'col_category' => 'Category',
-    'col_director' => 'Director',
+    'col_pic' => 'PIC',
     'col_services' => 'Services',
     'col_status' => 'Status',
     'col_active' => 'Active',

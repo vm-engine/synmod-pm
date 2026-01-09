@@ -411,10 +411,8 @@
                     id="filterYear"
                     name="filterYear"
                     wire:model.live="filterYear"
-                    :options="array_merge(
-                        ['' => __('pm::project.all_years')],
-                        collect($years)->pluck('label', 'value')->toArray(),
-                    )"
+                    :options="['' => __('pm::project.all_years')] +
+                        collect($years)->pluck('label', 'value')->toArray()"
                 />
             </div>
 

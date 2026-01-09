@@ -66,7 +66,7 @@
                                     <p>{{ __('pm::client.col_category') }}</p>
                                 </th>
                                 <th>
-                                    <p>{{ __('pm::client.col_director') }}</p>
+                                    <p>{{ __('pm::client.col_pic') }}</p>
                                 </th>
                                 <th>
                                     <p>{{ __('pm::client.col_services') }}</p>
@@ -120,28 +120,24 @@
                                     </td>
                                     <td>
                                         <div class="flex items-center">
-                                            <p>{{ $client->director ?? '-' }}</p>
+                                            <p>{{ $client->pic ?? '-' }}
+                                                @if ($client->phone)
+                                                    <br><small><b>Phone:</b> {{ $client->phone }}</small>
+                                                @endif
+                                            </p>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="flex flex-wrap gap-1">
-                                            @if (!empty($client->services))
-                                                @foreach ($client->services as $serviceId)
-                                                    @php
-                                                        $service = \VmEngine\Pm\Enums\Services::tryFrom($serviceId);
-                                                    @endphp
-                                                    @if ($service)
-                                                        <button
-                                                            class="{{ in_array($serviceId, $filterServices)
-                                                                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-                                                                : 'bg-gray-100 text-gray-700 hover:bg-blue-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-blue-900/20' }} inline-flex cursor-pointer items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors"
-                                                            type="button"
-                                                            title="{{ __('pm::client.tooltip_filter_service') }}"
-                                                            wire:click="filterByService({{ $serviceId }})"
-                                                        >
-                                                            <span>{{ $service->label() }}</span>
-                                                        </button>
-                                                    @endif
+                                            @if ($client->projectCategories->count())
+                                                @foreach ($client->projectCategories as $category)
+                                                    <button
+                                                        class="inline-flex cursor-pointer items-center gap-1 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700 transition-colors dark:bg-blue-900/30 dark:text-blue-300"
+                                                        type="button"
+                                                        title="{{ __('pm::client.tooltip_filter_service') }}"
+                                                    >
+                                                        <span>{{ $category->name }}</span>
+                                                    </button>
                                                 @endforeach
                                             @else
                                                 <span

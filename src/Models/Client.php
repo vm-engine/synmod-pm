@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use VmEngine\Pm\Factories\ClientFactory;
 use VmEngine\Synapse\Traits\WithDeleteToken;
 use VmEngine\SynAuth\Traits\HasCreator;
@@ -106,6 +107,14 @@ class Client extends Model
     public function projects(): HasMany
     {
         return $this->hasMany(Project::class, 'user_id', 'user_id');
+    }
+
+    /**
+     * Get project categories by this client
+     */
+    public function projectCategories(): HasManyThrough
+    {
+        return $this->hasManyThrough(ProjectCategory::class, Project::class, 'client_id', 'id', 'id', 'project_category_id')->distinct();
     }
 
     /**

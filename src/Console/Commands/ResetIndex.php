@@ -4,6 +4,7 @@ namespace VmEngine\Pm\Console\Commands;
 
 use Illuminate\Console\Command;
 use VmEngine\Pm\Enums\Documents;
+use VmEngine\Pm\Models\ProjectCategory;
 
 class ResetIndex extends Command
 {
@@ -22,14 +23,17 @@ class ResetIndex extends Command
      */
     public function handle(): int
     {
-        foreach (Documents::cases() as $document) {
-            dbconf([
-                'pm.documents.'.$document->code(true).'.next_c_index' => 1,
-            ]);
-            if ($document->hasNCIndex()) {
+        $categories = ProjectCategory::all();
+        foreach ($categories as $category) {
+            foreach (Documents::cases() as $document) {
                 dbconf([
-                    'pm.documents.'.$document->code(true).'.next_nc_index' => 1,
+                    'pm.documents.'.$category->code.'.'.$document->code().'.next_c_index' => 1,
                 ]);
+                if ($document->hasNCIndex()) {
+                    dbconf([
+                        'pm.documents.'.$category->code.'.'.$document->code().'.next_nc_index' => 1,
+                    ]);
+                }
             }
         }
         $this->components->info('Document index has beenreset.');

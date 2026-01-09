@@ -22,4 +22,7 @@ return [
         'client_category' => 'Client Category Management',
         'project_category' => 'Project Category Management',
     ],
+    'config' => [
+        'label' => 'Configuration',
+    ]
 ];

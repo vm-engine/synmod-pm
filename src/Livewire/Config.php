@@ -29,10 +29,10 @@ class Config extends Component
         foreach (Documents::cases() as $document) {
             $key = strtolower($document->code());
             dbconf(["pm.documents.{$key}.number_format" => $this->docConfigs['format'][$key]]);
-            dbconf(["pm.documents.{$key}.next_c_index" => $this->docConfigs['next_c_index'][$key]]);
-            if ($document->hasNCIndex()) {
-                dbconf(["pm.documents.{$key}.next_nc_index" => $this->docConfigs['next_nc_index'][$key]]);
-            }
+            // dbconf(["pm.documents.{$key}.next_c_index" => $this->docConfigs['next_c_index'][$key]]);
+            // if ($document->hasNCIndex()) {
+            //     dbconf(["pm.documents.{$key}.next_nc_index" => $this->docConfigs['next_nc_index'][$key]]);
+            // }
         }
 
         $this->dispatch('notify', [

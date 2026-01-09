@@ -240,7 +240,7 @@ class ProjectList extends Component
         }
 
         // Apply year filter
-        if ($this->filterYear) {
+        if (! empty($this->filterYear)) {
             $query->where('year', $this->filterYear);
         }
 
@@ -281,12 +281,13 @@ class ProjectList extends Component
             'label' => $p->label(),
         ])->toArray();
 
-        // Generate year options (current year ± 5 years)
-        $currentYear = (int) date('Y');
-        $years = [];
-        for ($i = $currentYear - 5; $i <= $currentYear + 5; $i++) {
-            $years[] = ['value' => $i, 'label' => (string) $i];
-        }
+        // Get Years from Projects
+        $years = Project::select('year')
+            ->distinct()
+            ->orderBy('year')
+            ->pluck('year')
+            ->map(fn ($y) => ['value' => (string) $y, 'label' => (string) $y])
+            ->toArray();
 
         $progressRanges = [
             ['value' => '0-25', 'label' => '0-25%'],

@@ -110,7 +110,7 @@
                         @enderror
                     </div>
 
-                    <div class="form-box">
+                    {{-- <div class="form-box">
                         <label for="services">{{ __('pm::client.services') }}</label>
                         <x-synapse-adv-select
                             wire-model="form.services"
@@ -121,7 +121,7 @@
                         @error('form.services')
                             <p class="form-error-message">{{ $message }}</p>
                         @enderror
-                    </div>
+                    </div> --}}
 
                     <div class="form-box">
                         <label for="social_media">{{ __('pm::client.social_media') }}</label>

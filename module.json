@@ -35,41 +35,47 @@
                     "name": "__pm::menu.be.project.index",
                     "class": "",
                     "route": "pm.project.index",
-                    "icon": "fa-solid fa-diagram-project"
+                    "icon": "fa-solid fa-diagram-project",
+                    "acl": "pm.project.read"
                 },
                 "client": {
                     "id": "client",
                     "name": "__pm::menu.be.client.index",
                     "class": "",
                     "route": "pm.client.index",
-                    "icon": "fa-solid fa-users"
+                    "icon": "fa-solid fa-users",
+                    "acl": "pm.client.read"
                 },
                 "master": {
                     "id": "master",
                     "name": "__pm::menu.be.master.parent",
                     "class": "",
                     "icon": "fa-solid fa-table",
+                    "acl": "pm.master.division.read|pm.master.client_category.read|pm.master.project_category.read",
                     "sub": {
                         "division": {
                             "id": "division",
                             "name": "__pm::menu.be.master.division",
                             "class": "",
                             "route": "pm.master.division",
-                            "icon": "fa-solid fa-building"
+                            "icon": "fa-solid fa-building",
+                            "acl": "pm.master.division.read"
                         },
                         "client_category": {
                             "id": "client_category",
                             "name": "__pm::menu.be.master.client_category",
                             "class": "",
                             "route": "pm.master.client_category",
-                            "icon": "fa-solid fa-tags"
+                            "icon": "fa-solid fa-tags",
+                            "acl": "pm.master.client_category.read"
                         },
                         "project_category": {
                             "id": "project_category",
                             "name": "__pm::menu.be.master.project_category",
                             "class": "",
                             "route": "pm.master.project_category",
-                            "icon": "fa-solid fa-folder-tree"
+                            "icon": "fa-solid fa-folder-tree",
+                            "acl": "pm.master.project_category.read"
                         }
                     }
                 },
@@ -78,7 +84,8 @@
                     "name": "__pm::menu.be.config.index",
                     "class": "",
                     "route": "pm.config",
-                    "icon": "fa-solid fa-gear"
+                    "icon": "fa-solid fa-gear",
+                    "acl": "pm.config.read"
                 }
             }
         }

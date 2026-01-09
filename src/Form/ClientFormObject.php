@@ -30,7 +30,7 @@ class ClientFormObject extends Form
 
     public string $phone = '';
 
-    public array $services = [];
+    // public array $services = [];
 
     public string $social_media = '';  // Textarea input
 
@@ -64,7 +64,7 @@ class ClientFormObject extends Form
         $this->director = $client->director ?? '';
         $this->pic = $client->pic ?? '';
         $this->phone = $client->phone ?? '';
-        $this->services = $client->services ?? [];
+        // $this->services = $client->services ?? [];
         $this->social_media = implode("\n", $client->social_media ?? []);
         $this->status = $client->status;
         $this->active = $client->active;
@@ -95,7 +95,7 @@ class ClientFormObject extends Form
             'pic' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:20',
             'services' => 'nullable|array',
-            'services.*' => 'integer',
+            // 'services.*' => 'integer',
             'social_media' => 'nullable|string',
             'status' => 'required|integer|in:0,1',
             'active' => 'boolean',
@@ -200,7 +200,7 @@ class ClientFormObject extends Form
                 'director' => $this->director,
                 'pic' => $this->pic,
                 'phone' => $this->phone,
-                'services' => $this->services,
+                'services' => [],
                 'social_media' => $this->parseSocialMedia(),
                 'status' => $this->status,
                 'active' => $this->active,
@@ -244,7 +244,7 @@ class ClientFormObject extends Form
                 'director' => $this->director,
                 'pic' => $this->pic,
                 'phone' => $this->phone,
-                'services' => $this->services,
+                'services' => [],
                 'social_media' => $this->parseSocialMedia(),
                 'status' => $this->status,
                 'active' => $this->active,
