@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.6] - 2026-01-09
+
+### Added
+- Added logging to all user activity
+
+### Changed
+- Remove readonly attribute from Document Number form
+
 ## [0.4.5] - 2026-01-09
 
 ### Fixed
