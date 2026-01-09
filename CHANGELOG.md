@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.5] - 2026-01-09
+
+### Fixed
+- Division component now properly clears code field after creation and update
+- ClientCategory component converts empty description to null
+- Removed services field from ClientFormObject (temporarily disabled feature)
+- Updated tests to match code changes and use unique identifiers
+- Reduced test failures from 31 to 6 (improved test coverage)
+
+### Changed
+- Enhanced test suite with better data isolation using unique IDs
+- Improved test reliability for client creation and updates
+
 ## [0.4.4] - 2026-01-08
 
 ### Changed
