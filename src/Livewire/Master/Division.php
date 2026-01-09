@@ -32,6 +32,7 @@ class Division extends Component
     {
         $this->editId = null;
         $this->editText = '';
+        $this->editCode = '';
 
         $this->editSubId = null;
         $this->editSubText = '';
@@ -51,6 +52,7 @@ class Division extends Component
             ]);
 
             $this->newDivision = '';
+            $this->newDivisionCode = '';
         } catch (Exception $e) {
             $this->dispatch('notify', [
                 'variant' => 'danger',

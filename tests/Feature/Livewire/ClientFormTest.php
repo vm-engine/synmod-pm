@@ -45,7 +45,7 @@ test('can create new client with user', function () {
         ->set('form.director', 'John Doe')
         ->set('form.pic', 'Jane Smith')
         ->set('form.phone', '555-1234')
-        ->set('form.services', [1, 2])
+        // ->set('form.services', [1, 2]) // Services field removed
         ->set('form.social_media', "website.com\nlinkedin.com/company")
         ->set('form.status', Client::STATUS_ACTIVE)
         ->set('form.active', true)
@@ -67,6 +67,7 @@ test('can create new client with user', function () {
 
 test('creates user with correct status for active client', function () {
     $category = ClientCategory::factory()->create();
+    $uniqueId = substr(md5(uniqid()), 0, 8);
 
     Volt::test(ClientForm::class)
         ->set('form.company', 'Active Company')
@@ -74,18 +75,21 @@ test('creates user with correct status for active client', function () {
         ->set('form.status', Client::STATUS_ACTIVE)
         ->set('form.active', true)
         ->set('form.name', 'Active User')
-        ->set('form.username', 'activeuser')
-        ->set('form.email', '[email protected]')
+        ->set('form.username', "activeuser{$uniqueId}")
+        ->set('form.email', "active{$uniqueId}@example.com")
         ->set('form.password', 'Test@1234')
         ->set('form.password_confirmation', 'Test@1234')
-        ->call('save');
+        ->call('save')
+        ->assertHasNoErrors();
 
     $client = Client::where('company', 'Active Company')->first();
+    expect($client)->not->toBeNull();
     expect($client->user->status)->toBe(1);
 });
 
 test('creates user with inactive status for prospect client', function () {
     $category = ClientCategory::factory()->create();
+    $uniqueId = substr(md5(uniqid()), 0, 8);
 
     Volt::test(ClientForm::class)
         ->set('form.company', 'Prospect Company')
@@ -93,18 +97,21 @@ test('creates user with inactive status for prospect client', function () {
         ->set('form.status', Client::STATUS_PROSPECT)
         ->set('form.active', true)
         ->set('form.name', 'Prospect User')
-        ->set('form.username', 'prospectuser')
-        ->set('form.email', '[email protected]')
+        ->set('form.username', "prospectuser{$uniqueId}")
+        ->set('form.email', "prospect{$uniqueId}@example.com")
         ->set('form.password', 'Test@1234')
         ->set('form.password_confirmation', 'Test@1234')
-        ->call('save');
+        ->call('save')
+        ->assertHasNoErrors();
 
     $client = Client::where('company', 'Prospect Company')->first();
+    expect($client)->not->toBeNull();
     expect($client->user->status)->toBe(0);
 });
 
 test('creates user with inactive status when active is false', function () {
     $category = ClientCategory::factory()->create();
+    $uniqueId = substr(md5(uniqid()), 0, 8);
 
     Volt::test(ClientForm::class)
         ->set('form.company', 'Inactive Company')
@@ -112,13 +119,15 @@ test('creates user with inactive status when active is false', function () {
         ->set('form.status', Client::STATUS_ACTIVE)
         ->set('form.active', false)
         ->set('form.name', 'Inactive User')
-        ->set('form.username', 'inactiveuser')
-        ->set('form.email', '[email protected]')
+        ->set('form.username', "inactiveuser{$uniqueId}")
+        ->set('form.email', "inactive{$uniqueId}@example.com")
         ->set('form.password', 'Test@1234')
         ->set('form.password_confirmation', 'Test@1234')
-        ->call('save');
+        ->call('save')
+        ->assertHasNoErrors();
 
     $client = Client::where('company', 'Inactive Company')->first();
+    expect($client)->not->toBeNull();
     expect($client->user->status)->toBe(0);
 });
 
@@ -287,50 +296,62 @@ test('validates status is valid', function () {
 
 test('parses social media textarea into array', function () {
     $category = ClientCategory::factory()->create();
+    $uniqueId = substr(md5(uniqid()), 0, 8);
 
     Volt::test(ClientForm::class)
-        ->set('form.company', 'Test Company')
+        ->set('form.company', "Test Company {$uniqueId}")
         ->set('form.client_category_id', $category->id)
         ->set('form.social_media', "website.com\nlinkedin.com\n\nfacebook.com")
         ->set('form.name', 'Test User')
-        ->set('form.email', '[email protected]')
+        ->set('form.username', "testuser{$uniqueId}")
+        ->set('form.email', "test{$uniqueId}@social.com")
         ->set('form.password', 'Test@1234')
         ->set('form.password_confirmation', 'Test@1234')
-        ->call('save');
+        ->call('save')
+        ->assertHasNoErrors();
 
-    $client = Client::where('company', 'Test Company')->first();
+    $client = Client::where('company', "Test Company {$uniqueId}")->first();
+    expect($client)->not->toBeNull();
     expect($client->social_media)->toBe(['website.com', 'linkedin.com', 'facebook.com']);
 });
 
 test('sets email verified at on user creation', function () {
     $category = ClientCategory::factory()->create();
+    $uniqueId = substr(md5(uniqid()), 0, 8);
 
     Volt::test(ClientForm::class)
-        ->set('form.company', 'Test Company')
+        ->set('form.company', "Test Company {$uniqueId}")
         ->set('form.client_category_id', $category->id)
         ->set('form.name', 'Test User')
-        ->set('form.email', '[email protected]')
+        ->set('form.username', "testuser{$uniqueId}")
+        ->set('form.email', "test{$uniqueId}@verified.com")
         ->set('form.password', 'Test@1234')
         ->set('form.password_confirmation', 'Test@1234')
-        ->call('save');
+        ->call('save')
+        ->assertHasNoErrors();
 
-    $client = Client::where('company', 'Test Company')->first();
+    $client = Client::where('company', "Test Company {$uniqueId}")->first();
+    expect($client)->not->toBeNull();
     expect($client->user->email_verified_at)->not->toBeNull();
 });
 
 test('sets created_by field on creation', function () {
     $category = ClientCategory::factory()->create();
+    $uniqueId = substr(md5(uniqid()), 0, 8);
 
     Volt::test(ClientForm::class)
-        ->set('form.company', 'Test Company')
+        ->set('form.company', "Test Company {$uniqueId}")
         ->set('form.client_category_id', $category->id)
         ->set('form.name', 'Test User')
-        ->set('form.email', '[email protected]')
+        ->set('form.username', "testuser{$uniqueId}")
+        ->set('form.email', "test{$uniqueId}@created.com")
         ->set('form.password', 'Test@1234')
         ->set('form.password_confirmation', 'Test@1234')
-        ->call('save');
+        ->call('save')
+        ->assertHasNoErrors();
 
-    $client = Client::where('company', 'Test Company')->first();
+    $client = Client::where('company', "Test Company {$uniqueId}")->first();
+    expect($client)->not->toBeNull();
     expect($client->created_by)->toBe($this->user->id);
 });
 

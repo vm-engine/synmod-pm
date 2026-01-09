@@ -94,7 +94,7 @@ class ClientFormObject extends Form
             'director' => 'nullable|string|max:255',
             'pic' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:20',
-            'services' => 'nullable|array',
+            // 'services' => 'nullable|array',
             // 'services.*' => 'integer',
             'social_media' => 'nullable|string',
             'status' => 'required|integer|in:0,1',

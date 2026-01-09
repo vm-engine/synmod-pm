@@ -29,6 +29,7 @@ test('displays division list', function () {
 test('can create new division', function () {
     Volt::test(Division::class)
         ->set('newDivision', 'New Division')
+        ->set('newDivisionCode', 'ND')
         ->call('store')
         ->assertDispatched('notify');
 
@@ -38,29 +39,33 @@ test('can create new division', function () {
 test('clears form after creating division', function () {
     Volt::test(Division::class)
         ->set('newDivision', 'Test Division')
+        ->set('newDivisionCode', 'TD')
         ->call('store')
         ->assertSet('newDivision', '');
 });
 
 test('can edit division', function () {
-    $division = ModelsDivision::factory()->create(['name' => 'Old Name']);
+    $division = ModelsDivision::factory()->create(['name' => 'Old Name', 'code' => 'ON']);
 
     Volt::test(Division::class)
         ->call('edit', $division->id)
         ->assertSet('editId', $division->id)
-        ->assertSet('editText', 'Old Name');
+        ->assertSet('editText', 'Old Name')
+        ->assertSet('editCode', 'ON');
 });
 
 test('can update division', function () {
-    $division = ModelsDivision::factory()->create(['name' => 'Old Name']);
+    $division = ModelsDivision::factory()->create(['name' => 'Old Name', 'code' => 'ON']);
 
     Volt::test(Division::class)
         ->call('edit', $division->id)
         ->set('editText', 'New Name')
+        ->set('editCode', 'NN')
         ->call('update', $division->id)
         ->assertDispatched('notify');
 
     expect($division->fresh()->name)->toBe('New Name');
+    expect($division->fresh()->code)->toBe('NN');
 });
 
 test('clears edit form after updating division', function () {
@@ -69,9 +74,11 @@ test('clears edit form after updating division', function () {
     Volt::test(Division::class)
         ->call('edit', $division->id)
         ->set('editText', 'Updated')
+        ->set('editCode', 'UP')
         ->call('update', $division->id)
         ->assertSet('editId', null)
-        ->assertSet('editText', '');
+        ->assertSet('editText', '')
+        ->assertSet('editCode', '');
 });
 
 test('can delete division', function () {

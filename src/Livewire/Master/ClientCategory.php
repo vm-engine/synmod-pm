@@ -38,7 +38,7 @@ class ClientCategory extends Component
         try {
             ModelsClientCategory::create([
                 'name' => $this->newName,
-                'description' => $this->newDescription,
+                'description' => $this->newDescription ?: null,
             ]);
 
             $this->newName = '';
@@ -79,7 +79,7 @@ class ClientCategory extends Component
         try {
             $category = ModelsClientCategory::findOrFail($id);
             $category->name = $this->editName;
-            $category->description = $this->editDescription;
+            $category->description = $this->editDescription ?: null;
             $category->save();
 
             $this->cancelEdit();
