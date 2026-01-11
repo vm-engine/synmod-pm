@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace VmEngine\Pm\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use VmEngine\Pm\Factories\IssuerBankAccountFactory;
 use VmEngine\SynAuth\Traits\HasCreator;
 use VmEngine\SynAuth\Traits\HasUpdater;
 
-class IssuerBankAccount extends Model
+class IssuerBankAccount extends Pivot
 {
     use HasCreator;
     use HasFactory;

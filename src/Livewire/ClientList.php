@@ -151,12 +151,6 @@ class ClientList extends Component
                     'pm',
                 );
             });
-
-            $this->dispatch('notify', [
-                'variant' => 'success',
-                'title' => __('pm::messages.success'),
-                'message' => __('pm::messages.client_deleted_successfully'),
-            ]);
         } catch (Exception $e) {
             $this->dispatch('notify', [
                 'variant' => 'danger',
@@ -164,6 +158,13 @@ class ClientList extends Component
                 'message' => $e->getMessage(),
             ]);
         }
+
+        $this->dispatch('synapse-confirmed');
+        $this->dispatch('notify', [
+            'variant' => 'success',
+            'title' => __('pm::messages.success'),
+            'message' => __('pm::messages.client_deleted_successfully'),
+        ]);
     }
 
     #[Computed()]

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use VmEngine\Pm\Factories\ProjectInvoiceFactory;
+use VmEngine\Synapse\Traits\WithDeleteToken;
 use VmEngine\SynAuth\Traits\HasCreator;
 use VmEngine\SynAuth\Traits\HasUpdater;
 
@@ -17,6 +18,7 @@ class ProjectInvoice extends Model
     use HasCreator;
     use HasFactory;
     use HasUpdater;
+    use WithDeleteToken;
 
     protected $fillable = [
         'project_id',

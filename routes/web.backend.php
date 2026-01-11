@@ -4,8 +4,10 @@ use Illuminate\Support\Facades\Route;
 use VmEngine\Pm\Livewire\ClientForm;
 use VmEngine\Pm\Livewire\ClientList;
 use VmEngine\Pm\Livewire\Config;
+use VmEngine\Pm\Livewire\Master\BankAccount;
 use VmEngine\Pm\Livewire\Master\ClientCategory;
 use VmEngine\Pm\Livewire\Master\Division;
+use VmEngine\Pm\Livewire\Master\Issuer;
 use VmEngine\Pm\Livewire\Master\ProjectCategory;
 use VmEngine\Pm\Livewire\Project\ProjectDetail;
 use VmEngine\Pm\Livewire\Project\ProjectForm;
@@ -41,6 +43,10 @@ Route::group([], function () {
         ->name('master.client_category')->middleware('can-access:pm.master.client_category');
     Route::get('/master/project-category', ProjectCategory::class)
         ->name('master.project_category')->middleware('can-access:pm.master.project_category');
+    Route::get('/master/issuer', Issuer::class)
+        ->name('master.issuer')->middleware('can-access:pm.master.issuer');
+    Route::get('/master/bank-account', BankAccount::class)
+        ->name('master.bank_account')->middleware('can-access:pm.master.bank_account');
 
     Route::get('/config', Config::class)
         ->name('config')->middleware('can-access:pm.config.read');

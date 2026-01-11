@@ -183,12 +183,6 @@ class ProjectList extends Component
                     'pm',
                 );
             });
-
-            $this->dispatch('notify', [
-                'variant' => 'success',
-                'title' => __('pm::messages.success'),
-                'message' => __('pm::messages.project_deleted_successfully'),
-            ]);
         } catch (Exception $e) {
             $this->dispatch('notify', [
                 'variant' => 'danger',
@@ -196,6 +190,13 @@ class ProjectList extends Component
                 'message' => $e->getMessage(),
             ]);
         }
+
+        $this->dispatch('synapse-confirmed');
+        $this->dispatch('notify', [
+            'variant' => 'success',
+            'title' => __('pm::messages.success'),
+            'message' => __('pm::messages.project_deleted_successfully'),
+        ]);
     }
 
     #[Computed()]

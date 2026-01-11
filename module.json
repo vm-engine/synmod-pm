@@ -51,7 +51,7 @@
                     "name": "__pm::menu.be.master.parent",
                     "class": "",
                     "icon": "fa-solid fa-table",
-                    "acl": "pm.master.division.read|pm.master.client_category.read|pm.master.project_category.read",
+                    "acl": "pm.master.division.read|pm.master.client_category.read|pm.master.project_category.read|pm.master.issuer|pm.master.bank_account",
                     "sub": {
                         "division": {
                             "id": "division",
@@ -76,6 +76,22 @@
                             "route": "pm.master.project_category",
                             "icon": "fa-solid fa-folder-tree",
                             "acl": "pm.master.project_category.read"
+                        },
+                        "issuer": {
+                            "id": "issuer",
+                            "name": "__pm::menu.be.master.issuer",
+                            "class": "",
+                            "route": "pm.master.issuer",
+                            "icon": "fa-solid fa-file-invoice",
+                            "acl": "pm.master.issuer"
+                        },
+                        "bank_account": {
+                            "id": "bank_account",
+                            "name": "__pm::menu.be.master.bank_account",
+                            "class": "",
+                            "route": "pm.master.bank_account",
+                            "icon": "fa-solid fa-building-columns",
+                            "acl": "pm.master.bank_account"
                         }
                     }
                 },
@@ -128,6 +144,20 @@
                 },
                 "project_category": {
                     "label": "__pm::acl.master.project_category",
+                    "create": 1,
+                    "read": 1,
+                    "update": 1,
+                    "delete": 1
+                },
+                "issuer": {
+                    "label": "__pm::acl.master.issuer",
+                    "create": 1,
+                    "read": 1,
+                    "update": 1,
+                    "delete": 1
+                },
+                "bank_account": {
+                    "label": "__pm::acl.master.bank_account",
                     "create": 1,
                     "read": 1,
                     "update": 1,

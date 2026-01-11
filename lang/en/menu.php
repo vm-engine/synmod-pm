@@ -20,6 +20,8 @@ return [
             'division' => 'Divisions',
             'client_category' => 'Client Categories',
             'project_category' => 'Project Categories',
+            'issuer' => 'Document Issuers',
+            'bank_account' => 'Bank Accounts',
         ],
         'config' => [
             'index' => 'Configuration',

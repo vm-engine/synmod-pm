@@ -89,14 +89,6 @@ class ProjectDocument extends Model
     }
 
     /**
-     * Get the user who created this document.
-     */
-    public function creator(): BelongsTo
-    {
-        return $this->belongsTo(config('auth.providers.users.model'), 'created_by');
-    }
-
-    /**
      * Get the document type label.
      */
     public function getTypeLabel(): string

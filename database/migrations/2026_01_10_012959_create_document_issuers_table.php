@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('document_issuers', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('header_image')->nullable();
+            $table->string('header_image');
             $table->string('tax_id_name');
             $table->text('tax_id_address');
             $table->string('tax_id_number');
@@ -23,6 +23,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('invoice_issuers');
+        Schema::dropIfExists('document_issuers');
     }
 };

@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('payment_proof')->nullable();
             $table->timestamp('paid_at')->nullable();
             $table->text('payment_notes')->nullable();
+            $table->foreignId('project_document_id')->nullable()->constrained('project_documents')->nullOnDelete();
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

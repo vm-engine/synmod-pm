@@ -163,22 +163,6 @@ class Project extends Model
     }
 
     /**
-     * Get the user who created this project.
-     */
-    public function creator(): BelongsTo
-    {
-        return $this->belongsTo(config('auth.providers.users.model'), 'created_by');
-    }
-
-    /**
-     * Get the user who last updated this project.
-     */
-    public function updater(): BelongsTo
-    {
-        return $this->belongsTo(config('auth.providers.users.model'), 'updated_by');
-    }
-
-    /**
      * Get the documents for this project.
      */
     public function documents(): HasMany

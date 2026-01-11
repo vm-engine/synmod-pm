@@ -42,20 +42,4 @@ class SubDivision extends Model
     {
         return $this->belongsTo(Division::class);
     }
-
-    /**
-     * Get the user who created this sub division.
-     */
-    public function creator(): BelongsTo
-    {
-        return $this->belongsTo(config('auth.providers.users.model'), 'created_by');
-    }
-
-    /**
-     * Get the user who last updated this sub division.
-     */
-    public function updater(): BelongsTo
-    {
-        return $this->belongsTo(config('auth.providers.users.model'), 'updated_by');
-    }
 }

@@ -177,6 +177,7 @@ class Division extends Component
             return;
         }
 
+        $this->dispatch('synapse-confirmed');
         // Dispatch browser event for immediate notification (no page reload)
         $this->dispatch('notify',
             variant: 'success',
@@ -307,6 +308,7 @@ class Division extends Component
             return;
         }
 
+        $this->dispatch('synapse-confirmed');
         // Dispatch browser event for immediate notification (no page reload)
         $this->dispatch('notify',
             variant: 'success',

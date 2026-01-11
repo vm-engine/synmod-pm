@@ -236,6 +236,7 @@ class MultipleDocument extends Component
             // Delete document record
             $document->delete();
 
+            $this->dispatch('synapse-confirmed');
             $this->dispatch('notify', [
                 'variant' => 'success',
                 'title' => 'File Deleted',

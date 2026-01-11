@@ -162,6 +162,7 @@ class ClientCategory extends Component
             return;
         }
 
+        $this->dispatch('synapse-confirmed');
         $this->dispatch('notify',
             variant: 'success',
             title: 'Success',

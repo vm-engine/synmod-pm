@@ -37,6 +37,7 @@ return new class extends Migration
             $table->foreignId('bank_account_id')->nullable()->constrained('bank_accounts')->nullOnDelete();
             $table->boolean('has_signature')->default(false);
             $table->foreignId('signature_id')->nullable()->constrained('signatures')->nullOnDelete();
+            $table->foreignId('project_document_id')->nullable()->constrained('project_documents')->nullOnDelete();
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

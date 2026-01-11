@@ -19,7 +19,10 @@
       "Bash(tree:*)",
       "Bash(git -C /media/adods/Data/Herd/member4vm/packages/synmod-pm diff lang/en/menu.php)",
       "Bash(git mv:*)",
-      "Bash(pest:*)"
+      "Bash(pest:*)",
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "Bash(composer show:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
