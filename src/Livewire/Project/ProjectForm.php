@@ -115,7 +115,7 @@ class ProjectForm extends Component
     {
         // Only return sub-divisions if a division is selected
         // Check for both null and empty string
-        if (empty($this->form->division_id) || $this->form->division_id === '') {
+        if (! $this->form->division_id) {
             return [];
         }
 

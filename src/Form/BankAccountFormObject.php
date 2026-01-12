@@ -176,6 +176,7 @@ class BankAccountFormObject extends Form
             'image/jpeg' => 'jpg',
             'image/png' => 'png',
             'image/webp' => 'webp',
+            default => throw new \Exception('Unsupported image type'),
         };
 
         $filename = 'bank_logo_'.uniqid().'_'.time().'.'.$extension;
@@ -191,6 +192,7 @@ class BankAccountFormObject extends Form
             'image/jpeg' => imagejpeg($destImage, $tempPath, 90),
             'image/png' => imagepng($destImage, $tempPath, 8),
             'image/webp' => imagewebp($destImage, $tempPath, 90),
+            default => throw new \Exception('Unsupported image type'),
         };
 
         // Free memory

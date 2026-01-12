@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Livewire\Components\Document;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\File;
 use Livewire\Attributes\Computed;
@@ -14,6 +15,7 @@ use VmEngine\Pm\Enums\Documents;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Pm\Models\ProjectDocument;
 use VmEngine\Pm\Services\Documents\Base;
+use VmEngine\SynAuth\Facades\SynAuth;
 
 class MultipleDocument extends Component
 {

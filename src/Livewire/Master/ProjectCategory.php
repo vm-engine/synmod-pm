@@ -6,12 +6,14 @@ namespace VmEngine\Pm\Livewire\Master;
 
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use VmEngine\Pm\Enums\Documents;
 use VmEngine\Pm\Models\ProjectCategory as ModelsProjectCategory;
 use VmEngine\Synapse\Services\Helper\Breadcrumbs;
+use VmEngine\SynAuth\Facades\SynAuth;
 
 class ProjectCategory extends Component
 {

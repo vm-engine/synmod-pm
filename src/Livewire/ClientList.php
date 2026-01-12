@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace VmEngine\Pm\Livewire;
 
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
@@ -14,6 +15,7 @@ use VmEngine\Pm\Enums\Services;
 use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\ClientCategory;
 use VmEngine\Synapse\Services\Helper\Breadcrumbs;
+use VmEngine\SynAuth\Facades\SynAuth;
 
 class ClientList extends Component
 {

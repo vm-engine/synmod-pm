@@ -4,11 +4,13 @@ namespace VmEngine\Pm\Livewire\Master;
 
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use VmEngine\Pm\Models\Division as ModelsDivision;
 use VmEngine\Pm\Models\SubDivision;
 use VmEngine\Synapse\Services\Helper\Breadcrumbs;
+use VmEngine\SynAuth\Facades\SynAuth;
 
 class Division extends Component
 {
@@ -74,7 +76,8 @@ class Division extends Component
         }
 
         // Dispatch browser event for immediate notification (no page reload)
-        $this->dispatch('notify',
+        $this->dispatch(
+            'notify',
             variant: 'success',
             title: 'Success',
             message: __('pm::messages.division_created_successfully')
@@ -132,7 +135,8 @@ class Division extends Component
         }
 
         // Dispatch browser event for immediate notification (no page reload)
-        $this->dispatch('notify',
+        $this->dispatch(
+            'notify',
             variant: 'success',
             title: 'Success',
             message: __('pm::messages.division_updated_successfully')
@@ -179,7 +183,8 @@ class Division extends Component
 
         $this->dispatch('synapse-confirmed');
         // Dispatch browser event for immediate notification (no page reload)
-        $this->dispatch('notify',
+        $this->dispatch(
+            'notify',
             variant: 'success',
             title: 'Success',
             message: __('pm::messages.division_deleted_successfully')
@@ -214,7 +219,8 @@ class Division extends Component
         }
 
         // Dispatch browser event for immediate notification (no page reload)
-        $this->dispatch('notify',
+        $this->dispatch(
+            'notify',
             variant: 'success',
             title: 'Success',
             message: __('pm::messages.sub_division_created_successfully')
@@ -265,7 +271,8 @@ class Division extends Component
         }
 
         // Dispatch browser event for immediate notification (no page reload)
-        $this->dispatch('notify',
+        $this->dispatch(
+            'notify',
             variant: 'success',
             title: 'Success',
             message: __('pm::messages.sub_division_updated_successfully')
@@ -310,7 +317,8 @@ class Division extends Component
 
         $this->dispatch('synapse-confirmed');
         // Dispatch browser event for immediate notification (no page reload)
-        $this->dispatch('notify',
+        $this->dispatch(
+            'notify',
             variant: 'success',
             title: 'Success',
             message: __('pm::messages.sub_division_deleted_successfully')

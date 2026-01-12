@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Form;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Livewire\Form;
@@ -14,6 +15,7 @@ use VmEngine\Pm\Enums\RiskLevel;
 use VmEngine\Pm\Enums\SalesSources;
 use VmEngine\Pm\Enums\Services;
 use VmEngine\Pm\Models\Project;
+use VmEngine\SynAuth\Facades\SynAuth;
 
 class ProjectFormObject extends Form
 {

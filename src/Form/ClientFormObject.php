@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Form;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Form;
 use VmEngine\Pm\Models\Client;
+use VmEngine\SynAuth\Facades\SynAuth;
 use VmEngine\SynAuth\Rules\UsernameRule;
 
 class ClientFormObject extends Form
@@ -115,7 +117,7 @@ class ClientFormObject extends Form
             $rules['username'] = [
                 'required',
                 'string',
-                new UsernameRule,
+                new UsernameRule(),
                 'unique:users,username'.($userId ? ','.$userId : ''),
             ];
         }

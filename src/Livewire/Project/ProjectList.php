@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace VmEngine\Pm\Livewire\Project;
 
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
@@ -17,6 +18,7 @@ use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\Division;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Synapse\Services\Helper\Breadcrumbs;
+use VmEngine\SynAuth\Facades\SynAuth;
 
 class ProjectList extends Component
 {
