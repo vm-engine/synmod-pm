@@ -1,6 +1,6 @@
 {
     "name": "vm-engine/synmod-pm",
-    "version": "0.4.7",
+    "version": "0.4.8",
     "description": "Project Management module for Laravel Synapse",
     "keywords": [
         "laravel",
