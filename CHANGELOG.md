@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.7] - 2026-01-11
+
+## Changed
+- Updated composer.json to use proper version number instead of @dev
+
 ## [0.4.6] - 2026-01-09
 
 ### Added
