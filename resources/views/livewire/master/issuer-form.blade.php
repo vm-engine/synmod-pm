@@ -1,6 +1,6 @@
 <div class="flex h-full flex-col">
     <!-- Modal Header (Sticky) -->
-    <div class="flex flex-shrink-0 items-center justify-between border-b border-gray-200 p-5 dark:border-gray-700">
+    <div class="flex shrink-0 items-center justify-between border-b border-gray-200 p-5 dark:border-gray-700">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
             @if ($form->issuer)
                 {{ __('pm::issuer.edit_title') }}
@@ -136,7 +136,7 @@
     </div>
 
     <!-- Modal Footer (Sticky) -->
-    <div class="flex flex-shrink-0 items-center justify-end gap-3 border-t border-gray-200 p-5 dark:border-gray-700">
+    <div class="flex shrink-0 items-center justify-end gap-3 border-t border-gray-200 p-5 dark:border-gray-700">
         <button
             class="btn secondary"
             type="button"

@@ -260,7 +260,7 @@
                     @if ($form->status === 0)
                         <div class="rounded-md bg-yellow-50 p-4 dark:bg-yellow-900/20">
                             <div class="flex">
-                                <div class="flex-shrink-0">
+                                <div class="shrink-0">
                                     <span class="fa-solid fa-exclamation-triangle text-yellow-400"></span>
                                 </div>
                                 <div class="ml-3">

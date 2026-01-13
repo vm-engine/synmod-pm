@@ -1,6 +1,6 @@
 <div class="flex h-full flex-col">
     {{-- Modal Header (Sticky) --}}
-    <div class="flex flex-shrink-0 items-center justify-between border-b border-gray-200 p-5 dark:border-gray-700">
+    <div class="flex shrink-0 items-center justify-between border-b border-gray-200 p-5 dark:border-gray-700">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
             @if ($form->bankAccount)
                 {{ __('pm::bank_account.edit_title') }}
@@ -44,7 +44,7 @@
             <label for="account_number">{{ __('pm::bank_account.number') }}</label>
             <div class="input-group">
                 <input
-                    class="form-input font-mono @error('form.number') has-error @enderror"
+                    class="form-input @error('form.number') has-error @enderror font-mono"
                     id="account_number"
                     name="number"
                     type="text"
@@ -114,7 +114,7 @@
     </div>
 
     {{-- Modal Footer (Sticky) --}}
-    <div class="flex flex-shrink-0 items-center justify-end gap-3 border-t border-gray-200 p-5 dark:border-gray-700">
+    <div class="flex shrink-0 items-center justify-end gap-3 border-t border-gray-200 p-5 dark:border-gray-700">
         <button
             class="btn secondary"
             type="button"

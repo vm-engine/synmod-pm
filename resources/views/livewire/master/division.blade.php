@@ -99,7 +99,7 @@
                                                     </button>
                                                 </div>
                                             @endif
-                                            @canAccess('pm.master.division.edit')
+                                            @canAccess('pm.master.division.update')
                                             @if ($editId != $list->id)
                                                 <button
                                                     class="btn-icon warning has-tooltip group"
@@ -184,7 +184,7 @@
                                         </td>
                                         <td>
                                             <div class="text-center">
-                                                @canAccess('pm.master.division.edit')
+                                                @canAccess('pm.master.division.update')
                                                 @if ($editSubId != $sub->id)
                                                     <button
                                                         class="btn-icon warning has-tooltip group"

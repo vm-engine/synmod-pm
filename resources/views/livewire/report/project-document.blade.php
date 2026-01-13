@@ -129,7 +129,9 @@
                                             <div>
                                                 <b>{{ ucwords($document->type->name) }}</b>:
                                                 {{ $document->number }}
-                                                (<small>{{ $document->created_at->format('j M Y') }}</small>)
+                                                (<small>{{ $document->created_at->format('j M Y') }} -
+                                                    <span
+                                                        class="fa-solid fa-user"></span>{{ $document->creator->name }}</small>)
                                             </div>
                                         @endforeach
                                     </div>
@@ -146,11 +148,18 @@
                                 </td>
                                 <td>
                                     <div>
-                                        {!! $project->projectCategory?->name ?? '<i>' . __('pm::report.documents.table.uncategorized') . '</i>' !!}
+                                        {!! $project->projectCategory?->name ??
+                                            '<i class="text-gray-400">' . __('pm::report.documents.table.uncategorized') . '</i>' !!}
                                     </div>
                                 </td>
                                 <td>
-                                    <div>{{ $project->hasSPKDocument() ? __('pm::report.documents.status.deal') : __('pm::report.documents.status.pending') }}</div>
+                                    <div class="items-center text-center">
+                                        @if ($project->hasSPKDocument())
+                                            <span
+                                                class="badge success">{{ __('pm::report.documents.status.deal') }}</span>
+                                        @else
+                                            <span class="badge">{{ __('pm::report.documents.status.pending') }}</span>
+                                        @endif
                                 </td>
                             </tr>
                         @empty

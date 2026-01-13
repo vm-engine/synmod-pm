@@ -45,17 +45,14 @@ class ProjectDocument extends Component
 
         $projectList = Project::query()->with(['client', 'projectCategory'])->where('year', $this->year);
         if (! is_null($this->documentType) && ($document = Documents::tryFrom($this->documentType))) {
+            $closureFilter = function ($query) use ($document) {
+                if (! is_null($document)) {
+                    $query->where('type', $document->value);
+                }
+            };
             $projectList = $projectList
-                ->with(['documents' => function ($query) use ($document) {
-                    if (! is_null($document)) {
-                        $query->where('type', $document->value);
-                    }
-                }])
-                ->whereHas('documents', function ($query) use ($document) {
-                    if (! is_null($document)) {
-                        $query->where('type', $document->value);
-                    }
-                });
+                ->with(['documents' => $closureFilter])
+                ->whereHas('documents', $closureFilter);
         }
 
         if (count($this->projectCategories) > 0) {

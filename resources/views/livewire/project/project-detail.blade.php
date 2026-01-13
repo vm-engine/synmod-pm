@@ -454,7 +454,7 @@
                             <h4 class="mb-3 font-semibold text-gray-900 dark:text-white">
                                 {{ __('pm::project.project_manager_label') }}</h4>
                             <div class="flex items-center gap-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
-                                <div class="flex-shrink-0">
+                                <div class="shrink-0">
                                     <div
                                         class="bg-brand-100 dark:bg-brand-900/30 flex h-10 w-10 items-center justify-center rounded-full">
                                         <span class="fa-solid fa-user text-brand-600 dark:text-brand-400"></span>
@@ -480,7 +480,7 @@
                                     @foreach ($this->teamMembers as $member)
                                         <div
                                             class="flex items-center gap-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
-                                            <div class="flex-shrink-0">
+                                            <div class="shrink-0">
                                                 <div
                                                     class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
                                                     <span

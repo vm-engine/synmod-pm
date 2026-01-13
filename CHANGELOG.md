@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.10] - 2026-01-13
+
+### Changed
+- **UI Improvements**: Updated Tailwind CSS classes from deprecated `flex-shrink-0` to modern `shrink-0` shorthand
+  - Updated across document-revision-list, client-form, bank-account-form, issuer-form, document-manager, and project-detail views
+- **Code Refactoring**: Improved ProjectDocument Livewire component code readability
+  - Refactored document filtering logic to use closure for better maintainability
+
+### Fixed
+- **ACL Permissions**: Fixed division master data ACL permission names
+  - Changed from `pm.master.division.edit` to correct `pm.master.division.update`
+- **Report Enhancements**: Enhanced project document report display
+  - Added document creator name with user icon in document list
+  - Improved status badges styling with color coding (success for deal, default for pending)
+  - Better visual styling for uncategorized projects with gray italic text
+
 ## [0.4.9] - 2026-01-13
 
 ### Added

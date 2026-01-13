@@ -24,7 +24,7 @@
                 wire:model.live.debounce.300ms="documentSearch"
             />
         </div>
-        <div class="w-48 flex-shrink-0">
+        <div class="w-48 shrink-0">
             <select
                 class="form-input w-full"
                 wire:model.live="filterDocType"

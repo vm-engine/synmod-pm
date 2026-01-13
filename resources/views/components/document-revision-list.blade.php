@@ -41,7 +41,7 @@
                         };
                     @endphp
                     <div
-                        class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-gray-50 dark:bg-gray-800">
+                        class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gray-50 dark:bg-gray-800">
                         <span class="fa-regular {{ $iconClass }} text-xl"></span>
                     </div>
 
@@ -80,7 +80,7 @@
                 </div>
 
                 {{-- Actions --}}
-                <div class="flex flex-shrink-0 flex-wrap gap-2">
+                <div class="flex shrink-0 flex-wrap gap-2">
                     <button
                         class="btn btn-sm btn-outline"
                         wire:click="downloadDocument({{ $first->id ?? 0 }})"
@@ -145,7 +145,7 @@
                                     class="flex items-center justify-between rounded-md bg-white px-3 py-2 text-sm dark:bg-gray-800">
                                     <div class="flex min-w-0 flex-1 items-center gap-3">
                                         <span
-                                            class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-100 text-xs font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-400"
+                                            class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gray-100 text-xs font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-400"
                                         >
                                             v{{ $oldVersion->version ?? 1 }}
                                         </span>
@@ -166,7 +166,7 @@
                                             @endif
                                         </div>
                                     </div>
-                                    <div class="flex flex-shrink-0 gap-2">
+                                    <div class="flex shrink-0 gap-2">
                                         <button
                                             class="text-blue-600 hover:text-blue-700 dark:text-blue-400"
                                             title="{{ __('pm::project_document.download_this_version') }}"
