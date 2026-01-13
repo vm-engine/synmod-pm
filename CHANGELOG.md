@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.9] - 2026-01-13
+
+### Added
+- **Project Document Report**: New report page for viewing project documents with advanced filtering
+  - Filter by year, document type, and project category
+  - Display document details with client, project, category, and status information
+  - Show deal status based on SPK document presence
+  - Comprehensive internationalization with language translations
+- **Report Menu & Navigation**: Added report section to backend navigation with ACL permissions
+- **Report Route**: New route with proper ACL middleware protection
+
+### Changed
+- **Project Model Enhancement**: Added name attribute accessor/mutator for automatic capitalization
+- **Client List UX**: Added category filter preload for better user experience
+- **Code Quality**: Applied Pint code formatting across multiple files
+
+### Fixed
+- Removed unused imports and standardized spacing
+
 ## [0.4.8] - 2026-01-11
 
 ## Changed
