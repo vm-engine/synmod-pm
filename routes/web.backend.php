@@ -12,6 +12,7 @@ use VmEngine\Pm\Livewire\Master\ProjectCategory;
 use VmEngine\Pm\Livewire\Project\ProjectDetail;
 use VmEngine\Pm\Livewire\Project\ProjectForm;
 use VmEngine\Pm\Livewire\Project\ProjectList;
+use VmEngine\Pm\Livewire\Report\ProjectDocument;
 
 Route::group([], function () {
     Route::get('/', function () {
@@ -47,6 +48,9 @@ Route::group([], function () {
         ->name('master.issuer')->middleware('can-access:pm.master.issuer');
     Route::get('/master/bank-account', BankAccount::class)
         ->name('master.bank_account')->middleware('can-access:pm.master.bank_account');
+
+    Route::get('/report/project-document', ProjectDocument::class)
+        ->name('report.project_document')->middleware('can-access:pm.report.project_document');
 
     Route::get('/config', Config::class)
         ->name('config')->middleware('can-access:pm.config.read');

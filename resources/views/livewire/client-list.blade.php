@@ -252,6 +252,7 @@
                     :live="true"
                     :options="$categories"
                     :multiple="true"
+                    :preload="$filterCategories"
                     placeholder="{{ __('pm::client.select_categories') }}"
                 />
             </div>

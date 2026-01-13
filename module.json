@@ -95,6 +95,23 @@
                         }
                     }
                 },
+                "report": {
+                    "id": "report",
+                    "name": "__pm::menu.be.report.index",
+                    "class": "",
+                    "icon": "fa-solid fa-chart-line",
+                    "acl": "pm.report.project_document",
+                    "sub": {
+                        "project_document": {
+                            "id": "project_document",
+                            "name": "__pm::menu.be.report.project_document",
+                            "class": "",
+                            "route": "pm.report.project_document",
+                            "icon": "fa-solid fa-diagram-project",
+                            "acl": "pm.report.project_document"
+                        }
+                    }
+                },
                 "config": {
                     "id": "config",
                     "name": "__pm::menu.be.config.index",
@@ -162,6 +179,22 @@
                     "read": 1,
                     "update": 1,
                     "delete": 1
+                }
+            }
+        },
+        "report": {
+            "label": "__pm::acl.report.label",
+            "create": 0,
+            "read": 1,
+            "update": 0,
+            "delete": 0,
+            "sub": {
+                "project_document": {
+                    "label": "__pm::acl.report.project_document",
+                    "create": 0,
+                    "read": 1,
+                    "update": 0,
+                    "delete": 0
                 }
             }
         },

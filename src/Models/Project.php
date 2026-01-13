@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace VmEngine\Pm\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -288,5 +289,13 @@ class Project extends Model
     public function hasInvoiceDocument(): bool
     {
         return $this->documents()->byType(Documents::INVOICE)->exists();
+    }
+
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => ucwords($value),
+            set: fn ($value) => ucwords($value),
+        );
     }
 }

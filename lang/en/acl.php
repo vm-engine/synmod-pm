@@ -30,6 +30,10 @@ return [
         'bank_account.update' => 'Update Bank Account',
         'bank_account.delete' => 'Delete Bank Account',
     ],
+    'report' => [
+        'label' => 'Reports',
+        'project_document' => 'Project Document Report',
+    ],
     'config' => [
         'label' => 'Configuration',
     ],

@@ -26,6 +26,10 @@ return [
         'config' => [
             'index' => 'Configuration',
         ],
+        'report' => [
+            'index' => 'Reports',
+            'project_document' => 'Project Documents',
+        ],
 
     ],
 ];
