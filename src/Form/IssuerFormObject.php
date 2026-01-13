@@ -89,7 +89,7 @@ class IssuerFormObject extends Form
         SynAuth::logActivity(
             Auth::id(),
             'pm.master.issuer.create',
-            'User '.Auth::user()->name . ' created a new issuer: '.json_encode($data),
+            'User '.Auth::user()->name.' created a new issuer: '.json_encode($data),
             'master.issuer',
             'pm',
         );
@@ -121,7 +121,7 @@ class IssuerFormObject extends Form
         SynAuth::logActivity(
             Auth::id(),
             'pm.master.issuer.update',
-            'User '.Auth::user()->name . ' updated an issuer. Old Data: '.json_encode($oldData).' New Data: '.json_encode($data),
+            'User '.Auth::user()->name.' updated an issuer. Old Data: '.json_encode($oldData).' New Data: '.json_encode($data),
             'master.issuer',
             'pm',
         );

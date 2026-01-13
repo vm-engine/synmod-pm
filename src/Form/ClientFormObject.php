@@ -117,7 +117,7 @@ class ClientFormObject extends Form
             $rules['username'] = [
                 'required',
                 'string',
-                new UsernameRule(),
+                new UsernameRule,
                 'unique:users,username'.($userId ? ','.$userId : ''),
             ];
         }

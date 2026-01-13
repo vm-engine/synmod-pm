@@ -22,7 +22,8 @@
       "Bash(pest:*)",
       "Bash(dir:*)",
       "Bash(findstr:*)",
-      "Bash(composer show:*)"
+      "Bash(composer show:*)",
+      "Bash(../../vendor/bin/pint:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

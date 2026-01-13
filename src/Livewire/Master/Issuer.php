@@ -47,7 +47,7 @@ class Issuer extends Component
             SynAuth::logActivity(
                 Auth::id(),
                 'pm.master.issuer.delete',
-                'User '.Auth::user()->name . ' deleted an issuer: '.json_encode($issuerArray),
+                'User '.Auth::user()->name.' deleted an issuer: '.json_encode($issuerArray),
                 'master.issuer',
                 'pm',
             );
