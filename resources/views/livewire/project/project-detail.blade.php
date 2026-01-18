@@ -1,4 +1,4 @@
-<div x-data="{ pageName: '{{ $project->name }}', isHome: false, activeTab: '{{ $activeTab }}' }">
+<div x-data="{ pageName: '{{ $project->name }}', isHome: false, activeTab: $wire.entangle('activeTab') }">
     @include('synapps::components.layouts.partials.breadcrumbs')
 
     <!-- Project Header -->
@@ -92,6 +92,15 @@
                 >
                     <span class="fa-solid fa-file mr-2"></span>
                     {{ __('pm::project.tab_documents') }}
+                </button>
+                <button
+                    class="whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors"
+                    @click="activeTab = 'invoices'"
+                    :class="activeTab === 'invoices' ? 'border-brand-500 text-brand-600 dark:text-brand-400' :
+                        'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                >
+                    <span class="fa-solid fa-file-invoice mr-2"></span>
+                    {{ __('pm::project.tab_invoices') }}
                 </button>
                 <button
                     class="whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors"
@@ -375,6 +384,11 @@
         <!-- Documents Tab -->
         <div x-show="activeTab === 'documents'">
             @livewire('pm.project.document-manager', ['project' => $project], key('document-manager-' . $project->id))
+        </div>
+
+        <!-- Invoices Tab -->
+        <div x-show="activeTab === 'invoices'">
+            @livewire('pm.project.invoice-list', ['projectId' => $project->id], key('invoice-list-' . $project->id))
         </div>
 
         <!-- Financial Tab -->

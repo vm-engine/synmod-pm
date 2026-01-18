@@ -51,7 +51,7 @@
                     "name": "__pm::menu.be.master.parent",
                     "class": "",
                     "icon": "fa-solid fa-table",
-                    "acl": "pm.master.division.read|pm.master.client_category.read|pm.master.project_category.read|pm.master.issuer|pm.master.bank_account",
+                    "acl": "pm.master.division.read|pm.master.client_category.read|pm.master.project_category.read|pm.master.issuer|pm.master.bank_account|pm.master.signature",
                     "sub": {
                         "division": {
                             "id": "division",
@@ -92,6 +92,14 @@
                             "route": "pm.master.bank_account",
                             "icon": "fa-solid fa-building-columns",
                             "acl": "pm.master.bank_account"
+                        },
+                        "signature": {
+                            "id": "signature",
+                            "name": "__pm::menu.be.master.signature",
+                            "class": "",
+                            "route": "pm.master.signature",
+                            "icon": "fa-solid fa-signature",
+                            "acl": "pm.master.signature"
                         }
                     }
                 },
@@ -179,6 +187,13 @@
                     "read": 1,
                     "update": 1,
                     "delete": 1
+                },
+                "signature": {
+                    "label": "__pm::acl.master.signature",
+                    "create": 1,
+                    "read": 1,
+                    "update": 1,
+                    "delete": 1
                 }
             }
         },
@@ -204,6 +219,20 @@
             "read": 1,
             "update": 1,
             "delete": 0
+        },
+        "invoice": {
+            "label": "__pm::acl.invoice.label",
+            "create": 1,
+            "read": 1,
+            "update": 1,
+            "delete": 1
+        },
+        "receipt": {
+            "label": "__pm::acl.receipt.label",
+            "create": 1,
+            "read": 1,
+            "update": 1,
+            "delete": 1
         }
     }
 }

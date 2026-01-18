@@ -22,7 +22,7 @@ return new class extends Migration
             $table->text('address');
             $table->string('attention');
             $table->text('notes')->nullable();
-            $table->unsignedInteger('amount');
+            $table->decimal('amount', 15, 2)->default(0.00);
             $table->boolean('include_vat')->default(true);
             $table->decimal('vat_percentage', 4, 2)->default(11);
             $table->decimal('vat_amount', 15, 2)->default(0.00);

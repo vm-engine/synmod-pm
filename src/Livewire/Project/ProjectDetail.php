@@ -7,6 +7,7 @@ namespace VmEngine\Pm\Livewire\Project;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Synapse\Services\Helper\Breadcrumbs;
@@ -15,6 +16,7 @@ class ProjectDetail extends Component
 {
     public Project $project;
 
+    #[Url(as: 'tab')]
     public string $activeTab = 'documents';
 
     public function mount(int $id)

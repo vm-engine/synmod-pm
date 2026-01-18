@@ -29,6 +29,10 @@ return [
         'bank_account.create' => 'Create Bank Account',
         'bank_account.update' => 'Update Bank Account',
         'bank_account.delete' => 'Delete Bank Account',
+        'signature' => 'Manage Signatures',
+        'signature.create' => 'Create Signature',
+        'signature.update' => 'Update Signature',
+        'signature.delete' => 'Delete Signature',
     ],
     'report' => [
         'label' => 'Reports',
@@ -36,5 +40,19 @@ return [
     ],
     'config' => [
         'label' => 'Configuration',
+    ],
+    'invoice' => [
+        'label' => 'Invoice Management',
+        'create' => 'Create Invoice',
+        'read' => 'View Invoices',
+        'update' => 'Edit Invoice',
+        'delete' => 'Delete Invoice',
+    ],
+    'receipt' => [
+        'label' => 'Receipt Management',
+        'create' => 'Create Receipt',
+        'read' => 'View Receipts',
+        'update' => 'Edit Receipt',
+        'delete' => 'Delete Receipt',
     ],
 ];

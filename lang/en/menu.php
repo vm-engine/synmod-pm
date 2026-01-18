@@ -22,6 +22,7 @@ return [
             'project_category' => 'Project Categories',
             'issuer' => 'Document Issuers',
             'bank_account' => 'Bank Accounts',
+            'signature' => 'Signatures',
         ],
         'config' => [
             'index' => 'Configuration',

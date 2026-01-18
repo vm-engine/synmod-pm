@@ -23,6 +23,7 @@ return [
     'tab_overview' => 'Overview',
     'tab_timeline' => 'Timeline & Activity',
     'tab_documents' => 'Documents',
+    'tab_invoices' => 'Invoices',
     'tab_financial' => 'Financial',
     'tab_team' => 'Team',
 
@@ -162,6 +163,7 @@ return [
     'no_payment_terms' => 'No payment terms specified',
     'timeline_activity' => 'Timeline & Activity',
     'timeline_placeholder' => 'Timeline feature - to be implemented with activity log',
+    'invoices' => 'Invoices',
     'documents_placeholder' => 'Document management - to be implemented',
     'upload_document' => 'Upload Document',
     'technical_urls' => 'Technical URLs',

@@ -9,6 +9,7 @@ use VmEngine\Pm\Livewire\Master\ClientCategory;
 use VmEngine\Pm\Livewire\Master\Division;
 use VmEngine\Pm\Livewire\Master\Issuer;
 use VmEngine\Pm\Livewire\Master\ProjectCategory;
+use VmEngine\Pm\Livewire\Master\Signature;
 use VmEngine\Pm\Livewire\Project\ProjectDetail;
 use VmEngine\Pm\Livewire\Project\ProjectForm;
 use VmEngine\Pm\Livewire\Project\ProjectList;
@@ -48,6 +49,8 @@ Route::group([], function () {
         ->name('master.issuer')->middleware('can-access:pm.master.issuer');
     Route::get('/master/bank-account', BankAccount::class)
         ->name('master.bank_account')->middleware('can-access:pm.master.bank_account');
+    Route::get('/master/signature', Signature::class)
+        ->name('master.signature')->middleware('can-access:pm.master.signature');
 
     Route::get('/report/project-document', ProjectDocument::class)
         ->name('report.project_document')->middleware('can-access:pm.report.project_document');

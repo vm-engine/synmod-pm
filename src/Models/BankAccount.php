@@ -6,7 +6,6 @@ namespace VmEngine\Pm\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Storage;
 use VmEngine\Pm\Factories\BankAccountFactory;
 use VmEngine\Synapse\Traits\WithDeleteToken;
@@ -40,18 +39,5 @@ class BankAccount extends Model
         return $this->bank_logo
             ? Storage::url($this->bank_logo)
             : null;
-    }
-
-    /**
-     * Get document issuers that use this bank account
-     */
-    public function issuers(): BelongsToMany
-    {
-        return $this->belongsToMany(
-            DocumentIssuer::class,
-            'issuer_bank_accounts',
-            'bank_account_id',
-            'issuer_id'
-        )->withTimestamps();
     }
 }
