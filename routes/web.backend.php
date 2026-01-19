@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use VmEngine\Pm\Http\Controllers\DocumentController;
 use VmEngine\Pm\Http\Controllers\InvoiceController;
+use VmEngine\Pm\Http\Controllers\ReceiptController;
 use VmEngine\Pm\Livewire\ClientForm;
 use VmEngine\Pm\Livewire\ClientList;
 use VmEngine\Pm\Livewire\Config;
@@ -31,11 +33,25 @@ Route::group([], function () {
     Route::get('/project/{id}', ProjectDetail::class)
         ->name('project.detail')->middleware('can-access:pm.project.read');
 
+    // Document Download routes
+    Route::get('/document/{id}/download', [DocumentController::class, 'download'])
+        ->name('document.download')->middleware('can-access:pm.document.read');
+    Route::get('/document/{id}/print', [DocumentController::class, 'print'])
+        ->name('document.print')->middleware('can-access:pm.document.read');
+
     // Invoice routes
     Route::get('/invoice/{id}/download', [InvoiceController::class, 'download'])
         ->name('invoice.download')->middleware('can-access:pm.invoice.read');
     Route::get('/invoice/{id}/print', [InvoiceController::class, 'print'])
         ->name('invoice.print')->middleware('can-access:pm.invoice.read');
+
+    // Receipt routes
+    Route::get('/receipt/{id}/download', [ReceiptController::class, 'download'])
+        ->name('receipt.download')->middleware('can-access:pm.invoice.read');
+    Route::get('/receipt/{id}/print', [ReceiptController::class, 'print'])
+        ->name('receipt.print')->middleware('can-access:pm.invoice.read');
+    Route::get('/receipt/{id}/payment-proof', [ReceiptController::class, 'paymentProof'])
+        ->name('receipt.payment-proof')->middleware('can-access:pm.invoice.read');
 
     // Client routes
     Route::get('/client', ClientList::class)

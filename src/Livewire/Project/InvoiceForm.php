@@ -86,6 +86,7 @@ class InvoiceForm extends Component
 
         $this->dispatch('close-modal-invoice-form');
         $this->dispatch('invoice-refresh');
+        $this->dispatch('activity-refresh');
     }
 
     #[Computed]

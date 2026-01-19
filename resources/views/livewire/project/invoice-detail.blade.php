@@ -147,7 +147,7 @@
                                             @if ($editItemId == $item->id)
                                                 <textarea
                                                     class="form-input min-h-[60px] w-full"
-                                                    wire:model.live="editItemName"
+                                                    wire:model="editItemName"
                                                     placeholder="{{ __('pm::invoice.item_name_placeholder') }}"
                                                     wire:loading.attr="disabled"
                                                     rows="2"
@@ -162,7 +162,7 @@
                                             @if ($editItemId == $item->id)
                                                 <x-synapse-currency
                                                     class="w-full"
-                                                    wire:model.live="editItemAmount"
+                                                    wire:model="editItemAmount"
                                                     currency="Rp"
                                                 />
                                             @else
@@ -181,7 +181,7 @@
                                                 >
                                                 @if ($editItemIncludeDiscount)
                                                     <input
-                                                        class="form-input w-16 text-center [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                                                        class="form-input no-spin w-16 text-center"
                                                         type="number"
                                                         step="0.05"
                                                         wire:model="editItemDiscountPercentage"
@@ -276,7 +276,7 @@
                                     <div>
                                         <textarea
                                             class="form-input @error('newItemName') border-red-500 @enderror min-h-[60px] w-full"
-                                            wire:model.live="newItemName"
+                                            wire:model="newItemName"
                                             placeholder="{{ __('pm::invoice.item_name_placeholder') }}"
                                             wire:loading.attr="disabled"
                                             rows="2"
@@ -290,7 +290,7 @@
                                     <div>
                                         <x-synapse-currency
                                             class="@error('newItemAmount') border-red-500 @enderror w-full"
-                                            wire:model.live="newItemAmount"
+                                            wire:model="newItemAmount"
                                             currency="Rp"
                                         />
                                         @error('newItemAmount')
@@ -307,7 +307,7 @@
                                         >
                                         @if ($newItemIncludeDiscount)
                                             <input
-                                                class="form-input w-16 text-center [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                                                class="form-input no-spin w-16 text-center"
                                                 type="number"
                                                 step="0.05"
                                                 wire:model="newItemDiscountPercentage"
@@ -367,7 +367,7 @@
                                     class="h-4 w-4 rounded border-gray-300"
                                     id="includeDpp"
                                     type="checkbox"
-                                    wire:model.live="includeDpp"
+                                    wire:model.live.debounce.500ms="includeDpp"
                                 >
                                 <label
                                     class="text-gray-600 dark:text-gray-400"
@@ -388,7 +388,7 @@
                                     class="h-4 w-4 rounded border-gray-300"
                                     id="includeDiscount"
                                     type="checkbox"
-                                    wire:model.live="includeDiscount"
+                                    wire:model.live.debounce.500ms="includeDiscount"
                                 >
                                 <label
                                     class="text-gray-600 dark:text-gray-400"
@@ -396,8 +396,9 @@
                                 >{{ __('pm::invoice.include_discount') }}</label>
                                 @if ($includeDiscount)
                                     <input
-                                        class="form-input w-20 text-center"
+                                        class="form-input no-spin w-20 text-center"
                                         type="number"
+                                        step="0.05"
                                         wire:model.live.debounce.500ms="discountPercentage"
                                         min="0"
                                         max="100"
@@ -429,7 +430,7 @@
                                     class="h-4 w-4 rounded border-gray-300"
                                     id="includeVat"
                                     type="checkbox"
-                                    wire:model.live="includeVat"
+                                    wire:model.live.debounce.500ms="includeVat"
                                 >
                                 <label
                                     class="text-gray-600 dark:text-gray-400"
@@ -437,8 +438,9 @@
                                 >{{ __('pm::invoice.include_vat') }} (PPN)</label>
                                 @if ($includeVat)
                                     <input
-                                        class="form-input w-20 text-center"
+                                        class="form-input no-spin w-20 text-center"
                                         type="number"
+                                        step="0.05"
                                         wire:model.live.debounce.500ms="vatPercentage"
                                         min="0"
                                         max="100"

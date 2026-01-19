@@ -10,7 +10,6 @@ use Illuminate\Validation\Rules\File;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithFileUploads;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use VmEngine\Pm\Enums\Documents;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Pm\Models\ProjectDocument;
@@ -144,7 +143,7 @@ class MultipleDocument extends Component
             'number' => $this->documentCode,
             'notes' => $this->notes,
             'version' => 1, // Multiple documents always version 1
-            'file_path' => $this->file->storePublicly('projects/'.$this->project->id.'/documents/'.($documentType->code() ?: $documentType->value)),
+            'file_path' => $this->file->store('projects/'.$this->project->id.'/documents/'.($documentType->code() ?: $documentType->value), 'local'),
             'file_info' => [
                 'original_name' => $this->file->getClientOriginalName(),
                 'size' => $this->file->getSize(),
@@ -160,9 +159,9 @@ class MultipleDocument extends Component
 
         SynAuth::logActivity(
             Auth::id(),
-            'pm.project.documents.uploaded',
+            'pm.project.'.$this->project->id.'.documents.uploaded',
             'User '.Auth::user()->name.' uploaded '.$documentType->label().' document. Data: '.json_encode($data),
-            'project.documents',
+            'project.'.$this->project->id.'.documents',
             'pm',
         );
 
@@ -174,13 +173,14 @@ class MultipleDocument extends Component
 
         // Dispatch event to refresh parent DocumentManager component
         $this->dispatch('document-uploaded');
+        $this->dispatch('activity-refresh');
 
         // Close modal and reset form
         $this->dispatch('close-modal-upload-'.$documentType->code(true));
         $this->resetUploadForm();
     }
 
-    public function downloadDocument(int $documentId): StreamedResponse
+    public function downloadDocument(int $documentId): void
     {
         // Check authorization
         if (! $this->canAccessDocument()) {
@@ -190,7 +190,7 @@ class MultipleDocument extends Component
                 'message' => 'You do not have permission to download this document',
             ]);
 
-            abort(403, 'Unauthorized to download this document');
+            return;
         }
 
         $document = $this->project->documents()->find($documentId);
@@ -202,7 +202,7 @@ class MultipleDocument extends Component
                 'message' => 'Document not found',
             ]);
 
-            abort(404);
+            return;
         }
 
         if (! Storage::exists($document->file_path)) {
@@ -212,10 +212,11 @@ class MultipleDocument extends Component
                 'message' => 'File not found on storage',
             ]);
 
-            abort(404);
+            return;
         }
 
-        return Storage::download($document->file_path, $document->file_info['original_name'] ?? 'document');
+        // Redirect to document download route
+        $this->redirect(route('backend.pm.document.download', $document->id));
     }
 
     public function confirmDeleteDocument(string $deleteToken): void
@@ -250,6 +251,7 @@ class MultipleDocument extends Component
 
             // Dispatch event to refresh parent DocumentManager component
             $this->dispatch('document-uploaded');
+            $this->dispatch('activity-refresh');
         } catch (\Exception $e) {
             $this->dispatch('notify', [
                 'variant' => 'danger',
@@ -269,7 +271,7 @@ class MultipleDocument extends Component
                 'message' => 'You do not have permission to view this document',
             ]);
 
-            abort(403, 'Unauthorized to view this document');
+            return;
         }
 
         $document = $this->project->documents()->find($documentId);
@@ -294,11 +296,8 @@ class MultipleDocument extends Component
             return;
         }
 
-        // Get temporary URL for viewing (valid for 5 minutes)
-        $url = Storage::temporaryUrl($document->file_path, now()->addMinutes(5));
-
-        // Open in new tab
-        $this->dispatch('open-url', url: $url);
+        // Redirect to document print route
+        $this->redirect(route('backend.pm.document.print', $document->id));
     }
 
     public function render()

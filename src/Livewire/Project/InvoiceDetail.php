@@ -7,6 +7,7 @@ namespace VmEngine\Pm\Livewire\Project;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
@@ -16,6 +17,7 @@ use VmEngine\Pm\Enums\Documents;
 use VmEngine\Pm\Models\ProjectDocument;
 use VmEngine\Pm\Models\ProjectInvoice;
 use VmEngine\Pm\Models\ProjectInvoiceItem;
+use VmEngine\SynAuth\Facades\SynAuth;
 
 class InvoiceDetail extends Component
 {
@@ -32,7 +34,7 @@ class InvoiceDetail extends Component
 
     public bool $editItemIncludeDiscount = false;
 
-    public int $editItemDiscountPercentage = 0;
+    public float $editItemDiscountPercentage = 0;
 
     // New item properties
     public string $newItemName = '';
@@ -41,16 +43,16 @@ class InvoiceDetail extends Component
 
     public bool $newItemIncludeDiscount = false;
 
-    public int $newItemDiscountPercentage = 0;
+    public float $newItemDiscountPercentage = 0;
 
     // Invoice totals
     public bool $includeVat = true;
 
-    public int $vatPercentage = 11;
+    public float $vatPercentage = 11;
 
     public bool $includeDiscount = false;
 
-    public int $discountPercentage = 0;
+    public float $discountPercentage = 0;
 
     public bool $includeDpp = false;
 
@@ -75,9 +77,9 @@ class InvoiceDetail extends Component
 
             // Load invoice settings
             $this->includeVat = (bool) $this->invoice->include_vat;
-            $this->vatPercentage = (int) $this->invoice->vat_percentage;
+            $this->vatPercentage = (float) $this->invoice->vat_percentage;
             $this->includeDiscount = (bool) $this->invoice->include_discount;
-            $this->discountPercentage = (int) $this->invoice->discount_percentage;
+            $this->discountPercentage = (float) $this->invoice->discount_percentage;
             $this->includeDpp = (bool) $this->invoice->include_dpp;
             $this->invoiceNotes = $this->invoice->notes ?? '';
         } catch (ModelNotFoundException) {
@@ -134,7 +136,7 @@ class InvoiceDetail extends Component
         $this->editItemName = $item->name;
         $this->editItemAmount = (string) (int) $item->amount;
         $this->editItemIncludeDiscount = (bool) $item->include_discount;
-        $this->editItemDiscountPercentage = (int) $item->discount_percentage;
+        $this->editItemDiscountPercentage = (float) $item->discount_percentage;
     }
 
     public function updateItem(int $id): void
@@ -343,6 +345,16 @@ class InvoiceDetail extends Component
                 $this->generatePdf();
             });
 
+            SynAuth::logActivity(
+                Auth::id(),
+                'pm.project.'.$this->invoice->_project_id.'.invoice.generated',
+                'User '.Auth::user()->name.' generated invoice file for project '.$this->invoice->project->name,
+                'project.'.$this->invoice->project_id.'.invoice',
+                'pm'
+            );
+
+            $this->dispatch('activity-refresh');
+
             $this->dispatch('notify', [
                 'variant' => 'success',
                 'title' => __('pm::messages.success'),
@@ -376,14 +388,14 @@ class InvoiceDetail extends Component
         if ($this->invoice->invoice_document_id) {
             $oldDocument = ProjectDocument::find($this->invoice->invoice_document_id);
             if ($oldDocument && $oldDocument->file_path) {
-                Storage::disk('public')->delete($oldDocument->file_path);
+                Storage::delete($oldDocument->file_path);
                 $oldDocument->delete();
             }
         }
 
         // Store PDF
         $fullPath = $storagePath.'/'.$filename;
-        Storage::disk('public')->put($fullPath, $pdf->output());
+        Storage::put($fullPath, $pdf->output());
 
         // Create project document record
         $document = ProjectDocument::create([
@@ -396,7 +408,7 @@ class InvoiceDetail extends Component
             'file_path' => $fullPath,
             'file_info' => [
                 'name' => $filename,
-                'size' => Storage::disk('public')->size($fullPath),
+                'size' => Storage::size($fullPath),
                 'mime' => 'application/pdf',
             ],
             'version' => 1,

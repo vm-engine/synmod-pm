@@ -75,9 +75,6 @@
                                     <p>{{ __('pm::invoice.col_due_date') }}</p>
                                 </th>
                                 <th>
-                                    <p>{{ __('pm::invoice.col_paid_amount') }}</p>
-                                </th>
-                                <th>
                                     <p>{{ __('pm::invoice.col_status') }}</p>
                                 </th>
                                 <th>
@@ -124,12 +121,6 @@
                                     <td>
                                         <div class="flex items-center">
                                             <p>{{ $invoice->due_date?->format('d M Y') ?? '-' }}</p>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="flex items-center">
-                                            <p class="font-mono">
-                                                {{ number_format($invoice->paid_amount, 0, ',', '.') }}</p>
                                         </div>
                                     </td>
                                     <td>
@@ -261,14 +252,16 @@
                                                             {{ __('pm::invoice.print') }}
                                                         </a>
                                                         @endcanAccess
-                                                        <a
-                                                            class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                                                            href="#"
-                                                            wire:navigate
-                                                        >
-                                                            <span class="fa-solid fa-receipt w-4"></span>
-                                                            {{ __('pm::invoice.receipts') }}
-                                                        </a>
+                                                        @if ($invoice->invoice_document_id)
+                                                            <button
+                                                                class="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                                                                type="button"
+                                                                @click="dropdownOpen = false; $dispatch('open-modal-receipt-detail'); $wire.dispatch('load-receipt-detail', { id: {{ $invoice->id }} })"
+                                                            >
+                                                                <span class="fa-solid fa-receipt w-4"></span>
+                                                                {{ __('pm::invoice.receipts') }}
+                                                            </button>
+                                                        @endif
                                                     </div>
                                                 </template>
                                             </div>
@@ -393,5 +386,13 @@
         maxWidth="7xl"
     >
         <livewire:pm.project.invoice-detail />
+    </x-synapse-modal>
+
+    <!-- Receipt Detail Modal -->
+    <x-synapse-modal
+        name="receipt-detail"
+        maxWidth="4xl"
+    >
+        <livewire:pm.project.receipt-detail />
     </x-synapse-modal>
 </div>

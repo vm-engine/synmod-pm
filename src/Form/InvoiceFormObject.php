@@ -182,9 +182,9 @@ class InvoiceFormObject extends Form
 
         SynAuth::logActivity(
             Auth::id(),
-            'pm.invoice.create',
+            'pm.project.'.$this->project->id.'.invoice.create',
             'User '.Auth::user()->name.' created a new invoice: '.json_encode($data),
-            'invoice',
+            'project.'.$this->project->id.'.invoice',
             'pm',
         );
 
@@ -217,9 +217,9 @@ class InvoiceFormObject extends Form
 
         SynAuth::logActivity(
             Auth::id(),
-            'pm.invoice.update',
+            'pm.project.'.$this->project->id.'.invoice.update',
             'User '.Auth::user()->name.' updated an invoice. Old Data: '.json_encode($oldData).' New Data: '.json_encode($data),
-            'invoice',
+            'project.'.$this->project->id.'.invoice',
             'pm',
         );
 

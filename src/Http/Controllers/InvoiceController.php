@@ -21,7 +21,7 @@ class InvoiceController extends Controller
             abort(404, __('pm::invoice.pdf_not_found'));
         }
 
-        $filePath = Storage::disk('public')->path($invoice->invoiceDocument->file_path);
+        $filePath = Storage::path($invoice->invoiceDocument->file_path);
 
         if (! file_exists($filePath)) {
             abort(404, __('pm::invoice.pdf_not_found'));

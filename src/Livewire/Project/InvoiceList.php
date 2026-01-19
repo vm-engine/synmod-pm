@@ -90,18 +90,22 @@ class InvoiceList extends Component
 
                 // Delete invoice items first
                 $invoice->items()->delete();
+                $invoice->invoiceDocument?->delete();
+                $invoice->recetipDocument?->delete();
                 $invoice->delete();
 
                 SynAuth::logActivity(
                     Auth::id(),
-                    'pm.invoice.delete',
+                    'pm.project.'.$this->project->id.'.invoice.delete',
                     'User '.Auth::user()->name.' deleted invoice data. Data: '.json_encode($invoiceArray),
-                    'invoice',
+                    'project.'.$this->project->id.'.invoice',
                     'pm',
                 );
             });
 
             $this->dispatch('synapse-confirmed');
+            $this->dispatch('activity-refresh');
+
             $this->dispatch('notify', [
                 'variant' => 'success',
                 'title' => __('pm::messages.success'),
@@ -133,11 +137,26 @@ class InvoiceList extends Component
 
         // Apply status filter
         if ($this->filterStatus === 'paid') {
-            $query->whereRaw('total_amount = paid_amount AND total_amount > 0');
+            // Show invoices marked as paid OR fully paid by amount
+            $query->where(function ($q) {
+                $q->where('is_paid', true)
+                    ->orWhere(function ($sq) {
+                        $sq->where(function ($isq) {
+                            $isq->where('is_paid', false)->orWhereNull('is_paid');
+                        })
+                            ->whereRaw('total_amount = paid_amount AND total_amount > 0');
+                    });
+            });
         } elseif ($this->filterStatus === 'unpaid') {
-            $query->where('paid_amount', 0);
+            // Show invoices not marked as paid AND no payment made
+            $query->where(function ($q) {
+                $q->where('is_paid', false)->orWhereNull('is_paid');
+            })->where('paid_amount', 0);
         } elseif ($this->filterStatus === 'partial') {
-            $query->whereRaw('paid_amount > 0 AND paid_amount < total_amount');
+            // Show invoices not marked as paid AND partial payment made
+            $query->where(function ($q) {
+                $q->where('is_paid', false)->orWhereNull('is_paid');
+            })->whereRaw('paid_amount > 0 AND paid_amount < total_amount');
         }
 
         // Apply year filter
@@ -200,6 +219,16 @@ class InvoiceList extends Component
 
     public function getPaymentStatus($invoice): array
     {
+        // Check receipt payment status first (has priority)
+        if ($invoice->is_paid) {
+            return [
+                'label' => __('pm::invoice.status_paid'),
+                'class' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+                'icon' => 'fa-check-circle',
+            ];
+        }
+
+        // Fallback to amount-based calculation
         $totalAmount = (float) $invoice->total_amount;
         $paidAmount = (float) $invoice->paid_amount;
 

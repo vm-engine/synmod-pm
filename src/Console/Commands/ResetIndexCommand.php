@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 use VmEngine\Pm\Enums\Documents;
 use VmEngine\Pm\Models\ProjectCategory;
 
-class ResetIndex extends Command
+class ResetIndexCommand extends Command
 {
     /**
      * The name and signature of the console command.

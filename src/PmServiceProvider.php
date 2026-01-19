@@ -7,7 +7,8 @@ namespace VmEngine\Pm;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
 use VmEngine\Pm\Console\Commands\MigrateOldDataCommand;
-use VmEngine\Pm\Console\Commands\ResetIndex;
+use VmEngine\Pm\Console\Commands\MigrateProjectUploadsCommand;
+use VmEngine\Pm\Console\Commands\ResetIndexCommand;
 use VmEngine\Pm\Console\Commands\SyncClientUserStatusCommand;
 use VmEngine\Synapse\Traits\AutoRegistersComponents;
 
@@ -27,7 +28,8 @@ class PmServiceProvider extends ServiceProvider
             $this->commands([
                 MigrateOldDataCommand::class,
                 SyncClientUserStatusCommand::class,
-                ResetIndex::class,
+                ResetIndexCommand::class,
+                MigrateProjectUploadsCommand::class,
             ]);
 
             $this->app->booted(function () {

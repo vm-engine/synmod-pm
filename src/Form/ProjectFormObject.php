@@ -289,7 +289,7 @@ class ProjectFormObject extends Form
         $validated = $this->validate();
 
         DB::transaction(function () use ($validated) {
-            Project::create([
+            $project = Project::create([
                 'user_id' => $this->client_id ? $this->getClientUserId() : Auth::id(),
                 'division_id' => $this->division_id,
                 'project_category_id' => $this->project_category_id,
@@ -335,9 +335,9 @@ class ProjectFormObject extends Form
 
             SynAuth::logActivity(
                 Auth::id(),
-                'pm.project.create',
+                'pm.project.'.$this->project->id.'.create',
                 'User '.Auth::user()->name.' created new project. Data: '.json_encode($validated),
-                'project',
+                'project.'.$project->id,
                 'pm',
             );
         });
@@ -401,9 +401,9 @@ class ProjectFormObject extends Form
 
             SynAuth::logActivity(
                 Auth::id(),
-                'pm.project.update',
+                'pm.project.'.$this->project->id.'.update',
                 'User '.Auth::user()->name.' updated project data. Old Data: '.json_encode($oldData).' New Data: '.json_encode($this->project->toArray()),
-                'Project',
+                'Project.'.$this->project->id,
                 'pm',
             );
         });

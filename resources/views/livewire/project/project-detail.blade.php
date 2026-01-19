@@ -1,4 +1,7 @@
-<div x-data="{ pageName: '{{ $project->name }}', isHome: false, activeTab: $wire.entangle('activeTab') }">
+<div
+    x-data="{ pageName: '{{ $project->name }}', isHome: false, activeTab: $wire.entangle('activeTab') }"
+    x-on:project-refresh.window="$wire.$refresh()"
+>
     @include('synapps::components.layouts.partials.breadcrumbs')
 
     <!-- Project Header -->
@@ -368,27 +371,17 @@
 
         <!-- Timeline Tab -->
         <div x-show="activeTab === 'timeline'">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">{{ __('pm::project.timeline_activity') }}</h3>
-                </div>
-                <div class="card-body">
-                    <div class="py-8 text-center text-gray-500">
-                        <span class="fa-solid fa-clock mb-4 block text-4xl text-gray-300"></span>
-                        <p>{{ __('pm::project.timeline_placeholder') }}</p>
-                    </div>
-                </div>
-            </div>
+            @livewire('pm.project.activity', ['projectId' => $project->id], key('activity-' . $project->id . '-' . now()))
         </div>
 
         <!-- Documents Tab -->
         <div x-show="activeTab === 'documents'">
-            @livewire('pm.project.document-manager', ['project' => $project], key('document-manager-' . $project->id))
+            @livewire('pm.project.document-manager', ['project' => $project], key('document-manager-' . $project->id . '-' . now()))
         </div>
 
         <!-- Invoices Tab -->
         <div x-show="activeTab === 'invoices'">
-            @livewire('pm.project.invoice-list', ['projectId' => $project->id], key('invoice-list-' . $project->id))
+            @livewire('pm.project.invoice-list', ['projectId' => $project->id], key('invoice-list-' . $project->id . '-' . now()))
         </div>
 
         <!-- Financial Tab -->

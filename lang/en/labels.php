@@ -20,4 +20,9 @@ return [
     'max_255' => 'must not exceed 255 characters',
     'max_5mb' => 'must not exceed 5MB',
     'must_be_image' => 'must be an image file (JPEG, PNG, WebP)',
+    'close' => 'Close',
+    'view' => 'View',
+    'view_details' => 'View Details',
+    'activity_detail' => 'Activity Detail',
+    'loading' => 'Loading...',
 ];

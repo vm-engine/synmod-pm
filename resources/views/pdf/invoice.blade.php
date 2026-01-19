@@ -414,7 +414,7 @@
                 </tr>
                 @if ($invoice->include_dpp)
                     <tr>
-                        <td class="label-col">DPP (11/12)</td>
+                        <td class="label-col">DPP</td>
                         <td class="value-col">Rp {{ number_format($dppAmount, 2, ',', '.') }}</td>
                     </tr>
                 @endif
