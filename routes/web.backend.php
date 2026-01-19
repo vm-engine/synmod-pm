@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use VmEngine\Pm\Http\Controllers\InvoiceController;
 use VmEngine\Pm\Livewire\ClientForm;
 use VmEngine\Pm\Livewire\ClientList;
 use VmEngine\Pm\Livewire\Config;
@@ -29,6 +30,12 @@ Route::group([], function () {
         ->name('project.edit')->middleware('can-access:pm.project.update');
     Route::get('/project/{id}', ProjectDetail::class)
         ->name('project.detail')->middleware('can-access:pm.project.read');
+
+    // Invoice routes
+    Route::get('/invoice/{id}/download', [InvoiceController::class, 'download'])
+        ->name('invoice.download')->middleware('can-access:pm.invoice.read');
+    Route::get('/invoice/{id}/print', [InvoiceController::class, 'print'])
+        ->name('invoice.print')->middleware('can-access:pm.invoice.read');
 
     // Client routes
     Route::get('/client', ClientList::class)

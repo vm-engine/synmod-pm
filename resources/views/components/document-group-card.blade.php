@@ -3,6 +3,7 @@
     'type' => null,
     'title' => '',
     'badge' => '',
+    'readonly' => false,
 ])
 
 <div

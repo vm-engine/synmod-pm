@@ -29,6 +29,8 @@ class VersionedDocument extends Component
 
     public string $badge = 'Versioned';
 
+    public bool $readonly = false;
+
     public bool $revisionMode = false;
 
     public $file;
@@ -39,11 +41,12 @@ class VersionedDocument extends Component
 
     public int $version = 1;
 
-    public function mount(Project $project, Documents $documentType, string $title): void
+    public function mount(Project $project, Documents $documentType, string $title, bool $readonly = false): void
     {
         $this->project = $project;
         $this->documentTypeValue = $documentType->value;
         $this->title = $title;
+        $this->readonly = $readonly;
 
         $this->resetUploadForm();
     }

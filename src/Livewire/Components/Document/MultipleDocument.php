@@ -29,18 +29,21 @@ class MultipleDocument extends Component
 
     public string $badge;
 
+    public bool $readonly = false;
+
     public $file;
 
     public string $documentCode = '';
 
     public string $notes = '';
 
-    public function mount(Project $project, Documents $documentType, string $title): void
+    public function mount(Project $project, Documents $documentType, string $title, bool $readonly = false): void
     {
         $this->project = $project;
         $this->documentTypeValue = $documentType->value;
         $this->title = $title;
         $this->badge = __('pm::project_document.add_new_file');
+        $this->readonly = $readonly;
 
         $this->resetUploadForm();
     }

@@ -43,11 +43,18 @@ class ProjectInvoice extends Model
         'include_dpp',
         'dpp_amount',
         'total_amount',
-        'paid_amount',
+        'is_paid',
+        'paid_at',
+        'payment_notes',
+        'payment_proof',
         'issuer_id',
         'bank_account_id',
         'has_signature',
         'signature_id',
+        'invoice_document_id',
+        'receipt_number',
+        'receipt_amount_text',
+        'receipt_document_id',
     ];
 
     protected function casts(): array
@@ -64,7 +71,8 @@ class ProjectInvoice extends Model
             'include_dpp' => 'boolean',
             'dpp_amount' => 'decimal:2',
             'total_amount' => 'decimal:2',
-            'paid_amount' => 'decimal:2',
+            'is_paid' => 'boolean',
+            'paid_at' => 'datetime',
             'has_signature' => 'boolean',
         ];
     }
@@ -119,8 +127,13 @@ class ProjectInvoice extends Model
         return $this->hasMany(ProjectInvoiceItem::class);
     }
 
-    public function receipts(): HasMany
+    public function invoiceDocument(): BelongsTo
     {
-        return $this->hasMany(ProjectReceipt::class);
+        return $this->belongsTo(ProjectDocument::class, 'invoice_document_id');
+    }
+
+    public function receiptDocument(): BelongsTo
+    {
+        return $this->belongsTo(ProjectDocument::class, 'receipt_document_id');
     }
 }

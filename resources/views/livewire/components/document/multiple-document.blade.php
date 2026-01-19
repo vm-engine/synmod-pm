@@ -7,14 +7,17 @@
         :title="$title"
         :badge="$badge"
         :type="$documentType"
+        :readonly="$readonly"
     >
         <x-pm::document-multiple-files-list
             :documents="$this->documents"
             :type="$documentType"
+            :readonly="$readonly"
         />
     </x-pm::document-group-card>
 
     {{-- Upload Modal --}}
+    @if (!$readonly)
     <x-synapse-modal name="upload-{{ $documentType->code(true) }}">
         <div class="p-6">
             <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
@@ -121,4 +124,5 @@
             </form>
         </div>
     </x-synapse-modal>
+    @endif
 </div>

@@ -92,6 +92,15 @@ enum Documents: int
         return ! $this->isMultiple();
     }
 
+    public function isReadonly(): bool
+    {
+        return match ($this) {
+            Documents::INVOICE,
+            Documents::RECEIPT => true,
+            default => false,
+        };
+    }
+
     public function handler(): Base
     {
         return match ($this) {

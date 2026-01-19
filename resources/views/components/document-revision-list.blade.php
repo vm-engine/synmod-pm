@@ -1,4 +1,4 @@
-@props(['documents', 'type' => null])
+@props(['documents', 'type' => null, 'readonly' => false])
 
 @if (count($documents) === 0)
     {{-- Empty State --}}
@@ -7,6 +7,7 @@
         <p class="text-sm text-gray-500 dark:text-gray-500">
             {{ __('pm::project_document.no_documents_uploaded') }}
         </p>
+        @if (!$readonly)
         <button
             class="btn primary btn-sm mt-3"
             @click="$dispatch('open-modal-upload-{{ $type->code(true) }}'); $wire.dispatch('reset-upload-form')"
@@ -14,6 +15,7 @@
             <span class="fa-solid fa-upload mr-2"></span>
             {{ __('pm::project_document.upload_first_document') }}
         </button>
+        @endif
     </div>
 @else
     <div class="divide-y divide-gray-100 dark:divide-gray-800">
@@ -101,6 +103,7 @@
                             </span>
                         @endif
                     </button>
+                    @if (!$readonly)
                     <button
                         class="btn primary btn-sm"
                         wire:click="uploadNewVersion({{ $first->id ?? 0 }})"
@@ -125,6 +128,7 @@
                     >
                         <span class="fa-solid fa-trash"></span>
                     </button>
+                    @endif
                 </div>
             </div>
 

@@ -12,6 +12,8 @@ return [
     'download' => 'Download',
     'print' => 'Print',
     'receipts' => 'Receipts',
+    'save_and_generate_pdf' => 'Save & Generate PDF',
+    'add_item' => 'Add Item',
 
     // Table columns
     'col_no' => 'No',
@@ -55,10 +57,17 @@ return [
     'updated_successfully' => 'Invoice updated successfully',
     'deleted_successfully' => 'Invoice deleted successfully',
     'not_found' => 'Invoice not found',
+    'pdf_generated' => 'PDF generated successfully',
+    'pdf_not_found' => 'Invoice PDF not found',
+    'item_added' => 'Item added successfully',
+    'item_updated' => 'Item updated successfully',
+    'item_deleted' => 'Item deleted successfully',
 
     // Delete confirmation
     'delete_title' => 'Delete Invoice',
     'delete_message' => 'Are you sure you want to delete invoice :code? This action cannot be undone.',
+    'delete_item_title' => 'Delete Item',
+    'delete_item_message' => 'Are you sure you want to delete this invoice item?',
 
     // Form fields
     'spk_number' => 'SPK Number',
@@ -82,6 +91,47 @@ return [
     'has_signature' => 'Include Signature',
     'signature' => 'Signature',
     'select_signature' => 'Select Signature',
+
+    // Invoice detail
+    'items_title' => 'Invoice Items',
+    'item_name' => 'Description',
+    'item_name_placeholder' => 'Enter item description',
+    'item_amount' => 'Amount',
+    'item_discount' => 'Discount',
+    'item_total' => 'Total',
+
+    // Totals section
+    'totals_title' => 'Invoice Totals',
+    'sub_total_items' => 'Sub Total (Items)',
+    'include_dpp' => 'DPP',
+    'include_discount' => 'Invoice Discount',
+    'after_discount' => 'After Discount',
+    'include_vat' => 'VAT',
+    'grand_total' => 'Grand Total',
+
+    // PDF translations
+    'pdf' => [
+        'to' => 'To',
+        'address' => 'Address',
+        'attention' => 'Attention',
+        'spk_no' => 'SPK No',
+        'date' => 'Date',
+        'due_date' => 'Due Date',
+        'description' => 'Description',
+        'amount' => 'Amount',
+        'discount' => 'Discount',
+        'total' => 'Total',
+        'sub_total' => 'Sub Total',
+        'dpp' => 'DPP',
+        'vat' => 'VAT',
+        'grand_total' => 'Grand Total',
+        'notes' => 'Notes',
+        'payment_method' => 'Payment Method',
+        'bank_transfer' => 'Bank Transfer',
+        'bank_name' => 'Bank Name',
+        'account_name' => 'Account Name',
+        'account_number' => 'Account Number',
+    ],
 
     // Validation messages
     'validation' => [

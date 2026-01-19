@@ -1,4 +1,4 @@
-@props(['documents', 'type' => 'document'])
+@props(['documents', 'type' => 'document', 'readonly' => false])
 
 @if (count($documents) === 0)
     {{-- Empty State --}}
@@ -7,6 +7,7 @@
         <p class="text-sm text-gray-500 dark:text-gray-500">
             {{ __('pm::project_document.no_files_uploaded') }}
         </p>
+        @if (!$readonly)
         <button
             class="btn primary btn-sm mt-3"
             @click="$dispatch('open-modal-upload-{{ $type->code(true) }}'); $wire.dispatch('reset-upload-form')"
@@ -14,6 +15,7 @@
             <span class="fa-solid fa-upload mr-2"></span>
             {{ __('pm::project_document.upload_first_file') }}
         </button>
+        @endif
     </div>
 @else
     {{-- Grid Layout for Multiple Files --}}
@@ -50,6 +52,7 @@
                         >
                             <span class="fa-solid fa-download text-xs"></span>
                         </button>
+                        @if (!$readonly)
                         <button
                             class="flex h-7 w-7 items-center justify-center rounded-md bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-500/10 dark:text-red-400"
                             type="button"
@@ -68,6 +71,7 @@
                         >
                             <span class="fa-solid fa-trash text-xs"></span>
                         </button>
+                        @endif
                     </div>
                 </div>
 
@@ -125,6 +129,7 @@
         @endforeach
 
         {{-- Add New File Card --}}
+        @if (!$readonly)
         <button
             class="flex min-h-[200px] flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 transition-colors hover:border-blue-400 hover:bg-blue-50/50 dark:border-gray-700 dark:bg-gray-800/30 dark:hover:border-blue-500 dark:hover:bg-blue-500/5"
             @click="$dispatch('open-modal-upload-{{ $type->code(true) }}'); $wire.dispatch('reset-upload-form')"
@@ -134,5 +139,6 @@
                 {{ __('pm::project_document.add_new_file') }}
             </span>
         </button>
+        @endif
     </div>
 @endif

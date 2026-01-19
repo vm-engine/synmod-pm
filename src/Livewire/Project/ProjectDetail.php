@@ -36,11 +36,6 @@ class ProjectDetail extends Component
         }
     }
 
-    public function setActiveTab(string $tab)
-    {
-        $this->activeTab = $tab;
-    }
-
     #[On('document-uploaded')]
     public function refreshProject(): void
     {

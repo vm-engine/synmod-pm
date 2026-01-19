@@ -49,6 +49,7 @@
                             'project' => $project,
                             'documentType' => $document,
                             'title' => $document->label(),
+                            'readonly' => $document->isReadonly(),
                         ],
                         key($document->code(true) . '-' . $project->id)
                     )
@@ -60,6 +61,7 @@
                             'project' => $project,
                             'documentType' => $document,
                             'title' => $document->label(),
+                            'readonly' => $document->isReadonly(),
                         ],
                         key($document->code(true) . '-' . $project->id)
                     )

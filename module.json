@@ -18,7 +18,9 @@
             "dev": {}
         },
         "composer": {
-            "main": {},
+            "main": {
+                "barryvdh/laravel-dompdf": "^3.0"
+            },
             "dev": {}
         }
     },

@@ -23,7 +23,8 @@
       "Bash(dir:*)",
       "Bash(findstr:*)",
       "Bash(composer show:*)",
-      "Bash(../../vendor/bin/pint:*)"
+      "Bash(../../vendor/bin/pint:*)",
+      "Bash(../synapse/vendor/bin/pint:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

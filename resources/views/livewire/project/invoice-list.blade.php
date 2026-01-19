@@ -1,6 +1,6 @@
 <div
     x-data="{ drawerOpen: false }"
-    x-on:invoice-refresh="$wire.$refresh()"
+    x-on:invoice-refresh.window="$wire.$refresh()"
 >
     <!-- Confirmation Dialog -->
     <x-synapse-confirm-dialog />
@@ -158,13 +158,14 @@
                                             x-data="{ dropdownOpen: false }"
                                         >
                                             @canAccess('pm.invoice.read')
-                                            <a
+                                            <button
                                                 class="btn-icon info has-tooltip group"
-                                                href="#"
+                                                type="button"
+                                                @click="$dispatch('open-modal-invoice-detail'); $wire.dispatch('load-invoice-detail', { id: {{ $invoice->id }} })"
                                             >
                                                 <span class="fa-solid fa-eye"></span>
                                                 <span class="tooltip">{{ __('pm::invoice.tooltip_detail') }}</span>
-                                            </a>
+                                            </button>
                                             @endcanAccess
 
                                             @canAccess('pm.invoice.update')
@@ -229,7 +230,8 @@
                                                     <div
                                                         class="shadow-theme-lg fixed z-[9999] w-48 rounded-lg border border-gray-200 bg-white py-1 dark:border-gray-700 dark:bg-gray-800"
                                                         x-show="dropdownOpen"
-                                                        :style="'top: ' + dropdownPosition.top + 'px; left: ' + dropdownPosition.left + 'px;'"
+                                                        :style="'top: ' + dropdownPosition.top + 'px; left: ' + dropdownPosition
+                                                            .left + 'px;'"
                                                         x-transition:enter="transition ease-out duration-100"
                                                         x-transition:enter-start="transform opacity-0 scale-95"
                                                         x-transition:enter-end="transform opacity-100 scale-100"
@@ -239,41 +241,34 @@
                                                         x-cloak
                                                         @click.outside="dropdownOpen = false"
                                                     >
-                                                    @canAccess('pm.invoice.read')
-                                                    <a
-                                                        class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                                                        href="#"
-                                                        target="_blank"
-                                                    >
-                                                        <span class="fa-solid fa-download w-4"></span>
-                                                        {{ __('pm::invoice.download') }}
-                                                    </a>
-                                                    <a
-                                                        class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                                                        href="#"
-                                                        target="_blank"
-                                                    >
-                                                        <span class="fa-solid fa-print w-4"></span>
-                                                        {{ __('pm::invoice.print') }}
-                                                    </a>
-                                                    @endcanAccess
-                                                    @canAccess('pm.receipt.read')
-                                                    <a
-                                                        class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                                                        href="#"
-                                                        wire:navigate
-                                                    >
-                                                        <span class="fa-solid fa-receipt w-4"></span>
-                                                        {{ __('pm::invoice.receipts') }}
-                                                        @if ($invoice->receipts_count ?? $invoice->receipts->count() > 0)
-                                                            <span
-                                                                class="ml-auto rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
+                                                        @canAccess('pm.invoice.read')
+                                                        @if ($invoice->invoice_document_id)
+                                                            <a
+                                                                class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                                                                href="{{ route('backend.pm.invoice.download', $invoice->id) }}"
+                                                                target="_blank"
                                                             >
-                                                                {{ $invoice->receipts_count ?? $invoice->receipts->count() }}
-                                                            </span>
+                                                                <span class="fa-solid fa-download w-4"></span>
+                                                                {{ __('pm::invoice.download') }}
+                                                            </a>
                                                         @endif
-                                                    </a>
-                                                    @endcanAccess
+                                                        <a
+                                                            class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                                                            href="{{ route('backend.pm.invoice.print', $invoice->id) }}"
+                                                            target="_blank"
+                                                        >
+                                                            <span class="fa-solid fa-print w-4"></span>
+                                                            {{ __('pm::invoice.print') }}
+                                                        </a>
+                                                        @endcanAccess
+                                                        <a
+                                                            class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                                                            href="#"
+                                                            wire:navigate
+                                                        >
+                                                            <span class="fa-solid fa-receipt w-4"></span>
+                                                            {{ __('pm::invoice.receipts') }}
+                                                        </a>
                                                     </div>
                                                 </template>
                                             </div>
@@ -390,5 +385,13 @@
         maxWidth="2xl"
     >
         <livewire:pm.project.invoice-form />
+    </x-synapse-modal>
+
+    <!-- Invoice Detail Modal -->
+    <x-synapse-modal
+        name="invoice-detail"
+        maxWidth="7xl"
+    >
+        <livewire:pm.project.invoice-detail />
     </x-synapse-modal>
 </div>
