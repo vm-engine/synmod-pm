@@ -50,6 +50,21 @@ class ClientFactory extends Factory
     }
 
     /**
+     * Configure the factory to sync user status with client status.
+     */
+    public function configure(): static
+    {
+        return $this->afterCreating(function (Client $client) {
+            // Sync user status according to business rules:
+            // - Prospect clients: user.status = 0 (always)
+            // - Active clients with active=true: user.status = 1
+            // - Active clients with active=false: user.status = 0
+            $userStatus = ($client->status === Client::STATUS_ACTIVE && $client->active) ? 1 : 0;
+            $client->user->update(['status' => $userStatus]);
+        });
+    }
+
+    /**
      * Indicate that the client is a prospect.
      */
     public function prospect(): static
@@ -66,6 +81,7 @@ class ClientFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => Client::STATUS_ACTIVE,
+            'active' => true,
         ]);
     }
 

@@ -12,6 +12,7 @@ use VmEngine\Pm\Enums\RiskLevel;
 use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\Division;
 use VmEngine\Pm\Models\Project;
+use VmEngine\Pm\Models\ProjectCategory;
 
 /**
  * @extends Factory<Project>
@@ -28,11 +29,13 @@ class ProjectFactory extends Factory
         $UserModel = config('auth.providers.users.model');
         $division = Division::factory()->create();
         $client = Client::factory()->create();
+        $category = ProjectCategory::factory()->create();
 
         return [
             'user_id' => $client->user_id,
             'division_id' => $division->id,
             'client_id' => $client->id,
+            'project_category_id' => $category->id,
             'name' => fake()->sentence(4),
             'description' => fake()->paragraph(),
             'year' => fake()->year(),

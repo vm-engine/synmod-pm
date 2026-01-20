@@ -85,6 +85,7 @@ class ClientFormObject extends Form
     public function rules(): array
     {
         $userId = $this->client?->user_id;
+        $oldUser = $this->client?->user;
         $mode = config('synapps.auth.login_credential', 'email');
 
         $rules = [
@@ -114,12 +115,18 @@ class ClientFormObject extends Form
 
         // Add username validation if required by mode (same as synapps-auth)
         if (in_array($mode, ['username', 'both'], true)) {
-            $rules['username'] = [
-                'required',
-                'string',
-                new UsernameRule,
-                'unique:users,username'.($userId ? ','.$userId : ''),
-            ];
+            if (! $this->client) {
+                // Creating new client - username required
+                $rules['username'] = ['required', 'string', new UsernameRule, 'unique:users,username'];
+            } elseif ($this->username !== '') {
+                // Updating existing client with non-empty username
+                $rules['username'] = ['string', new UsernameRule];
+                if ($oldUser && $oldUser->username !== $this->username) {
+                    // Updating existing client with username change
+                    $rules['username'][] = 'unique:users,username';
+                }
+            }
+            // else: updating with empty username - don't validate
         }
 
         // Password validation (same as synapps-auth)
@@ -133,7 +140,7 @@ class ClientFormObject extends Form
                     ->numbers()
                     ->symbols(),
             ];
-        } else {
+        } elseif ($this->password !== '') {
             // Editing existing client - password optional
             $rules['password'] = [
                 'nullable',
@@ -182,9 +189,12 @@ class ClientFormObject extends Form
                 'username' => $this->username,
                 'email' => $this->email,
                 'password' => Hash::make($this->password),
-                'email_verified_at' => now(),
-                'status' => $this->status === Client::STATUS_ACTIVE && $this->active,
+                'status' => ($this->status === Client::STATUS_ACTIVE && $this->active) ? 1 : 0,
             ]);
+
+            // Set email as verified (not in fillable array)
+            $user->email_verified_at = now();
+            $user->save();
 
             // Assign client role
             $clientRoleId = dbconf('pm.client_role_id');
@@ -237,7 +247,7 @@ class ClientFormObject extends Form
                 'name' => $this->name,
                 'username' => $this->username,
                 'email' => $this->email,
-                'status' => $this->status === Client::STATUS_ACTIVE && $this->active,
+                'status' => ($this->status === Client::STATUS_ACTIVE && $this->active) ? 1 : 0,
             ];
 
             // Only update password if provided

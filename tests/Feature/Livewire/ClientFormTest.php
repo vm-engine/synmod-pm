@@ -134,7 +134,7 @@ test('creates user with inactive status when active is false', function () {
 test('can update existing client', function () {
     $client = Client::factory()->create(['company' => 'Old Company']);
 
-    Volt::test(ClientForm::class, ['id' => $client->id])
+    $component = Volt::test(ClientForm::class, ['id' => $client->id])
         ->set('form.company', 'Updated Company')
         ->set('form.city', 'Updated City')
         ->call('save')
@@ -149,7 +149,8 @@ test('can update client without changing password', function () {
     $client = Client::factory()->create();
     $originalPassword = $client->user->password;
 
-    Volt::test(ClientForm::class, ['id' => $client->id])
+    Volt::actingAs($this->user)
+        ->test(ClientForm::class, ['id' => $client->id])
         ->set('form.company', 'Updated Company')
         ->set('form.password', '')
         ->set('form.password_confirmation', '')
@@ -163,7 +164,8 @@ test('can update client password', function () {
     $client = Client::factory()->create();
     $oldPassword = $client->user->password;
 
-    Volt::test(ClientForm::class, ['id' => $client->id])
+    Volt::actingAs($this->user)
+        ->test(ClientForm::class, ['id' => $client->id])
         ->set('form.password', 'NewPass@1234')
         ->set('form.password_confirmation', 'NewPass@1234')
         ->call('save')
@@ -188,7 +190,8 @@ test('updates user status when active flag changes', function () {
     $client = Client::factory()->active()->create(['active' => true]);
     expect($client->user->status)->toBe(1);
 
-    Volt::test(ClientForm::class, ['id' => $client->id])
+    Volt::actingAs($this->user)
+        ->test(ClientForm::class, ['id' => $client->id])
         ->set('form.active', false)
         ->call('save');
 
@@ -319,7 +322,8 @@ test('sets email verified at on user creation', function () {
     $category = ClientCategory::factory()->create();
     $uniqueId = substr(md5(uniqid()), 0, 8);
 
-    Volt::test(ClientForm::class)
+    Volt::actingAs($this->user)
+        ->test(ClientForm::class)
         ->set('form.company', "Test Company {$uniqueId}")
         ->set('form.client_category_id', $category->id)
         ->set('form.name', 'Test User')
@@ -358,9 +362,11 @@ test('sets created_by field on creation', function () {
 test('sets updated_by field on update', function () {
     $client = Client::factory()->create();
 
-    Volt::test(ClientForm::class, ['id' => $client->id])
+    Volt::actingAs($this->user)
+        ->test(ClientForm::class, ['id' => $client->id])
         ->set('form.company', 'Updated Company')
-        ->call('save');
+        ->call('save')
+        ->assertHasNoErrors();
 
     expect($client->fresh()->updated_by)->toBe($this->user->id);
 });

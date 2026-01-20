@@ -185,7 +185,7 @@ test('search scope finds clients by director', function () {
 
     $results = Client::search('John')->get();
 
-    expect($results)->toHaveCount(1);
+    expect($results->toArray())->toHaveCount(1);
     expect($results->first()->director)->toBe('John Smith');
 });
 
@@ -195,7 +195,7 @@ test('search scope finds clients by pic', function () {
 
     $results = Client::search('Alice')->get();
 
-    expect($results)->toHaveCount(1);
+    expect($results->toArray())->toHaveCount(1);
     expect($results->first()->pic)->toBe('Alice Johnson');
 });
 

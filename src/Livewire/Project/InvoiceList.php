@@ -123,7 +123,8 @@ class InvoiceList extends Component
     #[Computed()]
     public function invoiceList()
     {
-        $query = ProjectInvoice::with(['issuer', 'creator', 'client', 'project']);
+        // $query = ProjectInvoice::with(['issuer', 'creator', 'client', 'project']);
+        $query = ProjectInvoice::query();
 
         // Filter by project if projectId is set
         if ($this->projectId) {
@@ -137,26 +138,16 @@ class InvoiceList extends Component
 
         // Apply status filter
         if ($this->filterStatus === 'paid') {
-            // Show invoices marked as paid OR fully paid by amount
-            $query->where(function ($q) {
-                $q->where('is_paid', true)
-                    ->orWhere(function ($sq) {
-                        $sq->where(function ($isq) {
-                            $isq->where('is_paid', false)->orWhereNull('is_paid');
-                        })
-                            ->whereRaw('total_amount = paid_amount AND total_amount > 0');
-                    });
-            });
+            $query->where('is_paid', true);
         } elseif ($this->filterStatus === 'unpaid') {
-            // Show invoices not marked as paid AND no payment made
             $query->where(function ($q) {
                 $q->where('is_paid', false)->orWhereNull('is_paid');
-            })->where('paid_amount', 0);
+            });
         } elseif ($this->filterStatus === 'partial') {
-            // Show invoices not marked as paid AND partial payment made
+            // Partial payment no longer supported - treat as unpaid
             $query->where(function ($q) {
                 $q->where('is_paid', false)->orWhereNull('is_paid');
-            })->whereRaw('paid_amount > 0 AND paid_amount < total_amount');
+            });
         }
 
         // Apply year filter
@@ -183,9 +174,17 @@ class InvoiceList extends Component
     #[Computed()]
     public function availableYears()
     {
-        return ProjectInvoice::selectRaw('DISTINCT YEAR(created_at) as year')
+        $driver = \DB::connection()->getDriverName();
+
+        // SQLite uses strftime, MySQL/PostgreSQL use YEAR()
+        $yearExpression = $driver === 'sqlite'
+            ? "strftime('%Y', created_at)"
+            : 'YEAR(created_at)';
+
+        return ProjectInvoice::selectRaw("DISTINCT {$yearExpression} as year")
             ->orderByDesc('year')
             ->pluck('year')
+            ->map(fn ($year) => (int) $year)
             ->toArray();
     }
 
@@ -219,30 +218,11 @@ class InvoiceList extends Component
 
     public function getPaymentStatus($invoice): array
     {
-        // Check receipt payment status first (has priority)
         if ($invoice->is_paid) {
             return [
                 'label' => __('pm::invoice.status_paid'),
                 'class' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
                 'icon' => 'fa-check-circle',
-            ];
-        }
-
-        // Fallback to amount-based calculation
-        $totalAmount = (float) $invoice->total_amount;
-        $paidAmount = (float) $invoice->paid_amount;
-
-        if ($totalAmount > 0 && $paidAmount >= $totalAmount) {
-            return [
-                'label' => __('pm::invoice.status_paid'),
-                'class' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-                'icon' => 'fa-check-circle',
-            ];
-        } elseif ($paidAmount > 0 && $paidAmount < $totalAmount) {
-            return [
-                'label' => __('pm::invoice.status_partial'),
-                'class' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
-                'icon' => 'fa-clock',
             ];
         }
 

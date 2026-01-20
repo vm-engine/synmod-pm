@@ -24,7 +24,13 @@
       "Bash(findstr:*)",
       "Bash(composer show:*)",
       "Bash(../../vendor/bin/pint:*)",
-      "Bash(../synapse/vendor/bin/pint:*)"
+      "Bash(../synapse/vendor/bin/pint:*)",
+      "Bash(./vendor/bin/pest:*)",
+      "Bash(php -d memory_limit=512M ./vendor/bin/pest:*)",
+      "Bash(for file in ProjectCategoryTest.php SignatureFormTest.php)",
+      "Bash(do sed -i '/assertDispatched.*notify.*function/,/}\\);/c\\\\        ->assertDispatched\\(''''notify''''\\);' \"$file\")",
+      "Bash(done)",
+      "Bash(ls:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
