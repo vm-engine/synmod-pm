@@ -335,7 +335,7 @@ class ProjectFormObject extends Form
 
             SynAuth::logActivity(
                 Auth::id(),
-                'pm.project.'.$this->project->id.'.create',
+                'pm.project.'.$project->id.'.create',
                 'User '.Auth::user()->name.' created new project. Data: '.json_encode($validated),
                 'project.'.$project->id,
                 'pm',
