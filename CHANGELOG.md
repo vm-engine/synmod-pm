@@ -2,6 +2,70 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.0] - 2026-01-20
+
+### Added
+- **Receipt Generation System**: Complete receipt management with PDF generation
+  - ReceiptDetail Livewire component with payment status management
+  - Receipt PDF template with centered signature section matching reference design
+  - Payment tracking with datetime picker and proof upload functionality
+  - Terbilang helper for Indonesian number-to-text conversion
+  - Receipt routes for download, print, and payment proof viewing
+  - Integration with invoice list through receipt modal
+- **Invoice Management**: Full invoice system with PDF generation
+  - InvoiceDetail Livewire component for managing invoice items and totals
+  - InvoiceController with download, print, and regenerate endpoints
+  - Invoice PDF template matching company branding style
+  - Auto-fill from project/client data with document number generation
+  - Invoice list embedded in project detail with create/edit modal
+- **Signature Master Data**: New master data module for managing signatures
+  - Signature CRUD page with form modal
+  - ACL permissions for signature management
+  - Integration with invoice and receipt documents
+- **Document Storage Migration**: Enhanced security for project documents
+  - Migrated document storage from public to local disk
+  - Created secure DocumentController with authorization checks
+  - MigrateProjectUploadsCommand for migrating existing files
+  - Updated VersionedDocument and MultipleDocument components for local storage
+- **Activity Detail Modal**: Enhanced activity logging display
+  - Modal showing complete activity information
+  - Display user, activity type, feature, description, IP, user agent, and timestamp
+  - Added missing translation keys for activity fields
+- **Comprehensive Test Coverage**: Significantly expanded test suite with 375 tests total
+  - New test coverage for console commands (MigrateProjectUploadsCommand)
+  - New test coverage for HTTP controllers (DocumentController, ReceiptController)
+  - New test coverage for Master data Livewire components (BankAccount, ProjectCategory, Signature)
+  - New test coverage for Project Livewire components (Activity, InvoiceList, ReceiptDetail)
+  - New unit test for Terbilang helper function
+- **PDF Generation**: Added barryvdh/laravel-dompdf package for PDF generation
+
+### Fixed
+- **Client Form Tests**: Fixed multiple critical test failures
+  - Username validation now properly allows empty values on update
+  - Email verification timestamp (`email_verified_at`) now correctly set on user creation
+  - User status synchronization when active flag changes
+  - Added missing authentication context to multiple tests
+- **Client List Tests**: Fixed inactive filter test that was showing false positives
+- **Client Factory**: Added `configure()` hook to automatically sync user status with client status after creation
+- **Client Form Object**:
+  - Fixed `email_verified_at` field handling (not in User model's fillable array)
+  - Fixed user status casting to ensure proper integer values (0 or 1)
+  - Improved username validation logic differentiating between create and update operations
+- **Code Quality**: Applied Laravel Pint formatting fixes across test files
+
+### Changed
+- **Invoice List**: Updated payment status logic to prioritize `is_paid` field from receipts
+- **Document Components**: Added readonly mode support for VersionedDocument and MultipleDocument
+- **Invoice PDF Storage**: Invoices now stored on local disk instead of public disk for security
+- **Test Data Quality**: Improved test data naming to avoid conflicts with UI labels
+- **Factory States**: Enhanced `active()` state to explicitly set both `status` and `active` flags
+- **Test Reliability**: All 375 tests now passing with 863 assertions
+- **Translation Updates**: Added receipt, activity detail, and synauth activity translations
+
+### Removed
+- **ProjectReceipt Model**: Removed and consolidated functionality into invoice system
+- **Issuer-specific Tables**: Removed issuer-specific bank account and signature tables in favor of standalone master data tables
+
 ## [0.4.10] - 2026-01-13
 
 ### Changed
