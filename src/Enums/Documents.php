@@ -15,6 +15,7 @@ enum Documents: int
     case BLUEPRINT = 6;
     case INVOICE = 7;
     case RECEIPT = 8;
+    case TAX_INVOICE = 15;
     case PANDUAN = 10;
     case CHANGE_REQUEST = 11;
     case BA = 14;
@@ -32,7 +33,8 @@ enum Documents: int
             Documents::USE_CASE => 'Use Case Document',
             Documents::BLUEPRINT => 'Blueprint',
             Documents::INVOICE => 'Invoice',
-            Documents::RECEIPT => 'Kwitansi',
+            Documents::RECEIPT => 'Kuitansi',
+            Documents::TAX_INVOICE => 'Tax Invoice/Faktur Pajak',
             Documents::BAST => 'Berita Acara Serah Terima (BAST)',
             Documents::PANDUAN => 'Panduan Penggunaan',
             Documents::CHANGE_REQUEST => 'Change Request Document',
@@ -54,6 +56,7 @@ enum Documents: int
             Documents::BLUEPRINT => 'BP',
             Documents::INVOICE => 'INV',
             Documents::RECEIPT => 'RCP',
+            Documents::TAX_INVOICE => 'TAX',
             Documents::BAST => 'BAST',
             Documents::PANDUAN => 'PANDUAN',
             Documents::CHANGE_REQUEST => 'CR',
@@ -79,6 +82,7 @@ enum Documents: int
         return match ($this) {
             Documents::INVOICE,
             Documents::RECEIPT,
+            Documents::TAX_INVOICE,
             Documents::BA,
             Documents::CHANGE_REQUEST,
             Documents::BACKUP,
@@ -113,6 +117,7 @@ enum Documents: int
             Documents::BLUEPRINT => app(\VmEngine\Pm\Services\Documents\Blueprint::class),
             Documents::INVOICE => app(\VmEngine\Pm\Services\Documents\Invoice::class),
             Documents::RECEIPT => app(\VmEngine\Pm\Services\Documents\Receipt::class),
+            Documents::TAX_INVOICE => app(\VmEngine\Pm\Services\Documents\TaxInvoice::class),
             Documents::BAST => app(\VmEngine\Pm\Services\Documents\Bast::class),
             Documents::PANDUAN => app(\VmEngine\Pm\Services\Documents\Panduan::class),
             Documents::CHANGE_REQUEST => app(\VmEngine\Pm\Services\Documents\ChangeRequest::class),
@@ -133,6 +138,7 @@ enum Documents: int
             Documents::USE_CASE => 'green',
             Documents::BLUEPRINT => 'lime',
             Documents::INVOICE => 'yellow',
+            Documents::TAX_INVOICE => 'orange',
             Documents::RECEIPT => 'amber',
             Documents::BAST => 'orange',
             Documents::PANDUAN => 'red',
@@ -155,6 +161,7 @@ enum Documents: int
             Documents::BLUEPRINT => 'fa-sitemap',
             Documents::INVOICE => 'fa-file-invoice',
             Documents::RECEIPT => 'fa-receipt',
+            Documents::TAX_INVOICE => 'fa-file-invoice-dollar',
             Documents::BAST => 'fa-file-signature',
             Documents::PANDUAN => 'fa-book',
             Documents::CHANGE_REQUEST => 'fa-code-pull-request',

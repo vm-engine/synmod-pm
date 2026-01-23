@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.2] - 2026-01-23
+
+### Added
+- **Tax Invoice Document Type**: New document type for tax invoices (Faktur Pajak)
+  - TaxInvoice service class with document management
+  - TAX_INVOICE enum case with code 'TAX' and icon
+  - Active when project has both SPK and Invoice documents
+- **Invoice Archive System**: Archive/unarchive functionality for invoices
+  - New `archived` field in project_invoices table with index
+  - Archive and unarchive actions in invoice list
+  - Confirmation dialogs for archive operations
+  - Archived invoices excluded from reports
+  - Visual indicators for archived invoices
+- **NPWP Image Upload**: Client NPWP (tax ID) document upload
+  - New `npwp_image` field in clients table
+  - File upload component in client form
+  - Display NPWP image in client list
+
+### Changed
+- **Documents Enum**: Updated receipt label from "Kwitansi" to "Kuitansi" (typo fix)
+- **Invoice List**: Enhanced UI with archive functionality
+- **Client Form**: Added NPWP image upload section
+- **Translation Updates**: Added archive-related translations for invoices
+
+### Fixed
+- Minor UI improvements in invoice and receipt views
+
 ## [0.5.1] - 2026-01-20
 
 ### Fixed

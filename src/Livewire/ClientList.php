@@ -7,7 +7,9 @@ namespace VmEngine\Pm\Livewire;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -42,9 +44,33 @@ class ClientList extends Component
 
     public string $sortDirection = 'desc';
 
+    public string $npwpImage = '';
+
     public function updated($property)
     {
         $this->resetPage();
+    }
+
+    #[On('close-modal-npwp-image')]
+    public function resetNpwpImage()
+    {
+        $this->npwpImage = '';
+    }
+
+    public function showImage($id)
+    {
+        try {
+            $client = Client::findOrFail($id);
+            $npwpImage = Storage::disk('local')->get($client->npwp_image);
+            $this->npwpImage = 'data:image/png;base64,'.base64_encode($npwpImage);
+            $this->dispatch('open-modal-npwp-image');
+        } catch (Exception $e) {
+            $this->dispatch('notify', [
+                'variant' => 'error',
+                'title' => __('pm::messages.error'),
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     public function updatedFilterCategories($value)
@@ -141,6 +167,14 @@ class ClientList extends Component
 
             DB::transaction(function () use ($client) {
                 // Delete client first (user will cascade or be handled separately)
+                if ($client->user) {
+                    $client->user->delete();
+                }
+
+                if ($client->npwp_image && Storage::disk('local')->exists($client->npwp_image)) {
+                    Storage::disk('local')->delete($client->npwp_image);
+                }
+
                 $clientArray = $client->toArray();
 
                 $client->delete();

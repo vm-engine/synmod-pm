@@ -7,14 +7,18 @@ namespace VmEngine\Pm\Form;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Form;
+use Livewire\WithFileUploads;
 use VmEngine\Pm\Models\Client;
 use VmEngine\SynAuth\Facades\SynAuth;
 use VmEngine\SynAuth\Rules\UsernameRule;
 
 class ClientFormObject extends Form
 {
+    use WithFileUploads;
+
     public ?Client $client = null;
 
     // Client data
@@ -35,6 +39,8 @@ class ClientFormObject extends Form
     // public array $services = [];
 
     public string $social_media = '';  // Textarea input
+
+    public $npwp_image; // Uploaded file
 
     public int $status = 0;
 
@@ -111,6 +117,7 @@ class ClientFormObject extends Form
                 'max:255',
                 'unique:users,email'.($userId ? ','.$userId : ''),
             ],
+            'npwp_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:512',
         ];
 
         // Add username validation if required by mode (same as synapps-auth)
@@ -178,9 +185,9 @@ class ClientFormObject extends Form
      */
     public function store(): void
     {
-        $validated = $this->validate();
+        $this->validate();
 
-        DB::transaction(function () use ($validated) {
+        DB::transaction(function () {
             $UserModel = config('auth.providers.users.model');
 
             // Create user
@@ -202,8 +209,14 @@ class ClientFormObject extends Form
                 $user->roles()->attach($clientRoleId);
             }
 
+            if ($this->npwp_image) {
+                $npwpImagePath = $this->npwp_image->store('clients/npwp', 'local');
+            } else {
+                $npwpImagePath = null;
+            }
+
             // Create client
-            Client::create([
+            $newClient = Client::create([
                 'user_id' => $user->id,
                 'client_category_id' => $this->client_category_id,
                 'company' => $this->company,
@@ -214,6 +227,7 @@ class ClientFormObject extends Form
                 'phone' => $this->phone,
                 'services' => [],
                 'social_media' => $this->parseSocialMedia(),
+                'npwp_image' => $npwpImagePath,
                 'status' => $this->status,
                 'active' => $this->active,
                 'created_by' => Auth::id(),
@@ -222,7 +236,7 @@ class ClientFormObject extends Form
             SynAuth::logActivity(
                 Auth::id(),
                 'pm.client.create',
-                'User '.Auth::user()->name.' created new client. Data: '.json_encode($validated),
+                'User '.Auth::user()->name.' created new client. Data: '.json_encode($newClient->toArray()),
                 'client',
                 'pm',
             );
@@ -256,6 +270,13 @@ class ClientFormObject extends Form
             }
 
             $user->update($userData);
+            $npwpImagePath = $this->client->npwp_image;
+            if ($this->npwp_image) {
+                $npwpImagePath = $this->npwp_image->store('clients/npwp', 'local');
+                if ($this->client->npwp_image && Storage::disk('local')->exists($this->client->npwp_image)) {
+                    Storage::disk('local')->delete($this->client->npwp_image);
+                }
+            }
 
             // Update client
             $this->client->update([
@@ -268,6 +289,7 @@ class ClientFormObject extends Form
                 'phone' => $this->phone,
                 'services' => [],
                 'social_media' => $this->parseSocialMedia(),
+                'npwp_image' => $npwpImagePath,
                 'status' => $this->status,
                 'active' => $this->active,
                 'updated_by' => Auth::id(),

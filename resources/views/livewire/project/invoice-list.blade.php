@@ -69,6 +69,9 @@
                                     <p>{{ __('pm::invoice.col_total') }}</p>
                                 </th>
                                 <th>
+                                    <p>{{ __('pm::invoice.col_vat') }}</p>
+                                </th>
+                                <th>
                                     <p>{{ __('pm::invoice.col_issue_date') }}</p>
                                 </th>
                                 <th>
@@ -96,7 +99,10 @@
                                 @php
                                     $status = $this->getPaymentStatus($invoice);
                                 @endphp
-                                <tr wire:key="invoice-{{ $invoice->id }}">
+                                <tr
+                                    wire:key="invoice-{{ $invoice->id }}"
+                                    @class(['bg-gray-200' => $invoice->archived])
+                                >
                                     <td>
                                         <div class="flex items-center">
                                             <p>{{ ($this->invoiceList->currentPage() - 1) * $limit + $i }}</p>
@@ -111,6 +117,18 @@
                                         <div class="flex items-center">
                                             <p class="font-mono">
                                                 {{ number_format($invoice->total_amount, 0, ',', '.') }}</p>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="flex items-center">
+                                            @if ($invoice->include_vat)
+                                                <p class="font-mono">
+                                                    {{ number_format($invoice->vat_amount, 0, ',', '.') }}
+                                                    ({{ $invoice->vat_percentage }}%)
+                                                </p>
+                                            @else
+                                                <p>No VAT</p>
+                                            @endif
                                         </div>
                                     </td>
                                     <td>
@@ -148,27 +166,29 @@
                                             class="flex items-center gap-1"
                                             x-data="{ dropdownOpen: false }"
                                         >
-                                            @canAccess('pm.invoice.read')
-                                            <button
-                                                class="btn-icon info has-tooltip group"
-                                                type="button"
-                                                @click="$dispatch('open-modal-invoice-detail'); $wire.dispatch('load-invoice-detail', { id: {{ $invoice->id }} })"
-                                            >
-                                                <span class="fa-solid fa-eye"></span>
-                                                <span class="tooltip">{{ __('pm::invoice.tooltip_detail') }}</span>
-                                            </button>
-                                            @endcanAccess
+                                            @if (!$invoice->archived)
+                                                @canAccess('pm.invoice.read')
+                                                <button
+                                                    class="btn-icon info has-tooltip group"
+                                                    type="button"
+                                                    @click="$dispatch('open-modal-invoice-detail'); $wire.dispatch('load-invoice-detail', { id: {{ $invoice->id }} })"
+                                                >
+                                                    <span class="fa-solid fa-eye"></span>
+                                                    <span class="tooltip">{{ __('pm::invoice.tooltip_detail') }}</span>
+                                                </button>
+                                                @endcanAccess
 
-                                            @canAccess('pm.invoice.update')
-                                            <button
-                                                class="btn-icon warning has-tooltip group"
-                                                type="button"
-                                                @click="$dispatch('open-modal-invoice-form'); $wire.dispatch('load-invoice', { id: {{ $invoice->id }} })"
-                                            >
-                                                <span class="fa-solid fa-edit"></span>
-                                                <span class="tooltip">{{ __('pm::invoice.tooltip_edit') }}</span>
-                                            </button>
-                                            @endcanAccess
+                                                @canAccess('pm.invoice.update')
+                                                <button
+                                                    class="btn-icon warning has-tooltip group"
+                                                    type="button"
+                                                    @click="$dispatch('open-modal-invoice-form'); $wire.dispatch('load-invoice', { id: {{ $invoice->id }} })"
+                                                >
+                                                    <span class="fa-solid fa-edit"></span>
+                                                    <span class="tooltip">{{ __('pm::invoice.tooltip_edit') }}</span>
+                                                </button>
+                                                @endcanAccess
+                                            @endif
 
                                             @canAccess('pm.invoice.delete')
                                             <button
@@ -219,7 +239,7 @@
 
                                                 <template x-teleport="body">
                                                     <div
-                                                        class="shadow-theme-lg fixed z-[9999] w-48 rounded-lg border border-gray-200 bg-white py-1 dark:border-gray-700 dark:bg-gray-800"
+                                                        class="icon-dropdown"
                                                         x-show="dropdownOpen"
                                                         :style="'top: ' + dropdownPosition.top + 'px; left: ' + dropdownPosition
                                                             .left + 'px;'"
@@ -235,7 +255,7 @@
                                                         @canAccess('pm.invoice.read')
                                                         @if ($invoice->invoice_document_id)
                                                             <a
-                                                                class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                                                                class="icon-dropdown-item"
                                                                 href="{{ route('backend.pm.invoice.download', $invoice->id) }}"
                                                                 target="_blank"
                                                             >
@@ -244,7 +264,7 @@
                                                             </a>
                                                         @endif
                                                         <a
-                                                            class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                                                            class="icon-dropdown-item"
                                                             href="{{ route('backend.pm.invoice.print', $invoice->id) }}"
                                                             target="_blank"
                                                         >
@@ -252,9 +272,50 @@
                                                             {{ __('pm::invoice.print') }}
                                                         </a>
                                                         @endcanAccess
+                                                        @canAccess('pm.invoice.update')
+                                                        @if ($invoice->archived)
+                                                            <button
+                                                                class="icon-dropdown-item"
+                                                                type="button"
+                                                                wire:click="$dispatch('confirm-dialog', {
+                                                                    title: '{{ __('pm::invoice.unarchive_title') }}',
+                                                                    message: '{{ __('pm::invoice.unarchive_message', ['code' => addslashes($invoice->invoice_number)]) }}',
+                                                                    confirmText: '{{ __('pm::labels.yes_unarchive') }}',
+                                                                    cancelText: '{{ __('pm::labels.cancel') }}',
+                                                                    confirmColor: 'warning',
+                                                                    icon: 'fa-solid fa-box-open',
+                                                                    wireMethod: 'archive',
+                                                                    wireParams: ['{{ $invoice->delete_token }}', true],
+                                                                    wireComponent: '{{ $this->getId() }}'
+                                                                })"
+                                                            >
+                                                                <span class="fa-solid fa-box-open"></span>
+                                                                {{ __('pm::invoice.unarchive') }}
+                                                            </button>
+                                                        @else
+                                                            <button
+                                                                class="icon-dropdown-item"
+                                                                type="button"
+                                                                wire:click="$dispatch('confirm-dialog', {
+                                                                    title: '{{ __('pm::invoice.archive_title') }}',
+                                                                    message: '{{ __('pm::invoice.archive_message', ['code' => addslashes($invoice->invoice_number)]) }}',
+                                                                    confirmText: '{{ __('pm::labels.yes_archive') }}',
+                                                                    cancelText: '{{ __('pm::labels.cancel') }}',
+                                                                    confirmColor: 'danger',
+                                                                    icon: 'fa-solid fa-trash',
+                                                                    wireMethod: 'archive',
+                                                                    wireParams: ['{{ $invoice->delete_token }}'],
+                                                                    wireComponent: '{{ $this->getId() }}'
+                                                                })"
+                                                            >
+                                                                <span class="fa-solid fa-archive"></span>
+                                                                {{ __('pm::invoice.archive') }}
+                                                            </button>
+                                                        @endif
+                                                        @endcanAccess
                                                         @if ($invoice->invoice_document_id)
                                                             <button
-                                                                class="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                                                                class="icon-dropdown-item"
                                                                 type="button"
                                                                 @click="dropdownOpen = false; $dispatch('open-modal-receipt-detail'); $wire.dispatch('load-receipt-detail', { id: {{ $invoice->id }} })"
                                                             >
@@ -278,7 +339,8 @@
                                         colspan="10"
                                     >
                                         <span
-                                            class="fa-solid fa-file-invoice text-6xl text-gray-300 dark:text-gray-600"></span>
+                                            class="fa-solid fa-file-invoice text-6xl text-gray-300 dark:text-gray-600"
+                                        ></span>
                                         <p class="mt-4 text-gray-500 dark:text-gray-400">
                                             {{ __('pm::invoice.no_data') }}
                                         </p>

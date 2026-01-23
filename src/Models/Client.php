@@ -40,6 +40,7 @@ class Client extends Model
         'phone',
         'services',
         'social_media',
+        'npwp_image',
         'status',
         'active',
         'is_proposal',

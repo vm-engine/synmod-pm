@@ -12,6 +12,8 @@ return [
     'download' => 'Download',
     'print' => 'Print',
     'receipts' => 'Receipts',
+    'archive' => 'Archive',
+    'unarchive' => 'Unarchive',
     'save_and_generate_pdf' => 'Save & Generate PDF',
     'add_item' => 'Add Item',
 
@@ -19,6 +21,7 @@ return [
     'col_no' => 'No',
     'col_invoice_code' => 'Invoice Code',
     'col_total' => 'Total Invoice',
+    'col_vat' => 'VAT',
     'col_issue_date' => 'Issue Date',
     'col_due_date' => 'Due Date',
     'col_paid_amount' => 'Paid Amount',
@@ -56,6 +59,8 @@ return [
     'created_successfully' => 'Invoice created successfully',
     'updated_successfully' => 'Invoice updated successfully',
     'deleted_successfully' => 'Invoice deleted successfully',
+    'archived_successfully' => 'Invoice archived successfully',
+    'unarchived_successfully' => 'Invoice unarchived successfully',
     'not_found' => 'Invoice not found',
     'pdf_generated' => 'PDF generated successfully',
     'pdf_not_found' => 'Invoice PDF not found',
@@ -68,6 +73,13 @@ return [
     'delete_message' => 'Are you sure you want to delete invoice :code? This action cannot be undone.',
     'delete_item_title' => 'Delete Item',
     'delete_item_message' => 'Are you sure you want to delete this invoice item?',
+
+    // Archive confirmation
+    'archive_title' => 'Archive Invoice',
+    'archive_message' => 'Are you sure you want to archive invoice :code? Archived invoices will not be counted on reports',
+    'unarchive_title' => 'Unarchive Invoice',
+    'unarchive_message' => 'Are you sure you want to unarchive invoice :code?',
+    'archived_detail' => 'This invoice is archived. To make changes, please unarchive it first.',
 
     // Form fields
     'spk_number' => 'SPK Number',

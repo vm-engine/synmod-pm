@@ -14,7 +14,7 @@
                 <div class="card-body">
                     <div class="form-box">
                         <label for="category">{{ __('pm::client.category') }}</label>
-                        <x-synapse-select
+                        <
                             id="client_category_id"
                             name="client_category_id"
                             :options="$categories"
@@ -126,7 +126,7 @@
                     <div class="form-box">
                         <label for="social_media">{{ __('pm::client.social_media') }}</label>
                         <textarea
-                            class="form-input @error('form.social_media') has-error @enderror"
+                            class="form-input @error('form.social_media') has-error @enderror w-full"
                             id="social_media"
                             name="social_media"
                             rows="4"
@@ -139,6 +139,34 @@
                         @error('form.social_media')
                             <p class="form-error-message">{{ $message }}</p>
                         @enderror
+                    </div>
+
+                    <div class="form-box">
+                        <label
+                            class="form-label"
+                            for="npwp_image"
+                        >{{ __('pm::client.npwp_image') }}</label>
+                        <input
+                            class="form-input"
+                            id="npwp_image"
+                            name="npwp_image"
+                            type="file"
+                            wire:model.defer="form.npwp_image"
+                            accept=".png,.jpg,.jpeg,.webp"
+                        />
+                        @error('npwp_image')
+                            <p class="form-error-message">
+                                {{ $message }}
+                            </p>
+                        @enderror
+                        <div
+                            class="mt-1 text-sm text-blue-600 dark:text-blue-400"
+                            wire:loading
+                            wire:target="form.npwp_image"
+                        >
+                            <span class="fa-solid fa-spinner fa-spin mr-1"></span>
+                            Uploading file...
+                        </div>
                     </div>
 
                     <div class="form-box required">

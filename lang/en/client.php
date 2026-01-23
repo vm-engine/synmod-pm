@@ -19,6 +19,7 @@ return [
     'phone' => 'Phone Number',
     'services' => 'Services',
     'social_media' => 'Social Media',
+    'npwp_image' => 'NPWP Image',
     'status' => 'Client Status',
     'active' => 'Active',
     'prospect' => 'Prospect',

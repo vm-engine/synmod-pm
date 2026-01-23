@@ -185,8 +185,8 @@
         }
 
         .totals-table .total-row .label-col {
-            background-color: #1e88e5;
-            color: white;
+            /* background-color: #1e88e5;
+            color: white; */
             font-weight: bold;
             border-radius: 4px 0 0 4px;
         }

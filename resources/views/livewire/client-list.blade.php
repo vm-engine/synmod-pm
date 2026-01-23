@@ -95,7 +95,19 @@
                                     </td>
                                     <td>
                                         <div class="flex items-center">
-                                            <p class="font-medium">{{ $client->company }}</p>
+                                            <p class="font-medium">
+                                                {{ $client->company }}
+                                                @if ($client->npwp_image)
+                                                    <button
+                                                        class="btn-icon primary ml-2 cursor-pointer"
+                                                        type="button"
+                                                        title="NPWP Image"
+                                                        wire:click="showImage({{ $client->id }})"
+                                                    >
+                                                        <span class="fa-solid fa-image"></span>
+                                                    </button>
+                                                @endif
+                                            </p>
                                         </div>
                                     </td>
                                     <td>
@@ -303,4 +315,28 @@
             </div>
         </div>
     </x-synapse-drawer>
+
+    <x-synapse-modal name="npwp-image">
+        <div class="shrink-0 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between px-5 py-3">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    NPWP Image
+                </h3>
+                <button
+                    class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    type="button"
+                    @click="$dispatch('close-modal-npwp-image')"
+                >
+                    <span class="fa-solid fa-times text-xl"></span>
+                </button>
+            </div>
+        </div>
+        <div class="max-h-[90vh] flex-1 space-y-6 overflow-y-auto p-6">
+            <img
+                class="h-auto w-full"
+                src="{{ $npwpImage }}"
+                alt="NPWP Image"
+            >
+        </div>
+    </x-synapse-modal>
 </div>

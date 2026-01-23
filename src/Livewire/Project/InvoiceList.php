@@ -75,6 +75,46 @@ class InvoiceList extends Component
         $this->sort = $sort;
     }
 
+    public function archive($token, $unarchive = false): void
+    {
+        try {
+            $id = ProjectInvoice::validateDeleteToken($token);
+            if (! $id) {
+                throw new Exception(__('pm::messages.invalid_delete_token'));
+            }
+
+            $invoice = ProjectInvoice::findOrFail($id);
+
+            DB::transaction(function () use ($invoice, $unarchive) {
+                $invoice->archived = ! $unarchive;
+                $invoice->save();
+
+                SynAuth::logActivity(
+                    Auth::id(),
+                    'pm.project.'.$this->project->id.'.invoice.'.($unarchive ? 'un' : '').'archive',
+                    'User '.Auth::user()->name.' '.($unarchive ? 'un' : '').'archived an invoice data. Invoice Number: '.$invoice->invoice_number,
+                    'project.'.$this->project->id.'.invoice',
+                    'pm',
+                );
+
+                $this->dispatch('synapse-confirmed');
+                $this->dispatch('activity-refresh');
+
+                $this->dispatch('notify', [
+                    'variant' => 'success',
+                    'title' => __('pm::messages.success'),
+                    'message' => __('pm::invoice.'.($unarchive ? 'un' : '').'archive_successfully'),
+                ]);
+            });
+        } catch (Exception $e) {
+            $this->dispatch('notify', [
+                'variant' => 'danger',
+                'title' => __('pm::messages.error'),
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
     public function delete($token): void
     {
         try {

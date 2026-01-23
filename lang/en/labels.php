@@ -15,6 +15,8 @@ return [
     'add' => 'Add',
     'browse' => 'Browse',
     'yes_delete' => 'Yes, Delete',
+    'yes_archive' => 'Yes, Archive',
+    'yes_unarchive' => 'Yes, Unarchive',
     'per_page' => 'Per Page',
     'is_required' => 'is required',
     'max_255' => 'must not exceed 255 characters',

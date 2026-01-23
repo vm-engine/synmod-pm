@@ -35,7 +35,7 @@
         </div>
 
         <!-- Modal Body (Scrollable) -->
-        <div class="max-h-[700px] flex-1 space-y-6 overflow-y-auto p-6">
+        <div class="max-h-[70vh] flex-1 space-y-6 overflow-y-auto p-6">
             <!-- Invoice Data Card -->
             <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">

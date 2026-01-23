@@ -132,7 +132,7 @@
             vertical-align: top;
             text-align: center;
             padding-left: 30px;
-            padding-top: 60px;
+            padding-top: 220px;
         }
 
         .amount-box {
@@ -220,7 +220,9 @@
                         <td class="sep-cell">:</td>
                         <td class="value-cell">
                             @foreach ($invoice->items as $index => $item)
-                                {{ $item->name }}@if (!$loop->last), @endif
+                                {{ $item->name }}@if (!$loop->last)
+                                    ,
+                                @endif
                             @endforeach
                         </td>
                     </tr>
@@ -238,11 +240,9 @@
                         </div>
                     </td>
                     <td class="signature-cell">
-                        @if ($invoice->signature)
-                            <div class="signer-name">{{ $invoice->signature->name }}</div>
-                            <div class="signer-position">{{ $invoice->signature->position }}</div>
-                            <div class="signer-company">{{ $invoice->issuer?->name }}</div>
-                        @endif
+                        <div class="signer-name">{{ $invoice->signature->name }}</div>
+                        <div class="signer-position">{{ $invoice->signature->position }}</div>
+                        <div class="signer-company">{{ $invoice->issuer?->name }}</div>
                     </td>
                 </tr>
             </table>

@@ -73,6 +73,9 @@ class InvoiceDetail extends Component
                 'items',
                 'client',
             ])->findOrFail($id);
+            if ($this->invoice->archived) {
+                throw new Exception(__('pm::invoice.archived_detail'));
+            }
             $this->invoiceId = $id;
 
             // Load invoice settings
@@ -352,22 +355,23 @@ class InvoiceDetail extends Component
                 'project.'.$this->invoice->project_id.'.invoice',
                 'pm'
             );
-
-            $this->dispatch('activity-refresh');
-
-            $this->dispatch('notify', [
-                'variant' => 'success',
-                'title' => __('pm::messages.success'),
-                'message' => __('pm::invoice.pdf_generated'),
-            ]);
-            $this->dispatch('invoice-refresh');
         } catch (Exception $e) {
             $this->dispatch('notify', [
                 'variant' => 'danger',
                 'title' => __('pm::messages.error'),
                 'message' => $e->getMessage(),
             ]);
+
+            return;
         }
+
+        $this->dispatch('notify', [
+            'variant' => 'success',
+            'title' => __('pm::messages.success'),
+            'message' => __('pm::invoice.pdf_generated'),
+        ]);
+        $this->dispatch('activity-refresh');
+        $this->dispatch('invoice-refresh');
     }
 
     protected function generatePdf(): void

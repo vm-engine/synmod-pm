@@ -6,6 +6,7 @@ namespace VmEngine\Pm\Livewire;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use VmEngine\Pm\Enums\Services;
 use VmEngine\Pm\Form\ClientFormObject;
 use VmEngine\Pm\Models\Client;
@@ -14,6 +15,8 @@ use VmEngine\Synapse\Services\Helper\Breadcrumbs;
 
 class ClientForm extends Component
 {
+    use WithFileUploads;
+
     public ClientFormObject $form;
 
     public function mount(?int $id = null)
