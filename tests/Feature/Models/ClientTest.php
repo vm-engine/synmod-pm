@@ -18,6 +18,7 @@ test('client has correct fillable fields', function () {
         'phone',
         'services',
         'social_media',
+        'npwp_image',
         'status',
         'active',
         'is_proposal',
@@ -180,8 +181,20 @@ test('search scope finds clients by city', function () {
 });
 
 test('search scope finds clients by director', function () {
-    Client::factory()->create(['director' => 'John Smith']);
-    Client::factory()->create(['director' => 'Jane Doe']);
+    Client::factory()->create([
+        'company' => 'Alpha Corp',
+        'address' => '123 Main St',
+        'city' => 'Boston',
+        'director' => 'John Smith',
+        'pic' => 'Alice Brown',
+    ]);
+    Client::factory()->create([
+        'company' => 'Beta Inc',
+        'address' => '456 Oak Ave',
+        'city' => 'Seattle',
+        'director' => 'Jane Doe',
+        'pic' => 'Bob Wilson',
+    ]);
 
     $results = Client::search('John')->get();
 
@@ -190,8 +203,20 @@ test('search scope finds clients by director', function () {
 });
 
 test('search scope finds clients by pic', function () {
-    Client::factory()->create(['pic' => 'Alice Johnson']);
-    Client::factory()->create(['pic' => 'Bob Williams']);
+    Client::factory()->create([
+        'company' => 'Gamma Ltd',
+        'address' => '789 Pine Rd',
+        'city' => 'Denver',
+        'director' => 'Robert Brown',
+        'pic' => 'Alice Johnson',
+    ]);
+    Client::factory()->create([
+        'company' => 'Delta Corp',
+        'address' => '321 Elm St',
+        'city' => 'Phoenix',
+        'director' => 'Sarah Davis',
+        'pic' => 'Bob Williams',
+    ]);
 
     $results = Client::search('Alice')->get();
 

@@ -16,6 +16,7 @@ use VmEngine\Pm\Livewire\Master\Signature;
 use VmEngine\Pm\Livewire\Project\ProjectDetail;
 use VmEngine\Pm\Livewire\Project\ProjectForm;
 use VmEngine\Pm\Livewire\Project\ProjectList;
+use VmEngine\Pm\Livewire\Report\Invoice;
 use VmEngine\Pm\Livewire\Report\ProjectDocument;
 
 Route::group([], function () {
@@ -75,8 +76,11 @@ Route::group([], function () {
     Route::get('/master/signature', Signature::class)
         ->name('master.signature')->middleware('can-access:pm.master.signature');
 
+    // Report routes
     Route::get('/report/project-document', ProjectDocument::class)
         ->name('report.project_document')->middleware('can-access:pm.report.project_document');
+    Route::get('/report/invoice', Invoice::class)
+        ->name('report.invoice')->middleware('can-access:pm.report.invoice');
 
     Route::get('/config', Config::class)
         ->name('config')->middleware('can-access:pm.config.read');

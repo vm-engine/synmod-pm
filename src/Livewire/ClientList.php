@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace VmEngine\Pm\Livewire;
 
 use Exception;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
@@ -16,8 +14,8 @@ use Livewire\WithPagination;
 use VmEngine\Pm\Enums\Services;
 use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\ClientCategory;
+use VmEngine\Pm\Services\ClientService;
 use VmEngine\Synapse\Services\Helper\Breadcrumbs;
-use VmEngine\SynAuth\Facades\SynAuth;
 
 class ClientList extends Component
 {
@@ -130,16 +128,10 @@ class ClientList extends Component
     public function toggleActive(int $clientId): void
     {
         try {
-            DB::transaction(function () use ($clientId) {
-                $client = Client::findOrFail($clientId);
-                $client->active = ! $client->active;
-                $client->save();
+            $client = Client::findOrFail($clientId);
+            $clientService = app(ClientService::class);
 
-                // Update related user (only active if client is both active status AND active)
-                $client->user->update([
-                    'status' => $client->status === Client::STATUS_ACTIVE && $client->active,
-                ]);
-            });
+            $clientService->toggleActive($client);
 
             $this->dispatch('notify', [
                 'variant' => 'success',
@@ -164,43 +156,24 @@ class ClientList extends Component
             }
 
             $client = Client::findOrFail($id);
+            $clientService = app(ClientService::class);
 
-            DB::transaction(function () use ($client) {
-                // Delete client first (user will cascade or be handled separately)
-                if ($client->user) {
-                    $client->user->delete();
-                }
+            $clientService->delete($client, deleteUser: true);
 
-                if ($client->npwp_image && Storage::disk('local')->exists($client->npwp_image)) {
-                    Storage::disk('local')->delete($client->npwp_image);
-                }
-
-                $clientArray = $client->toArray();
-
-                $client->delete();
-
-                SynAuth::logActivity(
-                    Auth::id(),
-                    'pm.client.delete',
-                    'User '.Auth::user()->name.' deleted client data. Data: '.json_encode($clientArray),
-                    'client',
-                    'pm',
-                );
-            });
+            $this->dispatch('synapse-confirmed');
+            $this->dispatch('notify', [
+                'variant' => 'success',
+                'title' => __('pm::messages.success'),
+                'message' => __('pm::messages.client_deleted_successfully'),
+            ]);
         } catch (Exception $e) {
+            $this->dispatch('synapse-confirmed');
             $this->dispatch('notify', [
                 'variant' => 'danger',
                 'title' => __('pm::messages.error'),
                 'message' => $e->getMessage(),
             ]);
         }
-
-        $this->dispatch('synapse-confirmed');
-        $this->dispatch('notify', [
-            'variant' => 'success',
-            'title' => __('pm::messages.success'),
-            'message' => __('pm::messages.client_deleted_successfully'),
-        ]);
     }
 
     #[Computed()]

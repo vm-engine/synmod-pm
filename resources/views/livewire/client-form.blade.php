@@ -285,6 +285,14 @@
                         @enderror
                     </div>
 
+                    <div class="form-box">
+                        <label for="">Password Generator</label>
+                        <x-synapse-password-generator
+                            :length="12"
+                            :model="['form.password', 'form.password_confirmation']"
+                        />
+                    </div>
+
                     @if ($form->status === 0)
                         <div class="rounded-md bg-yellow-50 p-4 dark:bg-yellow-900/20">
                             <div class="flex">

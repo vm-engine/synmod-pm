@@ -6,7 +6,6 @@ namespace VmEngine\Pm\Livewire\Project;
 
 use Exception;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -17,8 +16,8 @@ use VmEngine\Pm\Enums\Services;
 use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\Division;
 use VmEngine\Pm\Models\Project;
+use VmEngine\Pm\Services\ProjectService;
 use VmEngine\Synapse\Services\Helper\Breadcrumbs;
-use VmEngine\SynAuth\Facades\SynAuth;
 
 class ProjectList extends Component
 {
@@ -172,33 +171,24 @@ class ProjectList extends Component
             }
 
             $project = Project::findOrFail($id);
+            $projectService = app(ProjectService::class);
 
-            DB::transaction(function () use ($project) {
-                $projectArray = $project->toArray();
-                $project->delete();
+            $projectService->delete($project);
 
-                SynAuth::logActivity(
-                    Auth::id(),
-                    'pm.project.delete',
-                    'User '.Auth::user()->name.' deleted project data. Data: '.json_encode($projectArray),
-                    'project',
-                    'pm',
-                );
-            });
+            $this->dispatch('synapse-confirmed');
+            $this->dispatch('notify', [
+                'variant' => 'success',
+                'title' => __('pm::messages.success'),
+                'message' => __('pm::messages.project_deleted_successfully'),
+            ]);
         } catch (Exception $e) {
+            $this->dispatch('synapse-confirmed');
             $this->dispatch('notify', [
                 'variant' => 'danger',
                 'title' => __('pm::messages.error'),
                 'message' => $e->getMessage(),
             ]);
         }
-
-        $this->dispatch('synapse-confirmed');
-        $this->dispatch('notify', [
-            'variant' => 'success',
-            'title' => __('pm::messages.success'),
-            'message' => __('pm::messages.project_deleted_successfully'),
-        ]);
     }
 
     #[Computed()]

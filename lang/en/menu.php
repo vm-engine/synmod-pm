@@ -30,6 +30,7 @@ return [
         'report' => [
             'index' => 'Reports',
             'project_document' => 'Project Documents',
+            'invoice' => 'Invoice Report',
         ],
 
     ],

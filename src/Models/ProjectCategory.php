@@ -54,4 +54,14 @@ class ProjectCategory extends Model
             }
         });
     }
+
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(ProjectInvoice::class);
+    }
 }

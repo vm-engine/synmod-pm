@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Form;
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Livewire\Form;
 use VmEngine\Pm\Enums\MaintenanceType;
@@ -15,7 +13,7 @@ use VmEngine\Pm\Enums\RiskLevel;
 use VmEngine\Pm\Enums\SalesSources;
 use VmEngine\Pm\Enums\Services;
 use VmEngine\Pm\Models\Project;
-use VmEngine\SynAuth\Facades\SynAuth;
+use VmEngine\Pm\Services\ProjectService;
 
 class ProjectFormObject extends Form
 {
@@ -286,61 +284,13 @@ class ProjectFormObject extends Form
      */
     public function store(): void
     {
-        $validated = $this->validate();
+        $this->validate();
 
-        DB::transaction(function () use ($validated) {
-            $project = Project::create([
-                'user_id' => $this->client_id ? $this->getClientUserId() : Auth::id(),
-                'division_id' => $this->division_id,
-                'project_category_id' => $this->project_category_id,
-                'client_id' => $this->client_id,
-                'project_manager_id' => $this->project_manager_id,
-                'name' => $this->name,
-                'description' => $this->description,
-                'year' => $this->year ?: (int) date('Y'),
-                'sub_division' => $this->sub_division,
-                'services' => $this->services,
-                'source_of_sales' => $this->source_of_sales ?? SalesSources::WEB->value,
-                'nominal' => $this->nominal ?: null,
-                'budget' => $this->budget ?: null,
-                'down_payment' => $this->down_payment ?: null,
-                'total_terms' => $this->total_terms,
-                'payment_terms' => $this->payment_terms,
-                'contract_signed_at' => $this->contract_signed_at ?: null,
-                'client_approved_at' => $this->client_approved_at ?: null,
-                'url' => $this->url,
-                'staging_url' => $this->staging_url,
-                'production_url' => $this->production_url,
-                'repository_url' => $this->repository_url,
-                'status' => $this->status ?? ProjectStatus::PROSPECT->value,
-                'progress' => $this->progress,
-                'priority' => $this->priority ?? ProjectPriority::MEDIUM->value,
-                'risk_level' => $this->risk_level,
-                'client_pic' => $this->client_pic,
-                'client_pic_phone' => $this->client_pic_phone,
-                'project_start' => $this->project_start ?: null,
-                'project_end' => $this->project_end ?: null,
-                'planned_delivery_date' => $this->planned_delivery_date ?: null,
-                'actual_delivery_date' => $this->actual_delivery_date ?: null,
-                'warranty_end_date' => $this->warranty_end_date ?: null,
-                'manager' => $this->manager,
-                'assigned_team' => $this->assigned_team,
-                'tags' => $this->tags,
-                'server_info' => $this->parseServerInfo(),
-                'maintenance_type' => $this->maintenance_type,
-                'quality_score' => $this->quality_score,
-                'client_satisfaction' => $this->client_satisfaction,
-                'created_by' => Auth::id(),
-            ]);
+        $projectService = app(ProjectService::class);
 
-            SynAuth::logActivity(
-                Auth::id(),
-                'pm.project.'.$project->id.'.create',
-                'User '.Auth::user()->name.' created new project. Data: '.json_encode($validated),
-                'project.'.$project->id,
-                'pm',
-            );
-        });
+        $projectData = $this->prepareProjectData();
+
+        $projectService->create($projectData);
 
         $this->reset();
     }
@@ -352,88 +302,60 @@ class ProjectFormObject extends Form
     {
         $this->validate();
 
-        DB::transaction(function () {
-            $oldData = $this->project->toArray();
+        $projectService = app(ProjectService::class);
 
-            $this->project->update([
-                'user_id' => $this->client_id ? $this->getClientUserId() : $this->project->user_id,
-                'division_id' => $this->division_id,
-                'project_category_id' => $this->project_category_id,
-                'client_id' => $this->client_id,
-                'project_manager_id' => $this->project_manager_id,
-                'name' => $this->name,
-                'description' => $this->description,
-                'year' => $this->year ?: (int) date('Y'),
-                'sub_division' => $this->sub_division,
-                'services' => $this->services,
-                'source_of_sales' => $this->source_of_sales,
-                'nominal' => $this->nominal ?: null,
-                'budget' => $this->budget ?: null,
-                'down_payment' => $this->down_payment ?: null,
-                'total_terms' => $this->total_terms,
-                'payment_terms' => $this->payment_terms,
-                'contract_signed_at' => $this->contract_signed_at ?: null,
-                'client_approved_at' => $this->client_approved_at ?: null,
-                'url' => $this->url,
-                'staging_url' => $this->staging_url,
-                'production_url' => $this->production_url,
-                'repository_url' => $this->repository_url,
-                'status' => $this->status ?? ProjectStatus::PROSPECT->value,
-                'progress' => $this->progress,
-                'priority' => $this->priority ?? ProjectPriority::MEDIUM->value,
-                'risk_level' => $this->risk_level,
-                'client_pic' => $this->client_pic,
-                'client_pic_phone' => $this->client_pic_phone,
-                'project_start' => $this->project_start ?: null,
-                'project_end' => $this->project_end ?: null,
-                'planned_delivery_date' => $this->planned_delivery_date ?: null,
-                'actual_delivery_date' => $this->actual_delivery_date ?: null,
-                'warranty_end_date' => $this->warranty_end_date ?: null,
-                'manager' => $this->manager,
-                'assigned_team' => $this->assigned_team,
-                'tags' => $this->tags,
-                'server_info' => $this->parseServerInfo(),
-                'maintenance_type' => $this->maintenance_type,
-                'quality_score' => $this->quality_score,
-                'client_satisfaction' => $this->client_satisfaction,
-                'updated_by' => Auth::id(),
-            ]);
+        $projectData = $this->prepareProjectData();
 
-            SynAuth::logActivity(
-                Auth::id(),
-                'pm.project.'.$this->project->id.'.update',
-                'User '.Auth::user()->name.' updated project data. Old Data: '.json_encode($oldData).' New Data: '.json_encode($this->project->toArray()),
-                'Project.'.$this->project->id,
-                'pm',
-            );
-        });
+        $this->project = $projectService->update($this->project, $projectData);
     }
 
     /**
-     * Parse server info JSON string into array.
+     * Prepare project data array from form fields.
      */
-    private function parseServerInfo(): array
+    private function prepareProjectData(): array
     {
-        if (empty($this->server_info)) {
-            return [];
-        }
+        $projectService = app(ProjectService::class);
 
-        $decoded = json_decode($this->server_info, true);
-
-        return is_array($decoded) ? $decoded : [];
-    }
-
-    /**
-     * Get user_id from selected client.
-     */
-    private function getClientUserId(): ?int
-    {
-        if (! $this->client_id) {
-            return null;
-        }
-
-        $client = \VmEngine\Pm\Models\Client::find($this->client_id);
-
-        return $client?->user_id;
+        return [
+            'division_id' => $this->division_id,
+            'project_category_id' => $this->project_category_id,
+            'client_id' => $this->client_id,
+            'project_manager_id' => $this->project_manager_id,
+            'name' => $this->name,
+            'description' => $this->description,
+            'year' => $this->year ?: (int) date('Y'),
+            'sub_division' => $this->sub_division,
+            'services' => $this->services,
+            'source_of_sales' => $this->source_of_sales ?? SalesSources::WEB->value,
+            'nominal' => $this->nominal ?: null,
+            'budget' => $this->budget ?: null,
+            'down_payment' => $this->down_payment ?: null,
+            'total_terms' => $this->total_terms,
+            'payment_terms' => $this->payment_terms,
+            'contract_signed_at' => $this->contract_signed_at ?: null,
+            'client_approved_at' => $this->client_approved_at ?: null,
+            'url' => $this->url,
+            'staging_url' => $this->staging_url,
+            'production_url' => $this->production_url,
+            'repository_url' => $this->repository_url,
+            'status' => $this->status ?? ProjectStatus::PROSPECT->value,
+            'progress' => $this->progress,
+            'priority' => $this->priority ?? ProjectPriority::MEDIUM->value,
+            'risk_level' => $this->risk_level,
+            'client_pic' => $this->client_pic,
+            'client_pic_phone' => $this->client_pic_phone,
+            'project_start' => $this->project_start ?: null,
+            'project_end' => $this->project_end ?: null,
+            'planned_delivery_date' => $this->planned_delivery_date ?: null,
+            'actual_delivery_date' => $this->actual_delivery_date ?: null,
+            'warranty_end_date' => $this->warranty_end_date ?: null,
+            'manager' => $this->manager,
+            'assigned_team' => $this->assigned_team,
+            'tags' => $this->tags,
+            'server_info' => $projectService->parseServerInfo($this->server_info),
+            'maintenance_type' => $this->maintenance_type,
+            'quality_score' => $this->quality_score,
+            'client_satisfaction' => $this->client_satisfaction,
+        ];
     }
 }

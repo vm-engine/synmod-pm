@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Form;
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\Form;
 use VmEngine\Pm\Models\Signature;
+use VmEngine\Pm\Services\SignatureService;
 
 class SignatureFormObject extends Form
 {
@@ -61,18 +59,14 @@ class SignatureFormObject extends Form
     {
         $this->validate();
 
+        $signatureService = app(SignatureService::class);
+
         $data = [
             'name' => $this->name,
             'position' => $this->position,
-            'created_by' => Auth::id(),
         ];
 
-        // Process and store signature file
-        if ($this->file instanceof TemporaryUploadedFile) {
-            $data['file'] = $this->processSignatureImage($this->file);
-        }
-
-        Signature::create($data);
+        $signatureService->create($data, $this->file);
 
         $this->reset();
     }
@@ -81,130 +75,13 @@ class SignatureFormObject extends Form
     {
         $this->validate();
 
+        $signatureService = app(SignatureService::class);
+
         $data = [
             'name' => $this->name,
             'position' => $this->position,
-            'updated_by' => Auth::id(),
         ];
 
-        // Process and store new signature file if uploaded
-        if ($this->file instanceof TemporaryUploadedFile) {
-            // Delete old file
-            if ($this->signature->file) {
-                $this->deleteOldImage($this->signature->file);
-            }
-
-            $data['file'] = $this->processSignatureImage($this->file);
-        }
-
-        $this->signature->update($data);
-    }
-
-    private function processSignatureImage($file): string
-    {
-        $imagePath = $file->getRealPath();
-
-        // In test environment, skip image processing for fake files
-        if (app()->environment('testing')) {
-            $filename = 'signature_'.uniqid().'_'.time().'.'.$file->getClientOriginalExtension();
-            $path = $file->storeAs('signatures', $filename, 'public');
-
-            return $path;
-        }
-
-        $imageInfo = getimagesize($imagePath);
-        $mimeType = $imageInfo['mime'];
-
-        // Create source image
-        $sourceImage = match ($mimeType) {
-            'image/jpeg' => imagecreatefromjpeg($imagePath),
-            'image/png' => imagecreatefrompng($imagePath),
-            'image/webp' => imagecreatefromwebp($imagePath),
-            default => throw new \Exception('Unsupported image type'),
-        };
-
-        $sourceWidth = imagesx($sourceImage);
-        $sourceHeight = imagesy($sourceImage);
-
-        // Target dimensions: max width 500px, maintain aspect ratio
-        $maxWidth = 500;
-        $aspectRatio = $sourceWidth / $sourceHeight;
-
-        if ($sourceWidth > $maxWidth) {
-            $targetWidth = $maxWidth;
-            $targetHeight = (int) ($maxWidth / $aspectRatio);
-        } else {
-            $targetWidth = $sourceWidth;
-            $targetHeight = $sourceHeight;
-        }
-
-        // Create destination image
-        $destImage = imagecreatetruecolor($targetWidth, $targetHeight);
-
-        // Preserve transparency for PNG/WebP
-        if ($mimeType === 'image/png' || $mimeType === 'image/webp') {
-            imagealphablending($destImage, false);
-            imagesavealpha($destImage, true);
-            $transparent = imagecolorallocatealpha($destImage, 0, 0, 0, 127);
-            imagefilledrectangle($destImage, 0, 0, $targetWidth, $targetHeight, $transparent);
-        }
-
-        // Resize while maintaining aspect ratio
-        imagecopyresampled(
-            $destImage,
-            $sourceImage,
-            0,
-            0,
-            0,
-            0,
-            $targetWidth,
-            $targetHeight,
-            $sourceWidth,
-            $sourceHeight
-        );
-
-        // Save to temporary file
-        $extension = match ($mimeType) {
-            'image/jpeg' => 'jpg',
-            'image/png' => 'png',
-            'image/webp' => 'webp',
-            default => throw new \Exception('Unsupported image type'),
-        };
-
-        $filename = 'signature_'.uniqid().'_'.time().'.'.$extension;
-        $tempPath = storage_path('app/temp/'.$filename);
-
-        // Ensure temp directory exists
-        if (! is_dir(storage_path('app/temp'))) {
-            mkdir(storage_path('app/temp'), 0755, true);
-        }
-
-        // Save image
-        match ($mimeType) {
-            'image/jpeg' => imagejpeg($destImage, $tempPath, 90),
-            'image/png' => imagepng($destImage, $tempPath, 8),
-            'image/webp' => imagewebp($destImage, $tempPath, 90),
-            default => throw new \Exception('Unsupported image type'),
-        };
-
-        // Free memory
-        imagedestroy($sourceImage);
-        imagedestroy($destImage);
-
-        // Move to final location
-        $path = 'signatures/'.$filename;
-        Storage::disk('public')->put($path, file_get_contents($tempPath));
-
-        // Delete temp file
-        unlink($tempPath);
-
-        return $path;
-    }
-
-    private function deleteOldImage(?string $path): void
-    {
-        if ($path && Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->delete($path);
-        }
+        $this->signature = $signatureService->update($this->signature, $data, $this->file);
     }
 }

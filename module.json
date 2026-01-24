@@ -8,7 +8,7 @@
     },
     "name": "Pm",
     "description": "Pm Module",
-    "version": "0.5.1",
+    "version": "0.5.2",
     "author": "Adods",
     "email": "theadods@gmail.com",
     "url_prefix": "pm",
@@ -119,6 +119,14 @@
                             "route": "pm.report.project_document",
                             "icon": "fa-solid fa-diagram-project",
                             "acl": "pm.report.project_document"
+                        },
+                        "invoice": {
+                            "id": "invoice",
+                            "name": "__pm::menu.be.report.invoice",
+                            "class": "",
+                            "route": "pm.report.invoice",
+                            "icon": "fa-solid fa-file-invoice-dollar",
+                            "acl": "pm.report.invoice"
                         }
                     }
                 },
@@ -208,6 +216,13 @@
             "sub": {
                 "project_document": {
                     "label": "__pm::acl.report.project_document",
+                    "create": 0,
+                    "read": 1,
+                    "update": 0,
+                    "delete": 0
+                },
+                "invoice": {
+                    "label": "__pm::acl.report.invoice",
                     "create": 0,
                     "read": 1,
                     "update": 0,

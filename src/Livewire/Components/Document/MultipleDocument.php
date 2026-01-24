@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Livewire\Components\Document;
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use Exception;
 use Illuminate\Validation\Rules\File;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -14,7 +13,7 @@ use VmEngine\Pm\Enums\Documents;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Pm\Models\ProjectDocument;
 use VmEngine\Pm\Services\Documents\Base;
-use VmEngine\SynAuth\Facades\SynAuth;
+use VmEngine\Pm\Services\ProjectDocumentService;
 
 class MultipleDocument extends Component
 {
@@ -68,35 +67,9 @@ class MultipleDocument extends Component
      */
     protected function canAccessDocument(): bool
     {
-        $user = Auth::user();
+        $documentService = app(ProjectDocumentService::class);
 
-        if (! $user) {
-            return false;
-        }
-
-        // Dev role has full access
-        if ($user->isDev()) {
-            return true;
-        }
-
-        // Get user's highest role level
-        $userRoles = $user->roles()->get();
-        $highestLevel = $userRoles->min('level'); // Lower level = higher privilege
-
-        // Admin or higher (level < 10)
-        if ($highestLevel < 10) {
-            return true;
-        }
-
-        // Client role with matching client_id
-        if ($user->hasRole('client')) {
-            // Check if user's client matches the project's client
-            $client = \VmEngine\Pm\Models\Client::where('user_id', $user->id)->first();
-
-            return $client && $client->id === $this->project->client_id;
-        }
-
-        return false;
+        return $documentService->canAccessDocument($this->project);
     }
 
     #[Computed()]
@@ -135,34 +108,15 @@ class MultipleDocument extends Component
         ]);
 
         $documentType = $this->getDocumentType();
+        $documentService = app(ProjectDocumentService::class);
 
-        $data = [
-            'client_id' => $this->project->client_id,
-            'user_id' => Auth::id(),
-            'type' => $documentType,
-            'number' => $this->documentCode,
-            'notes' => $this->notes,
-            'version' => 1, // Multiple documents always version 1
-            'file_path' => $this->file->store('projects/'.$this->project->id.'/documents/'.($documentType->code() ?: $documentType->value), 'local'),
-            'file_info' => [
-                'original_name' => $this->file->getClientOriginalName(),
-                'size' => $this->file->getSize(),
-                'mime_type' => $this->file->getMimeType(),
-            ],
-        ];
-
-        $this->project->documents()->create($data);
-
-        // Call uploaded hook
-        $this->getDocumentHandler()->uploaded($this->project, $documentType);
-        $this->getDocumentHandler()->incrementIndex($this->project, $documentType);
-
-        SynAuth::logActivity(
-            Auth::id(),
-            'pm.project.'.$this->project->id.'.documents.uploaded',
-            'User '.Auth::user()->name.' uploaded '.$documentType->label().' document. Data: '.json_encode($data),
-            'project.'.$this->project->id.'.documents',
-            'pm',
+        $documentService->uploadDocument(
+            $this->project,
+            $documentType,
+            $this->file,
+            $this->documentCode,
+            $this->notes,
+            1 // Multiple documents always version 1
         );
 
         $this->dispatch('notify', [
@@ -182,41 +136,19 @@ class MultipleDocument extends Component
 
     public function downloadDocument(int $documentId): void
     {
-        // Check authorization
-        if (! $this->canAccessDocument()) {
-            $this->dispatch('notify', [
-                'variant' => 'danger',
-                'title' => 'Unauthorized',
-                'message' => 'You do not have permission to download this document',
-            ]);
+        try {
+            $documentService = app(ProjectDocumentService::class);
+            $document = $documentService->validateDocumentAccess($this->project, $documentId);
 
-            return;
-        }
-
-        $document = $this->project->documents()->find($documentId);
-
-        if (! $document) {
+            // Redirect to document download route
+            $this->redirect(route('backend.pm.document.download', $document->id));
+        } catch (Exception $e) {
             $this->dispatch('notify', [
                 'variant' => 'danger',
                 'title' => 'Error',
-                'message' => 'Document not found',
+                'message' => $e->getMessage(),
             ]);
-
-            return;
         }
-
-        if (! Storage::exists($document->file_path)) {
-            $this->dispatch('notify', [
-                'variant' => 'danger',
-                'title' => 'Error',
-                'message' => 'File not found on storage',
-            ]);
-
-            return;
-        }
-
-        // Redirect to document download route
-        $this->redirect(route('backend.pm.document.download', $document->id));
     }
 
     public function confirmDeleteDocument(string $deleteToken): void
@@ -224,23 +156,18 @@ class MultipleDocument extends Component
         try {
             $id = ProjectDocument::validateDeleteToken($deleteToken);
             if (! $id) {
-                throw new \Exception('Invalid delete token');
+                throw new Exception('Invalid delete token');
             }
 
             $document = ProjectDocument::findOrFail($id);
 
             // Check if user has permission to delete this document
             if ($document->project_id !== $this->project->id) {
-                throw new \Exception('Unauthorized to delete this document');
+                throw new Exception('Unauthorized to delete this document');
             }
 
-            // Delete file from storage
-            if (Storage::exists($document->file_path)) {
-                Storage::delete($document->file_path);
-            }
-
-            // Delete document record
-            $document->delete();
+            $documentService = app(ProjectDocumentService::class);
+            $documentService->deleteDocument($document);
 
             $this->dispatch('synapse-confirmed');
             $this->dispatch('notify', [
@@ -252,7 +179,7 @@ class MultipleDocument extends Component
             // Dispatch event to refresh parent DocumentManager component
             $this->dispatch('document-uploaded');
             $this->dispatch('activity-refresh');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify', [
                 'variant' => 'danger',
                 'title' => 'Error',
@@ -263,41 +190,19 @@ class MultipleDocument extends Component
 
     public function viewDocument(int $documentId): void
     {
-        // Check authorization
-        if (! $this->canAccessDocument()) {
-            $this->dispatch('notify', [
-                'variant' => 'danger',
-                'title' => 'Unauthorized',
-                'message' => 'You do not have permission to view this document',
-            ]);
+        try {
+            $documentService = app(ProjectDocumentService::class);
+            $document = $documentService->validateDocumentAccess($this->project, $documentId);
 
-            return;
-        }
-
-        $document = $this->project->documents()->find($documentId);
-
-        if (! $document) {
+            // Redirect to document print route
+            $this->redirect(route('backend.pm.document.print', $document->id));
+        } catch (Exception $e) {
             $this->dispatch('notify', [
                 'variant' => 'danger',
                 'title' => 'Error',
-                'message' => 'Document not found',
+                'message' => $e->getMessage(),
             ]);
-
-            return;
         }
-
-        if (! Storage::exists($document->file_path)) {
-            $this->dispatch('notify', [
-                'variant' => 'danger',
-                'title' => 'Error',
-                'message' => 'File not found on storage',
-            ]);
-
-            return;
-        }
-
-        // Redirect to document print route
-        $this->redirect(route('backend.pm.document.print', $document->id));
     }
 
     public function render()

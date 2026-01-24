@@ -168,7 +168,7 @@
         <img
             class="header-image"
             src="{{ $forBrowser ?? false ? asset('storage/' . $invoice->issuer->header_image) : storage_path('app/public/' . $invoice->issuer->header_image) }}"
-            alt="{{ $invoice->issuer->name }}"
+            alt="{{ $invoice->issuer?->name }}"
         >
     @endif
 
@@ -240,8 +240,8 @@
                         </div>
                     </td>
                     <td class="signature-cell">
-                        <div class="signer-name">{{ $invoice->signature->name }}</div>
-                        <div class="signer-position">{{ $invoice->signature->position }}</div>
+                        <div class="signer-name">{{ $invoice->signature?->name }}</div>
+                        <div class="signer-position">{{ $invoice->signature?->position }}</div>
                         <div class="signer-company">{{ $invoice->issuer?->name }}</div>
                     </td>
                 </tr>

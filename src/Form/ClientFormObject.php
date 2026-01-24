@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Form;
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Form;
 use Livewire\WithFileUploads;
 use VmEngine\Pm\Models\Client;
-use VmEngine\SynAuth\Facades\SynAuth;
+use VmEngine\Pm\Services\ClientService;
 use VmEngine\SynAuth\Rules\UsernameRule;
 
 class ClientFormObject extends Form
@@ -187,60 +183,30 @@ class ClientFormObject extends Form
     {
         $this->validate();
 
-        DB::transaction(function () {
-            $UserModel = config('auth.providers.users.model');
+        $clientService = app(ClientService::class);
 
-            // Create user
-            $user = $UserModel::create([
-                'name' => $this->name,
-                'username' => $this->username,
-                'email' => $this->email,
-                'password' => Hash::make($this->password),
-                'status' => ($this->status === Client::STATUS_ACTIVE && $this->active) ? 1 : 0,
-            ]);
+        $clientData = [
+            'client_category_id' => $this->client_category_id,
+            'company' => $this->company,
+            'address' => $this->address,
+            'city' => $this->city,
+            'director' => $this->director,
+            'pic' => $this->pic,
+            'phone' => $this->phone,
+            'services' => [],
+            'social_media' => $clientService->parseSocialMedia($this->social_media),
+            'status' => $this->status,
+            'active' => $this->active,
+        ];
 
-            // Set email as verified (not in fillable array)
-            $user->email_verified_at = now();
-            $user->save();
+        $userData = [
+            'name' => $this->name,
+            'username' => $this->username,
+            'email' => $this->email,
+            'password' => $this->password,
+        ];
 
-            // Assign client role
-            $clientRoleId = dbconf('pm.client_role_id');
-            if ($clientRoleId) {
-                $user->roles()->attach($clientRoleId);
-            }
-
-            if ($this->npwp_image) {
-                $npwpImagePath = $this->npwp_image->store('clients/npwp', 'local');
-            } else {
-                $npwpImagePath = null;
-            }
-
-            // Create client
-            $newClient = Client::create([
-                'user_id' => $user->id,
-                'client_category_id' => $this->client_category_id,
-                'company' => $this->company,
-                'address' => $this->address,
-                'city' => $this->city,
-                'director' => $this->director,
-                'pic' => $this->pic,
-                'phone' => $this->phone,
-                'services' => [],
-                'social_media' => $this->parseSocialMedia(),
-                'npwp_image' => $npwpImagePath,
-                'status' => $this->status,
-                'active' => $this->active,
-                'created_by' => Auth::id(),
-            ]);
-
-            SynAuth::logActivity(
-                Auth::id(),
-                'pm.client.create',
-                'User '.Auth::user()->name.' created new client. Data: '.json_encode($newClient->toArray()),
-                'client',
-                'pm',
-            );
-        });
+        $clientService->create($clientData, $userData, $this->npwp_image);
 
         $this->reset();
     }
@@ -252,72 +218,29 @@ class ClientFormObject extends Form
     {
         $this->validate();
 
-        $oldData = $this->client->toArray();
+        $clientService = app(ClientService::class);
 
-        DB::transaction(function () use ($oldData) {
-            // Update user
-            $user = $this->client->user;
-            $userData = [
-                'name' => $this->name,
-                'username' => $this->username,
-                'email' => $this->email,
-                'status' => ($this->status === Client::STATUS_ACTIVE && $this->active) ? 1 : 0,
-            ];
+        $clientData = [
+            'client_category_id' => $this->client_category_id,
+            'company' => $this->company,
+            'address' => $this->address,
+            'city' => $this->city,
+            'director' => $this->director,
+            'pic' => $this->pic,
+            'phone' => $this->phone,
+            'services' => [],
+            'social_media' => $clientService->parseSocialMedia($this->social_media),
+            'status' => $this->status,
+            'active' => $this->active,
+        ];
 
-            // Only update password if provided
-            if (filled($this->password)) {
-                $userData['password'] = Hash::make($this->password);
-            }
+        $userData = [
+            'name' => $this->name,
+            'username' => $this->username,
+            'email' => $this->email,
+            'password' => $this->password,
+        ];
 
-            $user->update($userData);
-            $npwpImagePath = $this->client->npwp_image;
-            if ($this->npwp_image) {
-                $npwpImagePath = $this->npwp_image->store('clients/npwp', 'local');
-                if ($this->client->npwp_image && Storage::disk('local')->exists($this->client->npwp_image)) {
-                    Storage::disk('local')->delete($this->client->npwp_image);
-                }
-            }
-
-            // Update client
-            $this->client->update([
-                'client_category_id' => $this->client_category_id,
-                'company' => $this->company,
-                'address' => $this->address,
-                'city' => $this->city,
-                'director' => $this->director,
-                'pic' => $this->pic,
-                'phone' => $this->phone,
-                'services' => [],
-                'social_media' => $this->parseSocialMedia(),
-                'npwp_image' => $npwpImagePath,
-                'status' => $this->status,
-                'active' => $this->active,
-                'updated_by' => Auth::id(),
-            ]);
-
-            SynAuth::logActivity(
-                Auth::id(),
-                'pm.client.update',
-                'User '.Auth::user()->name.' updated client data. Old Data: '.json_encode($oldData).' New Data: '.json_encode($this->client->toArray()),
-                'client',
-                'pm',
-            );
-        });
-    }
-
-    /**
-     * Parse social media textarea into array.
-     */
-    private function parseSocialMedia(): array
-    {
-        if (empty($this->social_media)) {
-            return [];
-        }
-
-        return collect(explode("\n", $this->social_media))
-            ->map('trim')
-            ->filter()
-            ->values()
-            ->toArray();
+        $this->client = $clientService->update($this->client, $clientData, $userData, $this->npwp_image);
     }
 }

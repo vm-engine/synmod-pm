@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Form;
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\Form;
 use VmEngine\Pm\Models\DocumentIssuer;
-use VmEngine\SynAuth\Facades\SynAuth;
+use VmEngine\Pm\Services\IssuerService;
 
 class IssuerFormObject extends Form
 {
@@ -73,6 +70,8 @@ class IssuerFormObject extends Form
     {
         $this->validate();
 
+        $issuerService = app(IssuerService::class);
+
         $data = [
             'name' => $this->name,
             'tax_id_name' => $this->tax_id_name,
@@ -80,19 +79,7 @@ class IssuerFormObject extends Form
             'tax_id_number' => $this->tax_id_number,
         ];
 
-        if ($this->header_image instanceof TemporaryUploadedFile) {
-            $data['header_image'] = $this->processHeaderImage($this->header_image);
-        }
-
-        DocumentIssuer::create($data);
-
-        SynAuth::logActivity(
-            Auth::id(),
-            'pm.master.issuer.create',
-            'User '.Auth::user()->name.' created a new issuer: '.json_encode($data),
-            'master.issuer',
-            'pm',
-        );
+        $issuerService->create($data, $this->header_image);
 
         $this->reset();
     }
@@ -101,7 +88,7 @@ class IssuerFormObject extends Form
     {
         $this->validate();
 
-        $oldData = $this->issuer->toArray();
+        $issuerService = app(IssuerService::class);
 
         $data = [
             'name' => $this->name,
@@ -110,129 +97,6 @@ class IssuerFormObject extends Form
             'tax_id_number' => $this->tax_id_number,
         ];
 
-        if ($this->header_image instanceof TemporaryUploadedFile) {
-            // Delete old image
-            $this->deleteOldImage($this->issuer->header_image);
-
-            // Process and save new image
-            $data['header_image'] = $this->processHeaderImage($this->header_image);
-        }
-
-        SynAuth::logActivity(
-            Auth::id(),
-            'pm.master.issuer.update',
-            'User '.Auth::user()->name.' updated an issuer. Old Data: '.json_encode($oldData).' New Data: '.json_encode($data),
-            'master.issuer',
-            'pm',
-        );
-
-        $this->issuer->update($data);
-    }
-
-    private function processHeaderImage($file): string
-    {
-        $imagePath = $file->getRealPath();
-
-        // In test environment, skip image processing for fake files
-        if (app()->environment('testing')) {
-            $filename = 'issuer_header_'.uniqid().'_'.time().'.'.$file->getClientOriginalExtension();
-            $path = $file->storeAs('issuers/headers', $filename, 'public');
-
-            return $path;
-        }
-
-        $imageInfo = getimagesize($imagePath);
-        $mimeType = $imageInfo['mime'];
-
-        // Create source image
-        $sourceImage = match ($mimeType) {
-            'image/jpeg' => imagecreatefromjpeg($imagePath),
-            'image/png' => imagecreatefrompng($imagePath),
-            'image/webp' => imagecreatefromwebp($imagePath),
-            default => throw new \Exception('Unsupported image type'),
-        };
-
-        $sourceWidth = imagesx($sourceImage);
-        $sourceHeight = imagesy($sourceImage);
-
-        // Target dimensions: max width 1200px, maintain aspect ratio
-        $maxWidth = 1200;
-        $aspectRatio = $sourceWidth / $sourceHeight;
-
-        if ($sourceWidth > $maxWidth) {
-            $targetWidth = $maxWidth;
-            $targetHeight = (int) ($maxWidth / $aspectRatio);
-        } else {
-            $targetWidth = $sourceWidth;
-            $targetHeight = $sourceHeight;
-        }
-
-        // Create destination image
-        $destImage = imagecreatetruecolor($targetWidth, $targetHeight);
-
-        // Preserve transparency for PNG/WebP
-        if ($mimeType === 'image/png' || $mimeType === 'image/webp') {
-            imagealphablending($destImage, false);
-            imagesavealpha($destImage, true);
-            $transparent = imagecolorallocatealpha($destImage, 0, 0, 0, 127);
-            imagefilledrectangle($destImage, 0, 0, $targetWidth, $targetHeight, $transparent);
-        }
-
-        // Resize while maintaining aspect ratio
-        imagecopyresampled(
-            $destImage,
-            $sourceImage,
-            0,
-            0,
-            0,
-            0,
-            $targetWidth,
-            $targetHeight,
-            $sourceWidth,
-            $sourceHeight
-        );
-
-        // Generate unique filename
-        $filename = 'issuer_header_'.uniqid().'_'.time();
-        $extension = match ($mimeType) {
-            'image/jpeg' => '.jpg',
-            'image/png' => '.png',
-            'image/webp' => '.webp',
-            default => '.jpg',
-        };
-
-        // Save to storage
-        $storagePath = 'issuers/headers/'.$filename.$extension;
-        $fullPath = storage_path('app/public/'.$storagePath);
-
-        // Ensure directory exists
-        if (! file_exists(dirname($fullPath))) {
-            mkdir(dirname($fullPath), 0755, true);
-        }
-
-        // Save image
-        $saved = match ($mimeType) {
-            'image/jpeg' => imagejpeg($destImage, $fullPath, 90),
-            'image/png' => imagepng($destImage, $fullPath, 8),
-            'image/webp' => imagewebp($destImage, $fullPath, 90),
-            default => imagejpeg($destImage, $fullPath, 90),
-        };
-
-        // Free memory
-        imagedestroy($sourceImage);
-        imagedestroy($destImage);
-
-        if (! $saved) {
-            throw new \Exception('Failed to save processed header image');
-        }
-
-        return $storagePath;
-    }
-
-    private function deleteOldImage(?string $path): void
-    {
-        if ($path && Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->delete($path);
-        }
+        $this->issuer = $issuerService->update($this->issuer, $data, $this->header_image);
     }
 }

@@ -37,6 +37,7 @@ return [
     'report' => [
         'label' => 'Reports',
         'project_document' => 'Project Document Report',
+        'invoice' => 'Invoice Report',
     ],
     'config' => [
         'label' => 'Configuration',

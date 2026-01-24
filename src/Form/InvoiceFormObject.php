@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Form;
 
-use Illuminate\Support\Facades\Auth;
 use Livewire\Form;
 use VmEngine\Pm\Enums\Documents;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Pm\Models\ProjectInvoice;
-use VmEngine\SynAuth\Facades\SynAuth;
+use VmEngine\Pm\Services\InvoiceService;
 
 class InvoiceFormObject extends Form
 {
@@ -76,8 +75,8 @@ class InvoiceFormObject extends Form
         }
 
         // Generate invoice number
-        $handler = Documents::INVOICE->handler();
-        $this->invoice_number = $handler->generateDocumentNumber($project, Documents::INVOICE);
+        $invoiceService = app(InvoiceService::class);
+        $this->invoice_number = $invoiceService->generateInvoiceNumber($project);
 
         // Set default dates
         $this->issue_date = now()->format('Y-m-d');
@@ -152,11 +151,12 @@ class InvoiceFormObject extends Form
     {
         $this->validate();
 
+        $invoiceService = app(InvoiceService::class);
+
         $data = [
             'project_id' => $this->project_id,
             'project_category_id' => $this->project_category_id,
             'client_id' => $this->client_id,
-            'user_id' => Auth::id(),
             'spk_document_id' => $this->spk_document_id,
             'invoice_number' => $this->invoice_number,
             'recipient' => $this->recipient,
@@ -168,25 +168,10 @@ class InvoiceFormObject extends Form
             'issuer_id' => $this->issuer_id,
             'bank_account_id' => $this->bank_account_id,
             'has_signature' => $this->has_signature,
-            'signature_id' => $this->has_signature ? $this->signature_id : null,
-            'amount' => 0,
-            'total_amount' => 0,
-            'paid_amount' => 0,
+            'signature_id' => $this->signature_id,
         ];
 
-        $invoice = ProjectInvoice::create($data);
-
-        // Increment the invoice index
-        $handler = Documents::INVOICE->handler();
-        $handler->incrementIndex($this->project, Documents::INVOICE);
-
-        SynAuth::logActivity(
-            Auth::id(),
-            'pm.project.'.$this->project->id.'.invoice.create',
-            'User '.Auth::user()->name.' created a new invoice: '.json_encode($data),
-            'project.'.$this->project->id.'.invoice',
-            'pm',
-        );
+        $invoice = $invoiceService->create($this->project, $data);
 
         $this->reset();
 
@@ -197,7 +182,7 @@ class InvoiceFormObject extends Form
     {
         $this->validate();
 
-        $oldData = $this->invoice->toArray();
+        $invoiceService = app(InvoiceService::class);
 
         $data = [
             'invoice_number' => $this->invoice_number,
@@ -210,18 +195,10 @@ class InvoiceFormObject extends Form
             'issuer_id' => $this->issuer_id,
             'bank_account_id' => $this->bank_account_id,
             'has_signature' => $this->has_signature,
-            'signature_id' => $this->has_signature ? $this->signature_id : null,
+            'signature_id' => $this->signature_id,
         ];
 
-        $this->invoice->update($data);
-
-        SynAuth::logActivity(
-            Auth::id(),
-            'pm.project.'.$this->project->id.'.invoice.update',
-            'User '.Auth::user()->name.' updated an invoice. Old Data: '.json_encode($oldData).' New Data: '.json_encode($data),
-            'project.'.$this->project->id.'.invoice',
-            'pm',
-        );
+        $this->invoice = $invoiceService->update($this->invoice, $data);
 
         return $this->invoice;
     }
