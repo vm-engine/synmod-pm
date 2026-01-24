@@ -2,6 +2,69 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.0] - 2026-01-24
+
+### Added
+- **Service Layer Architecture**: Complete refactoring with 10 new service classes
+  - `ClientService`: Main client CRUD operations with user management and transaction handling
+  - `ClientUserService`: User account creation, updates, and role assignment for clients
+  - `FileUploadService`: NPWP (tax ID) image upload and deletion handling
+  - `ProjectService`: Project CRUD operations with server info parsing
+  - `InvoiceService`: Invoice management with document numbering, statistics, and reporting
+  - `ImageProcessingService`: Generic image processing service (resize, optimize, format conversion)
+  - `BankAccountService`: Bank account CRUD with logo processing
+  - `SignatureService`: Digital signature CRUD with image processing
+  - `IssuerService`: Document issuer CRUD with header image processing
+  - `ProjectDocumentService`: Document upload, delete, restore, and authorization checks
+- **Invoice Report Component**: New comprehensive invoice reporting UI
+  - Year-based filtering with statistics overview
+  - Statistics cards showing: total invoices, receipts, amounts, unpaid/paid, and VAT
+  - Invoices by Creator table with detailed breakdown
+  - Invoices by Project Category table with comprehensive metrics
+  - Empty state handling and loading indicators
+  - Responsive design with mobile-first approach
+
+### Changed
+- **Form Objects Refactored**: Extracted business logic to service layer
+  - `ClientFormObject`: Reduced from 323 to 246 lines (-24%)
+  - `ProjectFormObject`: Reduced from 439 to 370 lines (-16%)
+  - `InvoiceFormObject`: Reduced from 228 to 161 lines (-29%)
+  - `BankAccountFormObject`: Reduced from 218 to 50 lines (-77%)
+  - `SignatureFormObject`: Reduced from 210 to 42 lines (-80%)
+  - `IssuerFormObject`: Reduced from 238 to 68 lines (-71%)
+- **Livewire Components Refactored**: Business logic moved to services
+  - `ClientList`: Refactored `toggleActive()` and `delete()` to use `ClientService`
+  - `ProjectList`: Refactored `delete()` to use `ProjectService`
+  - `VersionedDocument`: Reduced from 408 to 287 lines (-30%), uses `ProjectDocumentService`
+  - `MultipleDocument`: Reduced from 310 to 218 lines (-30%), uses `ProjectDocumentService`
+- **Code Quality**: Overall reduction of ~700 lines through better architecture
+- **Translation Updates**: Added invoice report translations (statistics_description, no_data, invoices)
+
+### Improved
+- **Invoice Report UI/UX**: Major improvements to reporting interface
+  - Unique icons and color themes for each statistic card
+  - Hover effects with smooth transitions on statistics cards
+  - Color-coded amounts (red for unpaid, green for paid, amber for VAT)
+  - Loading states with opacity changes when filtering
+  - Invoice count badges with better visual hierarchy
+  - Improved table footer styling with better contrast
+  - Better responsive layout for mobile devices
+- **Code Architecture**: Following SOLID principles
+  - Single Responsibility: Each service handles one domain
+  - Dependency Injection: Services properly injected via constructors
+  - Better testability and maintainability
+  - Reduced code duplication (~150 lines eliminated from image processing alone)
+
+### Fixed
+- **UI Bugs**: Fixed typo in invoice report view (`grod-cols-1` → `grid-cols-1`)
+- **Test Fixes**: Fixed "search scope finds clients by director" test
+  - Explicitly set all searchable fields to prevent random data matches
+  - Applied same fix to "search scope finds clients by pic" test
+  - All 375 tests passing (863 assertions)
+- **Currency Formatting**: Consistent format across all views (removed extra periods)
+- **Table Bugs**: Removed duplicate counter increment that caused incorrect numbering
+- **Dark Mode**: Proper dark mode support across all new components
+
 ## [0.5.2] - 2026-01-23
 
 ### Added
