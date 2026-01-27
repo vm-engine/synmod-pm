@@ -32,7 +32,7 @@
         </div>
 
         <!-- Modal Body (Scrollable) -->
-        <div class="max-h-[80vh] flex-1 space-y-6 overflow-y-auto p-6">
+        <div class="max-h-[65vh] flex-1 space-y-6 overflow-y-auto p-6">
             <!-- Receipt Preview Card -->
             <div class="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
                 <!-- Receipt Title -->

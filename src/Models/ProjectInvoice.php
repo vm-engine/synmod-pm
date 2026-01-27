@@ -55,6 +55,8 @@ class ProjectInvoice extends Model
         'receipt_number',
         'receipt_amount_text',
         'receipt_document_id',
+        'created_by',
+        'updated_by',
     ];
 
     protected function casts(): array

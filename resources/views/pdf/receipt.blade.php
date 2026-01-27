@@ -21,7 +21,7 @@
 
         body {
             font-family: 'DejaVu Sans', sans-serif;
-            font-size: 11pt;
+            font-size: 10pt;
             line-height: 1.5;
             color: #333;
         }
@@ -41,14 +41,14 @@
         }
 
         .title {
-            font-size: 20pt;
+            font-size: 18pt;
             font-weight: bold;
             color: #333;
             margin-bottom: 5px;
         }
 
         .receipt-number {
-            font-size: 12pt;
+            font-size: 10pt;
             color: #1e88e5;
         }
 
@@ -88,7 +88,7 @@
 
         .label-sub {
             font-style: italic;
-            font-size: 10pt;
+            font-size: 8pt;
             color: #666;
         }
 
@@ -132,31 +132,31 @@
             vertical-align: top;
             text-align: center;
             padding-left: 30px;
-            padding-top: 220px;
+            padding-top: 120px;
         }
 
         .amount-box {
             display: inline-block;
             border: 2px solid #333;
             padding: 12px 25px;
-            font-size: 16pt;
+            font-size: 14pt;
             font-weight: bold;
         }
 
         .signer-name {
             font-weight: bold;
-            font-size: 12pt;
+            font-size: 10pt;
             margin-bottom: 3px;
         }
 
         .signer-position {
-            font-size: 11pt;
+            font-size: 9pt;
             color: #333;
             margin-bottom: 3px;
         }
 
         .signer-company {
-            font-size: 11pt;
+            font-size: 9pt;
             color: #333;
         }
     </style>

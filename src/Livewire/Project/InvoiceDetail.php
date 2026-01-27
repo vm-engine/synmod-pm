@@ -4,19 +4,16 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Livewire\Project;
 
-use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
-use VmEngine\Pm\Enums\Documents;
-use VmEngine\Pm\Models\ProjectDocument;
 use VmEngine\Pm\Models\ProjectInvoice;
 use VmEngine\Pm\Models\ProjectInvoiceItem;
+use VmEngine\Pm\Services\InvoicePdfService;
 use VmEngine\SynAuth\Facades\SynAuth;
 
 class InvoiceDetail extends Component
@@ -376,52 +373,8 @@ class InvoiceDetail extends Component
 
     protected function generatePdf(): void
     {
-        $this->invoice->load(['items', 'issuer', 'bankAccount', 'signature', 'project', 'client']);
-
-        $pdf = Pdf::loadView('pm::pdf.invoice', [
-            'invoice' => $this->invoice,
-        ]);
-
-        $pdf->setPaper('a4');
-
-        // Generate filename
-        $filename = 'invoice_'.str_replace(['/', '\\', ' '], '_', $this->invoice->invoice_number).'.pdf';
-        $storagePath = 'projects/'.$this->invoice->project_id.'/documents/'.Documents::INVOICE->code();
-
-        // Delete old document if exists
-        if ($this->invoice->invoice_document_id) {
-            $oldDocument = ProjectDocument::find($this->invoice->invoice_document_id);
-            if ($oldDocument && $oldDocument->file_path) {
-                Storage::delete($oldDocument->file_path);
-                $oldDocument->delete();
-            }
-        }
-
-        // Store PDF
-        $fullPath = $storagePath.'/'.$filename;
-        Storage::put($fullPath, $pdf->output());
-
-        // Create project document record
-        $document = ProjectDocument::create([
-            'user_id' => auth()->id(),
-            'project_id' => $this->invoice->project_id,
-            'client_id' => $this->invoice->client_id,
-            'type' => Documents::INVOICE->value,
-            'number' => $this->invoice->invoice_number,
-            'notes' => 'Invoice '.$this->invoice->invoice_number.' - Auto-generated',
-            'file_path' => $fullPath,
-            'file_info' => [
-                'name' => $filename,
-                'size' => Storage::size($fullPath),
-                'mime' => 'application/pdf',
-            ],
-            'version' => 1,
-        ]);
-
-        // Update invoice with document reference
-        $this->invoice->update([
-            'invoice_document_id' => $document->id,
-        ]);
+        $service = new InvoicePdfService;
+        $service->generate($this->invoice, auth()->id());
     }
 
     protected function refreshInvoice(): void

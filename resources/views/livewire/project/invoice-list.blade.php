@@ -218,11 +218,39 @@
                                                     dropdownPosition: { top: 0, left: 0 },
                                                     updatePosition() {
                                                         const btn = this.$refs.dropdownBtn;
+                                                        const menu = this.$refs.dropdownMenu;
                                                         const rect = btn.getBoundingClientRect();
-                                                        this.dropdownPosition = {
-                                                            top: rect.bottom + window.scrollY + 8,
-                                                            left: rect.right + window.scrollX - 192
-                                                        };
+                                                        const menuHeight = 300; // Approximate dropdown height
+                                                        const menuWidth = 192; // w-48 = 12rem = 192px
+                                                        const viewportHeight = window.innerHeight;
+                                                        const viewportWidth = window.innerWidth;
+
+                                                        // Check if there's enough space below
+                                                        const spaceBelow = viewportHeight - rect.bottom;
+                                                        const spaceAbove = rect.top;
+
+                                                        // Position vertically (prefer below, use above if not enough space)
+                                                        let top;
+                                                        if (spaceBelow >= menuHeight || spaceBelow > spaceAbove) {
+                                                            top = rect.bottom + window.scrollY + 8;
+                                                        } else {
+                                                            top = rect.top + window.scrollY - menuHeight - 8;
+                                                        }
+
+                                                        // Position horizontally (align to right of button)
+                                                        let left = rect.right + window.scrollX - menuWidth;
+
+                                                        // Ensure dropdown doesn't go off the left edge
+                                                        if (left < 0) {
+                                                            left = 8;
+                                                        }
+
+                                                        // Ensure dropdown doesn't go off the right edge
+                                                        if (left + menuWidth > viewportWidth) {
+                                                            left = viewportWidth - menuWidth - 8;
+                                                        }
+
+                                                        this.dropdownPosition = { top, left };
                                                     }
                                                 }"
                                                 @click.outside="dropdownOpen = false"
@@ -240,6 +268,7 @@
                                                 <template x-teleport="body">
                                                     <div
                                                         class="icon-dropdown"
+                                                        x-ref="dropdownMenu"
                                                         x-show="dropdownOpen"
                                                         :style="'top: ' + dropdownPosition.top + 'px; left: ' + dropdownPosition
                                                             .left + 'px;'"
@@ -252,6 +281,16 @@
                                                         x-cloak
                                                         @click.outside="dropdownOpen = false"
                                                     >
+                                                        @if ($invoice->invoice_document_id)
+                                                            <button
+                                                                class="icon-dropdown-item"
+                                                                type="button"
+                                                                @click="dropdownOpen = false; $dispatch('open-modal-receipt-detail'); $wire.dispatch('load-receipt-detail', { id: {{ $invoice->id }} })"
+                                                            >
+                                                                <span class="fa-solid fa-receipt w-4"></span>
+                                                                {{ __('pm::invoice.receipts') }}
+                                                            </button>
+                                                        @endif
                                                         @canAccess('pm.invoice.read')
                                                         @if ($invoice->invoice_document_id)
                                                             <a
@@ -313,16 +352,6 @@
                                                             </button>
                                                         @endif
                                                         @endcanAccess
-                                                        @if ($invoice->invoice_document_id)
-                                                            <button
-                                                                class="icon-dropdown-item"
-                                                                type="button"
-                                                                @click="dropdownOpen = false; $dispatch('open-modal-receipt-detail'); $wire.dispatch('load-receipt-detail', { id: {{ $invoice->id }} })"
-                                                            >
-                                                                <span class="fa-solid fa-receipt w-4"></span>
-                                                                {{ __('pm::invoice.receipts') }}
-                                                            </button>
-                                                        @endif
                                                     </div>
                                                 </template>
                                             </div>

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Livewire\Project;
 
-use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
@@ -17,8 +16,8 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use VmEngine\Pm\Enums\Documents;
 use VmEngine\Pm\Helpers\Terbilang;
-use VmEngine\Pm\Models\ProjectDocument;
 use VmEngine\Pm\Models\ProjectInvoice;
+use VmEngine\Pm\Services\ReceiptPdfService;
 use VmEngine\SynAuth\Facades\SynAuth;
 
 class ReceiptDetail extends Component
@@ -167,75 +166,8 @@ class ReceiptDetail extends Component
 
     protected function generatePdf(): void
     {
-        $this->invoice->load(['items', 'issuer', 'signature', 'project', 'client']);
-
-        // Generate receipt number if not exists
-        $receiptNumber = $this->invoice->receipt_number;
-        if (! $receiptNumber) {
-            $receiptNumber = Documents::RECEIPT->handler()->generateDocumentNumber(
-                $this->invoice->project,
-                Documents::RECEIPT
-            );
-        }
-
-        // Generate amount text
-        $amountText = Terbilang::rupiah((float) $this->invoice->total_amount);
-
-        // Update invoice with receipt data
-        $this->invoice->update([
-            'receipt_number' => $receiptNumber,
-            'receipt_amount_text' => $amountText,
-        ]);
-
-        // Increment receipt index
-        Documents::RECEIPT->handler()->incrementIndex($this->invoice->project, Documents::RECEIPT);
-
-        $pdf = Pdf::loadView('pm::pdf.receipt', [
-            'invoice' => $this->invoice,
-            'receiptNumber' => $receiptNumber,
-            'amountText' => $amountText,
-        ]);
-
-        $pdf->setPaper('a4');
-
-        // Generate filename
-        $filename = 'receipt_'.str_replace(['/', '\\', ' '], '_', $receiptNumber).'.pdf';
-        $storagePath = 'projects/'.$this->invoice->project_id.'/documents/'.Documents::RECEIPT->code();
-
-        // Delete old document if exists
-        if ($this->invoice->receipt_document_id) {
-            $oldDocument = ProjectDocument::find($this->invoice->receipt_document_id);
-            if ($oldDocument && $oldDocument->file_path) {
-                Storage::delete($oldDocument->file_path);
-                $oldDocument->delete();
-            }
-        }
-
-        // Store PDF
-        $fullPath = $storagePath.'/'.$filename;
-        Storage::put($fullPath, $pdf->output());
-
-        // Create project document record
-        $document = ProjectDocument::create([
-            'user_id' => auth()->id(),
-            'project_id' => $this->invoice->project_id,
-            'client_id' => $this->invoice->client_id,
-            'type' => Documents::RECEIPT->value,
-            'number' => $receiptNumber,
-            'notes' => 'Receipt '.$receiptNumber.' - Auto-generated',
-            'file_path' => $fullPath,
-            'file_info' => [
-                'name' => $filename,
-                'size' => Storage::size($fullPath),
-                'mime' => 'application/pdf',
-            ],
-            'version' => 1,
-        ]);
-
-        // Update invoice with document reference
-        $this->invoice->update([
-            'receipt_document_id' => $document->id,
-        ]);
+        $service = new ReceiptPdfService;
+        $service->generate($this->invoice, auth()->id());
     }
 
     public function updatedIsPaid(): void

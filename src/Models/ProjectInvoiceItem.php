@@ -29,6 +29,8 @@ class ProjectInvoiceItem extends Model
         'discount_percentage',
         'discount_amount',
         'is_paid',
+        'created_by',
+        'updated_by',
     ];
 
     protected function casts(): array

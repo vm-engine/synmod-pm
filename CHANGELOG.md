@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.1] - 2026-01-27
+
+### Added
+- **PDF Service Classes**: Extracted PDF generation logic into dedicated services
+  - `InvoicePdfService`: Handles invoice PDF generation and document creation
+  - `ReceiptPdfService`: Handles receipt PDF generation with auto-numbering and Terbilang integration
+  - Improved code reusability and testability
+- **CSV Import Command**: New `mod-pm:import-projects` Artisan command
+  - Import projects from CSV files with validation
+  - Support for username and division options
+  - Dry-run mode for previewing imports
+  - Automatic client, division, and category lookup
+
+### Changed
+- **Livewire Components Refactored**: PDF generation moved to service layer
+  - `InvoiceDetail`: Reduced by 52 lines (-12%), now uses `InvoicePdfService`
+  - `ReceiptDetail`: Reduced by 73 lines (-17%), now uses `ReceiptPdfService`
+  - Cleaner component code following Single Responsibility Principle
+
+### Improved
+- **Invoice List UI**: Enhanced dropdown menu positioning
+  - Smart viewport detection to prevent off-screen positioning
+  - Automatically positions above button if insufficient space below
+  - Ensures dropdown stays within left/right viewport boundaries
+  - Moved "Receipts" button to top of dropdown for better UX
+- **Model Fillable Fields**: Added `created_by` and `updated_by` to fillable arrays
+  - `ProjectInvoice` model now properly handles audit fields
+  - `ProjectInvoiceItem` model now properly handles audit fields
+
+### Fixed
+- **Dropdown Positioning**: Fixed invoice list dropdown going off-screen on small viewports
+- **Minor UI Fixes**: Small improvements in invoice and receipt views
+
 ## [0.6.0] - 2026-01-24
 
 ### Added

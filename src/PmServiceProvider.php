@@ -6,6 +6,7 @@ namespace VmEngine\Pm;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
+use VmEngine\Pm\Console\Commands\ImportProjectsCommand;
 use VmEngine\Pm\Console\Commands\MigrateOldDataCommand;
 use VmEngine\Pm\Console\Commands\MigrateProjectUploadsCommand;
 use VmEngine\Pm\Console\Commands\ResetIndexCommand;
@@ -26,6 +27,7 @@ class PmServiceProvider extends ServiceProvider
         // Register commands
         if ($this->app->runningInConsole()) {
             $this->commands([
+                ImportProjectsCommand::class,
                 MigrateOldDataCommand::class,
                 SyncClientUserStatusCommand::class,
                 ResetIndexCommand::class,

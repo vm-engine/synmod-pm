@@ -14,7 +14,7 @@ use VmEngine\Synapse\Services\Helper\Breadcrumbs;
 class Invoice extends Component
 {
     #[Url()]
-    public int $year = 0;
+    public ?int $year = null;
 
     public string $pageName = '';
 
@@ -44,7 +44,7 @@ class Invoice extends Component
 
     public function render()
     {
-        if (! $this->year) {
+        if ($this->year === null || $this->year === 0) {
             $this->year = now()->year;
         }
 
