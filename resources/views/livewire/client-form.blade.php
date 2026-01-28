@@ -14,7 +14,7 @@
                 <div class="card-body">
                     <div class="form-box">
                         <label for="category">{{ __('pm::client.category') }}</label>
-                        <
+                        <x-synapse-select
                             id="client_category_id"
                             name="client_category_id"
                             :options="$categories"
