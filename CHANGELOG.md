@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.6] - 2026-01-29
+
+### Changed
+- **Scheduler**: Update Queue processing parameters
+  - Change option from `--stop-when-empty` to `--once`
+  - Add 5 minutes to overlapping timeout
+
 ## [0.6.5] - 2026-01-29
 
 ### Fixed
