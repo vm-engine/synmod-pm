@@ -37,6 +37,10 @@ class PmServiceProvider extends ServiceProvider
             $this->app->booted(function () {
                 $schedule = $this->app->make(Schedule::class);
                 $schedule->command('mod-pm:reset-index')->yearly();
+                $schedule->command('queue:work --stop-when-empty --max-time=270 --tries=3')
+                    ->everyMinute()
+                    ->withoutOverlapping()
+                    ->runInBackground();
             });
         }
     }

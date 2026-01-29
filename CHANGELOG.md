@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.4] - 2026-01-29
+
+### Added
+- **Scheduler**: Add `queue:work` commands to run every minutes, without overlapping, and run in background
+
 ## [0.6.3] - 2026-01-29
 
 ### Added
