@@ -10,6 +10,7 @@ use Livewire\Component;
 use VmEngine\Pm\Enums\Documents;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Pm\Models\ProjectCategory;
+use VmEngine\Pm\Services\ProjectDocumentService;
 use VmEngine\Synapse\Services\Helper\Breadcrumbs;
 
 class ProjectDocument extends Component
@@ -60,6 +61,14 @@ class ProjectDocument extends Component
         }
 
         return $projectList->get();
+    }
+
+    public function exportToExcel(ProjectDocumentService $service)
+    {
+        $year = $this->year ?? (int) date('Y');
+        $documentType = ! is_null($this->documentType) ? Documents::tryFrom($this->documentType) : null;
+
+        return $service->exportToExcel($year, $documentType, $this->projectCategories);
     }
 
     public function render()

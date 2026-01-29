@@ -9,6 +9,8 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Pm\Services\InvoiceService;
+use VmEngine\Synapse\Enums\ExcelTaskStatus;
+use VmEngine\Synapse\Models\ExcelExport;
 use VmEngine\Synapse\Services\Helper\Breadcrumbs;
 
 class Invoice extends Component
@@ -17,6 +19,8 @@ class Invoice extends Component
     public ?int $year = null;
 
     public string $pageName = '';
+
+    public ?int $exportTaskId = null;
 
     #[Computed()]
     public function statistics(): array
@@ -40,6 +44,66 @@ class Invoice extends Component
         $invoiceService = app(InvoiceService::class);
 
         return $invoiceService->getByProject($this->year);
+    }
+
+    #[Computed()]
+    public function exportTask(): ?ExcelExport
+    {
+        if (! $this->exportTaskId) {
+            return null;
+        }
+
+        return ExcelExport::find($this->exportTaskId);
+    }
+
+    public function exportToExcel(InvoiceService $service): void
+    {
+        $year = $this->year ?? now()->year;
+
+        $task = $service->exportToExcel($year);
+        $this->exportTaskId = $task->id;
+
+        $this->dispatch('notify', [
+            'variant' => 'info',
+            'title' => 'Info',
+            'message' => __('pm::report.invoice.export.queued', ['id' => $task->id]),
+        ]);
+    }
+
+    public function checkExportStatus(): void
+    {
+        unset($this->exportTask);
+    }
+
+    public function downloadExport()
+    {
+        $task = $this->exportTask;
+
+        if (! $task || $task->status !== ExcelTaskStatus::Completed) {
+            return;
+        }
+
+        if (! file_exists($task->output_path)) {
+            $this->dispatch('notify', [
+                'variant' => 'error',
+                'title' => 'Error',
+                'message' => __('pm::report.invoice.export.file_not_found'),
+            ]);
+
+            return;
+        }
+
+        $this->exportTaskId = null;
+
+        return response()->download(
+            $task->output_path,
+            basename($task->output_path)
+        )->deleteFileAfterSend();
+    }
+
+    public function dismissExport(): void
+    {
+        $this->exportTaskId = null;
     }
 
     public function render()

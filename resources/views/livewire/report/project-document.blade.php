@@ -86,6 +86,17 @@
                         {{ __('pm::report.documents.filters.reset') }}
                     </button>
 
+                    <button
+                        class="btn success"
+                        type="button"
+                        wire:click="exportToExcel"
+                        wire:loading.attr="disabled"
+                    >
+                        <span class="fa-solid fa-file-excel mr-1"></span>
+                        <span wire:loading.remove wire:target="exportToExcel">{{ __('pm::report.documents.filters.export') }}</span>
+                        <span wire:loading wire:target="exportToExcel">{{ __('pm::report.documents.filters.exporting') }}</span>
+                    </button>
+
                     <div class="ml-auto text-sm text-gray-600 dark:text-gray-400">
                         {{ __('pm::report.documents.filters.results', ['count' => $this->list->count()]) }}
                     </div>

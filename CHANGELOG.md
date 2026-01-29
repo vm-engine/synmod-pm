@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.3] - 2026-01-29
+
+### Added
+- **Report/Project Documents**: Added Sync Excel Export
+- **Report/Invoice**: Added Background Job Excel Export
+
+### Updated
+- **Requirement**: Update requirement for vm-engine/synapse to v1.7 to support Excel Export/Import
+
 ## [0.6.2] - 2026-01-27
 
 ### Fixed

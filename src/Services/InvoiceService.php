@@ -7,8 +7,11 @@ namespace VmEngine\Pm\Services;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use VmEngine\Pm\Enums\Documents;
+use VmEngine\Pm\Exports\InvoiceExportQuery;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Pm\Models\ProjectInvoice;
+use VmEngine\Synapse\Models\ExcelExport;
+use VmEngine\Synapse\Services\Excel\ExcelExporter;
 use VmEngine\SynAuth\Facades\SynAuth;
 
 class InvoiceService
@@ -173,5 +176,52 @@ class InvoiceService
             ->groupBy('project_category_id')
             ->with('projectCategory')
             ->get();
+    }
+
+    /**
+     * Export invoices to Excel (background job).
+     */
+    public function exportToExcel(int $year): ExcelExport
+    {
+        $outputPath = storage_path('app/exports/invoices-'.$year.'-'.now()->format('YmdHis').'.xlsx');
+
+        return ExcelExporter::make(InvoiceExportQuery::class)
+            ->columns([
+                __('pm::report.invoice.export.no') => null,
+                __('pm::report.invoice.export.client') => 'client_company',
+                __('pm::report.invoice.export.project') => 'project_name',
+                __('pm::report.invoice.export.category') => 'category_name',
+                __('pm::report.invoice.export.invoice_number') => 'invoice_number',
+                __('pm::report.invoice.export.issue_date') => 'issue_date',
+                __('pm::report.invoice.export.due_date') => 'due_date',
+                __('pm::report.invoice.export.total_amount') => 'total_amount',
+                __('pm::report.invoice.export.receipt_number') => 'receipt_number',
+                __('pm::report.invoice.export.paid_status') => 'is_paid',
+                __('pm::report.invoice.export.payment_time') => 'paid_at',
+                __('pm::report.invoice.export.creator') => 'creator_name',
+            ])
+            ->columnStyles([
+                __('pm::report.invoice.export.no') => ['width' => 5, 'alignment' => ['horizontal' => 'center', 'vertical' => 'center']],
+                __('pm::report.invoice.export.client') => ['width' => 30, 'alignment' => ['vertical' => 'center']],
+                __('pm::report.invoice.export.project') => ['width' => 35, 'alignment' => ['vertical' => 'center']],
+                __('pm::report.invoice.export.category') => ['width' => 20, 'alignment' => ['horizontal' => 'center', 'vertical' => 'center']],
+                __('pm::report.invoice.export.invoice_number') => ['width' => 25, 'alignment' => ['vertical' => 'center']],
+                __('pm::report.invoice.export.issue_date') => ['width' => 12, 'alignment' => ['horizontal' => 'center', 'vertical' => 'center']],
+                __('pm::report.invoice.export.due_date') => ['width' => 12, 'alignment' => ['horizontal' => 'center', 'vertical' => 'center']],
+                __('pm::report.invoice.export.total_amount') => ['width' => 18, 'alignment' => ['horizontal' => 'right', 'vertical' => 'center'], 'numberFormat' => ['formatCode' => '#,##0.00']],
+                __('pm::report.invoice.export.receipt_number') => ['width' => 25, 'alignment' => ['vertical' => 'center']],
+                __('pm::report.invoice.export.paid_status') => ['width' => 10, 'alignment' => ['horizontal' => 'center', 'vertical' => 'center']],
+                __('pm::report.invoice.export.payment_time') => ['width' => 18, 'alignment' => ['horizontal' => 'center', 'vertical' => 'center']],
+                __('pm::report.invoice.export.creator') => ['width' => 20, 'alignment' => ['vertical' => 'center']],
+            ])
+            ->headerStyle([
+                'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+                'fill' => ['fillType' => 'solid', 'startColor' => ['rgb' => '4472C4']],
+                'alignment' => ['horizontal' => 'center', 'vertical' => 'center'],
+            ])
+            ->sheet(__('pm::report.invoice.export.sheet_name', ['year' => $year]))
+            ->withFilters(['year' => $year])
+            ->forUser(Auth::id())
+            ->dispatch($outputPath);
     }
 }

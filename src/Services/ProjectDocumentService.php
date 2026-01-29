@@ -8,10 +8,12 @@ use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use VmEngine\Pm\Enums\Documents;
 use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Pm\Models\ProjectDocument;
+use VmEngine\Synapse\Services\Excel\ExcelExporter;
 use VmEngine\SynAuth\Facades\SynAuth;
 
 class ProjectDocumentService
@@ -183,6 +185,63 @@ class ProjectDocumentService
         }
 
         return $document;
+    }
+
+    /**
+     * Export project documents report to Excel.
+     */
+    public function exportToExcel(int $year, ?Documents $documentType = null, array $projectCategories = []): BinaryFileResponse
+    {
+        $query = Project::query()
+            ->with(['client', 'projectCategory', 'documents.creator'])
+            ->where('year', $year);
+
+        if ($documentType) {
+            $query->whereHas('documents', fn ($q) => $q->where('type', $documentType->value));
+        }
+
+        if (count($projectCategories) > 0) {
+            $query->whereIn('project_category_id', $projectCategories);
+        }
+
+        $documentCol = __('pm::report.documents.table.document');
+        $clientCol = __('pm::report.documents.table.client');
+        $projectCol = __('pm::report.documents.table.project');
+        $categoryCol = __('pm::report.documents.table.category');
+        $statusCol = __('pm::report.documents.table.status');
+
+        return ExcelExporter::make($query)
+            ->columns([
+                $documentCol => function ($project) use ($documentType) {
+                    $docs = $project->documents;
+                    if ($documentType) {
+                        $docs = $docs->where('type', $documentType);
+                    }
+
+                    return $docs->map(fn ($doc) => ucwords($doc->type->name).': '.$doc->number.' ('.$doc->created_at->format('j M Y').' - '.$doc->creator->name.')')
+                        ->implode("\n");
+                },
+                $clientCol => fn ($project) => $project->client?->company,
+                $projectCol => 'name',
+                $categoryCol => fn ($project) => $project->projectCategory?->name ?? __('pm::report.documents.table.uncategorized'),
+                $statusCol => fn ($project) => $project->documents->contains(fn ($doc) => $doc->type === Documents::SPK)
+                    ? __('pm::report.documents.status.deal')
+                    : __('pm::report.documents.status.pending'),
+            ])
+            ->columnStyles([
+                $documentCol => ['width' => 60, 'alignment' => ['wrapText' => true, 'vertical' => 'top']],
+                $clientCol => ['width' => 30, 'alignment' => ['vertical' => 'top']],
+                $projectCol => ['width' => 40, 'alignment' => ['vertical' => 'top']],
+                $categoryCol => ['width' => 20, 'alignment' => ['horizontal' => 'center', 'vertical' => 'top']],
+                $statusCol => ['width' => 12, 'alignment' => ['horizontal' => 'center', 'vertical' => 'top']],
+            ])
+            ->headerStyle([
+                'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+                'fill' => ['fillType' => 'solid', 'startColor' => ['rgb' => '4472C4']],
+                'alignment' => ['horizontal' => 'center', 'vertical' => 'center'],
+            ])
+            ->sheet(__('pm::report.documents.title'))
+            ->download('project-documents-'.$year.'.xlsx');
     }
 
     /**

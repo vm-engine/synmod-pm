@@ -14,15 +14,71 @@
                         {{ __('pm::report.invoice.statistics_description') }}
                     </p>
                 </div>
-                <div class="w-full min-w-48 sm:w-auto">
-                    <x-synapse-adv-select
-                        id="year"
-                        name="year"
-                        wire-model="year"
-                        :options="$years"
-                        :live="true"
-                        placeholder="{{ __('pm::report.invoice.filters.year') }}"
-                    />
+                <div class="flex w-full items-center gap-3 sm:w-auto">
+                    <div class="min-w-48">
+                        <x-synapse-adv-select
+                            id="year"
+                            name="year"
+                            wire-model="year"
+                            :options="$years"
+                            :live="true"
+                            placeholder="{{ __('pm::report.invoice.filters.year') }}"
+                        />
+                    </div>
+                    @if ($this->exportTask)
+                        @php $task = $this->exportTask; @endphp
+                        @if ($task->status === \VmEngine\Synapse\Enums\ExcelTaskStatus::Completed)
+                            <button
+                                class="btn success"
+                                type="button"
+                                wire:click="downloadExport"
+                            >
+                                <span class="fa-solid fa-download mr-1"></span>
+                                {{ __('pm::report.invoice.export.download') }}
+                            </button>
+                            <button
+                                class="btn secondary"
+                                type="button"
+                                wire:click="dismissExport"
+                                title="{{ __('pm::report.invoice.export.dismiss') }}"
+                            >
+                                <span class="fa-solid fa-xmark"></span>
+                            </button>
+                        @elseif ($task->status === \VmEngine\Synapse\Enums\ExcelTaskStatus::Failed)
+                            <span class="text-sm text-red-600 dark:text-red-400">
+                                <span class="fa-solid fa-exclamation-triangle mr-1"></span>
+                                {{ __('pm::report.invoice.export.failed') }}
+                            </span>
+                            <button
+                                class="btn secondary"
+                                type="button"
+                                wire:click="dismissExport"
+                            >
+                                <span class="fa-solid fa-xmark"></span>
+                            </button>
+                        @else
+                            <button
+                                class="btn secondary"
+                                type="button"
+                                wire:poll.2s="checkExportStatus"
+                                disabled
+                            >
+                                <span class="fa-solid fa-spinner fa-spin mr-1"></span>
+                                {{ __('pm::report.invoice.export.processing') }}
+                            </button>
+                        @endif
+                    @else
+                        <button
+                            class="btn success"
+                            type="button"
+                            wire:click="exportToExcel"
+                            wire:loading.attr="disabled"
+                        >
+                            <span class="fa-solid fa-file-excel mr-1"></span>
+                            <span wire:loading.remove wire:target="exportToExcel">{{ __('pm::report.invoice.export.button') }}</span>
+                            <span wire:loading wire:target="exportToExcel">{{ __('pm::report.invoice.export.exporting') }}</span>
+                        </button>
+                    @endif
                 </div>
             </div>
 
