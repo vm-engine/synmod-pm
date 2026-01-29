@@ -24,8 +24,8 @@ class PmServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Register commands
         if ($this->app->runningInConsole()) {
+            // Register commands
             $this->commands([
                 ImportProjectsCommand::class,
                 MigrateOldDataCommand::class,
@@ -34,14 +34,12 @@ class PmServiceProvider extends ServiceProvider
                 MigrateProjectUploadsCommand::class,
             ]);
 
-            $this->app->booted(function () {
-                $schedule = $this->app->make(Schedule::class);
-                $schedule->command('mod-pm:reset-index')->yearly();
-                $schedule->command('queue:work --stop-when-empty --max-time=270 --tries=3')
-                    ->everyMinute()
-                    ->withoutOverlapping()
-                    ->runInBackground();
-            });
+            $schedule = $this->app->make(Schedule::class);
+            $schedule->command('mod-pm:reset-index')->yearly();
+            $schedule->command('queue:work --stop-when-empty --max-time=270 --tries=3')
+                ->everyMinute()
+                ->withoutOverlapping()
+                ->runInBackground();
         }
     }
 }
