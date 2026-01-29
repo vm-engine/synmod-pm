@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.5] - 2026-01-29
+
+### Fixed
+- **Scheduler**: Improper Scheduler registration
+
 ## [0.6.4] - 2026-01-29
 
 ### Added
