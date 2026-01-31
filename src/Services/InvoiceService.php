@@ -12,6 +12,9 @@ use VmEngine\Pm\Models\Project;
 use VmEngine\Pm\Models\ProjectInvoice;
 use VmEngine\Synapse\Models\ExcelExport;
 use VmEngine\Synapse\Services\Excel\ExcelExporter;
+use VmEngine\Synapse\Services\Excel\Transformers\BooleanTransformer;
+use VmEngine\Synapse\Services\Excel\Transformers\DateFormatTransformer;
+use VmEngine\Synapse\Services\Excel\Transformers\DefaultValueTransformer;
 use VmEngine\SynAuth\Facades\SynAuth;
 
 class InvoiceService
@@ -179,29 +182,68 @@ class InvoiceService
     }
 
     /**
+     * Get the export reference key for a given year and user.
+     */
+    public static function exportReference(int $year, int $userId): string
+    {
+        return "pm-invoice-export-{$year}-{$userId}";
+    }
+
+    /**
      * Export invoices to Excel (background job).
+     *
+     * Deletes previous export file for the same reference before dispatching.
      */
     public function exportToExcel(int $year): ExcelExport
     {
+        $userId = Auth::id();
+        $reference = self::exportReference($year, $userId);
         $outputPath = storage_path('app/exports/invoices-'.$year.'-'.now()->format('YmdHis').'.xlsx');
+
+        // Delete previous export file for this reference
+        $previous = ExcelExport::findByReference($reference);
+        if ($previous && $previous->output_path && file_exists($previous->output_path)) {
+            @unlink($previous->output_path);
+        }
 
         return ExcelExporter::make(InvoiceExportQuery::class)
             ->columns([
-                __('pm::report.invoice.export.no') => null,
-                __('pm::report.invoice.export.client') => 'client_company',
-                __('pm::report.invoice.export.project') => 'project_name',
-                __('pm::report.invoice.export.category') => 'category_name',
+                __('pm::report.invoice.export.client') => 'client.company',
+                __('pm::report.invoice.export.project') => 'project.name',
+                __('pm::report.invoice.export.category') => [
+                    'field' => 'projectCategory.name',
+                    'transformer' => DefaultValueTransformer::class,
+                    'config' => ['default' => __('pm::report.documents.table.uncategorized')],
+                ],
                 __('pm::report.invoice.export.invoice_number') => 'invoice_number',
-                __('pm::report.invoice.export.issue_date') => 'issue_date',
-                __('pm::report.invoice.export.due_date') => 'due_date',
+                __('pm::report.invoice.export.issue_date') => [
+                    'field' => 'issue_date',
+                    'transformer' => DateFormatTransformer::class,
+                    'config' => ['format' => 'Y-m-d'],
+                ],
+                __('pm::report.invoice.export.due_date') => [
+                    'field' => 'due_date',
+                    'transformer' => DateFormatTransformer::class,
+                    'config' => ['format' => 'Y-m-d'],
+                ],
                 __('pm::report.invoice.export.total_amount') => 'total_amount',
                 __('pm::report.invoice.export.receipt_number') => 'receipt_number',
-                __('pm::report.invoice.export.paid_status') => 'is_paid',
-                __('pm::report.invoice.export.payment_time') => 'paid_at',
-                __('pm::report.invoice.export.creator') => 'creator_name',
+                __('pm::report.invoice.export.paid_status') => [
+                    'field' => 'is_paid',
+                    'transformer' => BooleanTransformer::class,
+                    'config' => [
+                        'trueLabel' => __('pm::report.invoice.export.paid'),
+                        'falseLabel' => __('pm::report.invoice.export.unpaid'),
+                    ],
+                ],
+                __('pm::report.invoice.export.payment_time') => [
+                    'field' => 'paid_at',
+                    'transformer' => DateFormatTransformer::class,
+                    'config' => ['format' => 'Y-m-d H:i'],
+                ],
+                __('pm::report.invoice.export.creator') => 'creator.name',
             ])
             ->columnStyles([
-                __('pm::report.invoice.export.no') => ['width' => 5, 'alignment' => ['horizontal' => 'center', 'vertical' => 'center']],
                 __('pm::report.invoice.export.client') => ['width' => 30, 'alignment' => ['vertical' => 'center']],
                 __('pm::report.invoice.export.project') => ['width' => 35, 'alignment' => ['vertical' => 'center']],
                 __('pm::report.invoice.export.category') => ['width' => 20, 'alignment' => ['horizontal' => 'center', 'vertical' => 'center']],
@@ -220,8 +262,9 @@ class InvoiceService
                 'alignment' => ['horizontal' => 'center', 'vertical' => 'center'],
             ])
             ->sheet(__('pm::report.invoice.export.sheet_name', ['year' => $year]))
+            ->reference($reference)
             ->withFilters(['year' => $year])
-            ->forUser(Auth::id())
+            ->forUser($userId)
             ->dispatch($outputPath);
     }
 }

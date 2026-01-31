@@ -25,58 +25,53 @@
                             placeholder="{{ __('pm::report.invoice.filters.year') }}"
                         />
                     </div>
-                    @if ($this->exportTask)
-                        @php $task = $this->exportTask; @endphp
-                        @if ($task->status === \VmEngine\Synapse\Enums\ExcelTaskStatus::Completed)
-                            <button
-                                class="btn success"
-                                type="button"
-                                wire:click="downloadExport"
-                            >
-                                <span class="fa-solid fa-download mr-1"></span>
-                                {{ __('pm::report.invoice.export.download') }}
-                            </button>
-                            <button
-                                class="btn secondary"
-                                type="button"
-                                wire:click="dismissExport"
-                                title="{{ __('pm::report.invoice.export.dismiss') }}"
-                            >
-                                <span class="fa-solid fa-xmark"></span>
-                            </button>
-                        @elseif ($task->status === \VmEngine\Synapse\Enums\ExcelTaskStatus::Failed)
-                            <span class="text-sm text-red-600 dark:text-red-400">
-                                <span class="fa-solid fa-exclamation-triangle mr-1"></span>
-                                {{ __('pm::report.invoice.export.failed') }}
-                            </span>
-                            <button
-                                class="btn secondary"
-                                type="button"
-                                wire:click="dismissExport"
-                            >
-                                <span class="fa-solid fa-xmark"></span>
-                            </button>
+                    @php
+                        $task = $this->exportTask;
+                        $isProcessing = $task && in_array($task->status, [
+                            \VmEngine\Synapse\Enums\ExcelTaskStatus::Pending,
+                            \VmEngine\Synapse\Enums\ExcelTaskStatus::Processing,
+                        ]);
+                        $isCompleted = $task
+                            && $task->status === \VmEngine\Synapse\Enums\ExcelTaskStatus::Completed
+                            && $task->output_path
+                            && file_exists($task->output_path);
+                        $isFailed = $task && $task->status === \VmEngine\Synapse\Enums\ExcelTaskStatus::Failed;
+                    @endphp
+
+                    @if ($isFailed)
+                        <span class="text-sm text-red-600 dark:text-red-400">
+                            <span class="fa-solid fa-exclamation-triangle mr-1"></span>
+                            {{ __('pm::report.invoice.export.failed') }}
+                        </span>
+                    @endif
+
+                    <button
+                        class="btn success"
+                        type="button"
+                        wire:click="exportToExcel"
+                        {{ $isProcessing ? 'disabled' : '' }}
+                        wire:loading.attr="disabled"
+                        wire:target="exportToExcel"
+                    >
+                        <span class="fa-solid fa-file-excel mr-1" wire:loading.remove wire:target="exportToExcel"></span>
+                        <span class="fa-solid fa-spinner fa-spin mr-1" wire:loading wire:target="exportToExcel"></span>
+                        @if ($isProcessing)
+                            <span class="fa-solid fa-spinner fa-spin mr-1" wire:poll.2s="checkExportStatus"></span>
+                            {{ __('pm::report.invoice.export.processing') }}
                         @else
-                            <button
-                                class="btn secondary"
-                                type="button"
-                                wire:poll.2s="checkExportStatus"
-                                disabled
-                            >
-                                <span class="fa-solid fa-spinner fa-spin mr-1"></span>
-                                {{ __('pm::report.invoice.export.processing') }}
-                            </button>
-                        @endif
-                    @else
-                        <button
-                            class="btn success"
-                            type="button"
-                            wire:click="exportToExcel"
-                            wire:loading.attr="disabled"
-                        >
-                            <span class="fa-solid fa-file-excel mr-1"></span>
                             <span wire:loading.remove wire:target="exportToExcel">{{ __('pm::report.invoice.export.button') }}</span>
                             <span wire:loading wire:target="exportToExcel">{{ __('pm::report.invoice.export.exporting') }}</span>
+                        @endif
+                    </button>
+
+                    @if ($isCompleted)
+                        <button
+                            class="btn primary"
+                            type="button"
+                            wire:click="downloadExport"
+                        >
+                            <span class="fa-solid fa-download mr-1"></span>
+                            {{ __('pm::report.invoice.export.download') }}
                         </button>
                     @endif
                 </div>

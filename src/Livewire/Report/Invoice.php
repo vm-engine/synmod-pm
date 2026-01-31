@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Livewire\Report;
 
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -19,8 +20,6 @@ class Invoice extends Component
     public ?int $year = null;
 
     public string $pageName = '';
-
-    public ?int $exportTaskId = null;
 
     #[Computed()]
     public function statistics(): array
@@ -49,24 +48,23 @@ class Invoice extends Component
     #[Computed()]
     public function exportTask(): ?ExcelExport
     {
-        if (! $this->exportTaskId) {
-            return null;
-        }
+        $year = $this->year ?? now()->year;
+        $reference = InvoiceService::exportReference($year, Auth::id());
 
-        return ExcelExport::find($this->exportTaskId);
+        return ExcelExport::findByReference($reference);
     }
 
     public function exportToExcel(InvoiceService $service): void
     {
         $year = $this->year ?? now()->year;
 
-        $task = $service->exportToExcel($year);
-        $this->exportTaskId = $task->id;
+        $service->exportToExcel($year);
+        unset($this->exportTask);
 
         $this->dispatch('notify', [
             'variant' => 'info',
             'title' => 'Info',
-            'message' => __('pm::report.invoice.export.queued', ['id' => $task->id]),
+            'message' => __('pm::report.invoice.export.queued'),
         ]);
     }
 
@@ -93,17 +91,19 @@ class Invoice extends Component
             return;
         }
 
-        $this->exportTaskId = null;
-
-        return response()->download(
-            $task->output_path,
-            basename($task->output_path)
-        )->deleteFileAfterSend();
+        return response()->download($task->output_path, 'invoices-'.($this->year ?? now()->year).'.xlsx');
     }
 
     public function dismissExport(): void
     {
-        $this->exportTaskId = null;
+        $task = $this->exportTask;
+
+        if ($task && $task->output_path && file_exists($task->output_path)) {
+            @unlink($task->output_path);
+        }
+
+        $task?->delete();
+        unset($this->exportTask);
     }
 
     public function render()

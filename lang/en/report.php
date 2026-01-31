@@ -54,7 +54,7 @@ return [
             'button' => 'Export',
             'exporting' => 'Processing...',
             'processing' => 'Processing...',
-            'queued' => 'Export queued (Task #:id). You will be notified when ready.',
+            'queued' => 'Export is being processed in the background.',
             'download' => 'Download',
             'dismiss' => 'Dismiss',
             'failed' => 'Export failed',
