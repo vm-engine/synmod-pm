@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.7] - 2026-01-31
+
+### Added
+- **Report/Invoice Excel Export**: Enhanced background job Excel export with persistent tracking
+  - `InvoiceExportQuery` implementing `ExportQuery` for background export
+  - Uses synapse reference tracking for persistent task monitoring across page refreshes
+  - Dot notation for relationship field resolution (client.company, project.name, projectCategory.name, creator.name)
+  - Column transformers for formatting (DateFormatTransformer, BooleanTransformer, DefaultValueTransformer)
+  - Column styling (widths, alignments, number formats) and blue header styling with white bold text
+  - Export UI with three states: processing (with 2s polling), completed (with download), and idle/failed
+  - Export button (success variant) always visible, Download button (primary variant) appears on right when completed
+  - Automatically deletes previous export file when regenerating new export
+  - Translation strings for export UI and all column headers
+
+### Changed
+- **InvoiceService**: Added `exportReference()` static method and `exportToExcel()` method for background export
+- **Invoice Livewire Component**: Uses reference-based export task lookup instead of session-based ID for persistence
+- **Invoice Report View**: Restructured export UI to handle Pending and Processing states as loading state
+
 ## [0.6.6] - 2026-01-29
 
 ### Changed
