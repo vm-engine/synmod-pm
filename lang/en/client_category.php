@@ -2,6 +2,7 @@
 
 return [
     'title' => 'Client Category Management',
+    'no_data' => 'No client categories found.',
     'titles' => [
         'delete' => 'Delete Client Category',
     ],

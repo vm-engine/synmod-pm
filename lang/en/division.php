@@ -5,6 +5,7 @@ return [
     'division' => 'Division',
     'division_name' => 'Division Name',
     'division_code' => 'Code',
+    'no_data' => 'No divisions found.',
     'titles' => [
         'delete' => 'Delete Division',
         'delete_sub' => 'Delete Sub Division',

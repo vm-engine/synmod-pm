@@ -18,7 +18,17 @@ return [
             'number_format' => 'E.g., {DOC_CODE}/{CLIENT_CODE}/{YEAR}/{INDEX}',
         ],
         'help' => [
-            'number_format' => 'Available placeholders: {INDEX}, {PROJECT_CODE}, {DIVISION_CODE}, {DOC_CODE}, {CNC}, {CLIENT_ID}, {MR}, {YYYY}, {YY}',
+            'title' => 'Available Placeholders',
+            'number_format' => 'Configure the document number format using placeholders below.',
+            'index' => 'Auto-increment number',
+            'project_code' => 'Project code',
+            'division_code' => 'Division code',
+            'doc_code' => 'Document type code',
+            'cnc' => 'Client/Non-client indicator',
+            'client_id' => 'Client ID',
+            'mr' => 'Month in Roman numerals',
+            'yyyy' => 'Year (4 digits)',
+            'yy' => 'Year (2 digits)',
         ],
         'buttons' => [
             'save' => 'Save Configuration',

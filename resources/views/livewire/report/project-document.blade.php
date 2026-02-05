@@ -92,9 +92,24 @@
                         wire:click="exportToExcel"
                         wire:loading.attr="disabled"
                     >
-                        <span class="fa-solid fa-file-excel mr-1"></span>
-                        <span wire:loading.remove wire:target="exportToExcel">{{ __('pm::report.documents.filters.export') }}</span>
-                        <span wire:loading wire:target="exportToExcel">{{ __('pm::report.documents.filters.exporting') }}</span>
+                        <span
+                            class="fa-solid fa-file-excel mr-1"
+                            wire:loading.remove
+                            wire:target="exportToExcel"
+                        ></span>
+                        <span
+                            class="fa-solid fa-spinner fa-spin mr-1"
+                            wire:loading
+                            wire:target="exportToExcel"
+                        ></span>
+                        <span
+                            wire:loading.remove
+                            wire:target="exportToExcel"
+                        >{{ __('pm::report.documents.filters.export') }}</span>
+                        <span
+                            wire:loading
+                            wire:target="exportToExcel"
+                        >{{ __('pm::report.documents.filters.exporting') }}</span>
                     </button>
 
                     <div class="ml-auto text-sm text-gray-600 dark:text-gray-400">
@@ -104,8 +119,16 @@
             </div>
         </div>
     </div>
-    <div class="card">
-        <div class="card-body">
+
+    <!-- Results Table -->
+    <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="flex items-center justify-between p-5">
+            <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
+                <span class="fa-solid fa-file-lines mr-2 text-blue-600 dark:text-blue-400"></span>
+                {{ __('pm::report.documents.title') }}
+            </h3>
+        </div>
+        <div class="border-t border-gray-100 dark:border-gray-800">
             <div class="max-w-full overflow-x-auto">
                 <table
                     class="datatable min-w-full"
@@ -114,6 +137,9 @@
                 >
                     <thead>
                         <tr>
+                            <th class="w-1">
+                                <p>No.</p>
+                            </th>
                             <th>
                                 <p>{{ __('pm::report.documents.table.document') }}</p>
                             </th>
@@ -126,29 +152,55 @@
                             <th>
                                 <p>{{ __('pm::report.documents.table.category') }}</p>
                             </th>
-                            <th>
+                            <th class="w-24 text-center">
                                 <p>{{ __('pm::report.documents.table.status') }}</p>
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($this->list as $project)
-                            <tr>
+                        @forelse ($this->list as $index => $project)
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
                                 <td>
-                                    <div>
+                                    <div class="text-center font-medium text-gray-500">
+                                        {{ $index + 1 }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="space-y-2.5">
                                         @foreach ($project->documents as $document)
-                                            <div>
-                                                <b>{{ ucwords($document->type->name) }}</b>:
-                                                {{ $document->number }}
-                                                (<small>{{ $document->created_at->format('j M Y') }} -
-                                                    <span
-                                                        class="fa-solid fa-user"></span>{{ $document->creator->name }}</small>)
+                                            @php
+                                                $typeName = strtoupper($document->type->name);
+                                                $typeColors = match($typeName) {
+                                                    'PROPOSAL' => 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+                                                    'SPH' => 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+                                                    'SPK' => 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+                                                    'INVOICE' => 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+                                                    default => 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
+                                                };
+                                            @endphp
+                                            <div class="flex items-start gap-3">
+                                                <span class="inline-flex min-w-[70px] items-center justify-center rounded-md px-2 py-1 text-xs font-bold uppercase tracking-wide {{ $typeColors }}">
+                                                    {{ $typeName }}
+                                                </span>
+                                                <div class="min-w-0 flex-1">
+                                                    <div class="font-semibold text-gray-900 dark:text-white">{{ $document->number }}</div>
+                                                    <div class="mt-0.5 flex flex-wrap items-center gap-x-3 text-xs text-gray-500 dark:text-gray-400">
+                                                        <span>
+                                                            <span class="fa-solid fa-calendar-days mr-1 text-gray-400 dark:text-gray-500"></span>
+                                                            {{ $document->created_at->format('j M Y') }}
+                                                        </span>
+                                                        <span>
+                                                            <span class="fa-solid fa-user mr-1 text-gray-400 dark:text-gray-500"></span>
+                                                            {{ $document->creator->name }}
+                                                        </span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         @endforeach
                                     </div>
                                 </td>
                                 <td>
-                                    <div>
+                                    <div class="font-medium">
                                         {{ $project->client->company }}
                                     </div>
                                 </td>
@@ -159,25 +211,45 @@
                                 </td>
                                 <td>
                                     <div>
-                                        {!! $project->projectCategory?->name ??
-                                            '<i class="text-gray-400">' . __('pm::report.documents.table.uncategorized') . '</i>' !!}
+                                        @if ($project->projectCategory)
+                                            <span class="inline-flex items-center rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-medium text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400">
+                                                {{ $project->projectCategory->name }}
+                                            </span>
+                                        @else
+                                            <span class="text-gray-400 italic">{{ __('pm::report.documents.table.uncategorized') }}</span>
+                                        @endif
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="items-center text-center">
+                                    <div class="flex justify-center">
                                         @if ($project->hasSPKDocument())
-                                            <span
-                                                class="badge success">{{ __('pm::report.documents.status.deal') }}</span>
+                                            <div class="flex flex-col items-center gap-1">
+                                                <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">
+                                                    <span class="fa-solid fa-circle-check text-lg"></span>
+                                                </span>
+                                                <span class="text-xs font-semibold text-green-700 dark:text-green-400">
+                                                    {{ __('pm::report.documents.status.deal') }}
+                                                </span>
+                                            </div>
                                         @else
-                                            <span class="badge">{{ __('pm::report.documents.status.pending') }}</span>
+                                            <div class="flex flex-col items-center gap-1">
+                                                <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
+                                                    <span class="fa-solid fa-clock text-lg"></span>
+                                                </span>
+                                                <span class="text-xs font-semibold text-amber-700 dark:text-amber-400">
+                                                    {{ __('pm::report.documents.status.pending') }}
+                                                </span>
+                                            </div>
                                         @endif
+                                    </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5">
-                                    <div class="items-center text-center">
-                                        <i>{{ __('pm::report.documents.table.no_data') }}</i>
+                                <td colspan="6">
+                                    <div class="py-12 text-center">
+                                        <span class="fa-solid fa-file-circle-xmark text-5xl text-gray-300 dark:text-gray-600"></span>
+                                        <p class="mt-4 text-gray-500 dark:text-gray-400">{{ __('pm::report.documents.table.no_data') }}</p>
                                     </div>
                                 </td>
                             </tr>

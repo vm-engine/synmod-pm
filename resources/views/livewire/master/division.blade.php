@@ -5,7 +5,12 @@
     <x-synapse-confirm-dialog />
 
     <div class="space-y-5 sm:space-y-6">
-        <div class="dark:bg-white/3 rounded-2xl border border-gray-200 bg-white dark:border-gray-800">
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+            <div class="flex items-center justify-between p-5">
+                <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
+                    {{ __('pm::division.title') }}
+                </h3>
+            </div>
             <div class="border-t border-gray-100 dark:border-gray-800">
                 <div class="max-w-full overflow-x-auto">
                     <table
@@ -34,8 +39,8 @@
                             @php
                                 $i = 1;
                             @endphp
-                            @foreach ($this->divisionList as $list)
-                                <tr>
+                            @forelse ($this->divisionList as $list)
+                                <tr @class(['!bg-blue-50/50 dark:!bg-blue-900/10' => $editId == $list->id])>
                                     <td>
                                         <div class="flex items-center">
                                             <p>{{ $i }}</p>
@@ -72,32 +77,30 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="text-center">
+                                        <div class="flex items-center justify-center gap-1">
                                             @if ($editId == $list->id)
-                                                <div>
-                                                    <button
-                                                        class="btn xs success has-tooltip group"
-                                                        type="button"
-                                                        wire:click="update({{ $list->id }})"
-                                                        wire:loading.attr="disabled"
-                                                    >
-                                                        <span
-                                                            class="fa-solid fa-check"
-                                                            wire:loading.class.remove="fa-check"
-                                                            wire:loading.class="fa-spinner fa-spin"
-                                                            wire:target="update({{ $list->id }})"
-                                                        ></span>
-                                                        <span class="tooltip">{{ __('pm::labels.save') }}</span>
-                                                    </button>
-                                                    <button
-                                                        class="btn xs danger has-tooltip group"
-                                                        type="button"
-                                                        wire:click="cancelEdit"
-                                                    >
-                                                        <span class="fa-solid fa-xmark"></span>
-                                                        <span class="tooltip">{{ __('pm::labels.cancel') }}</span>
-                                                    </button>
-                                                </div>
+                                                <button
+                                                    class="btn xs success has-tooltip group"
+                                                    type="button"
+                                                    wire:click="update({{ $list->id }})"
+                                                    wire:loading.attr="disabled"
+                                                >
+                                                    <span
+                                                        class="fa-solid fa-check"
+                                                        wire:loading.class.remove="fa-check"
+                                                        wire:loading.class="fa-spinner fa-spin"
+                                                        wire:target="update({{ $list->id }})"
+                                                    ></span>
+                                                    <span class="tooltip">{{ __('pm::labels.save') }}</span>
+                                                </button>
+                                                <button
+                                                    class="btn xs danger has-tooltip group"
+                                                    type="button"
+                                                    wire:click="cancelEdit"
+                                                >
+                                                    <span class="fa-solid fa-xmark"></span>
+                                                    <span class="tooltip">{{ __('pm::labels.cancel') }}</span>
+                                                </button>
                                             @endif
                                             @canAccess('pm.master.division.update')
                                             @if ($editId != $list->id)
@@ -138,15 +141,18 @@
                                     $i2 = 1;
                                 @endphp
                                 @foreach ($list->subDivisions as $sub)
-                                    <tr>
+                                    <tr @class([
+                                        'bg-gray-50/50 dark:bg-white/[0.02]',
+                                        '!bg-blue-50/50 dark:!bg-blue-900/10' => $editSubId == $sub->id,
+                                    ])>
                                         <td>
                                             <div class="flex items-center">
-                                                <p>{{ $i . '.' . $i2 }}</p>
+                                                <p class="text-gray-400 dark:text-gray-500">{{ $i . '.' . $i2 }}</p>
                                             </div>
                                         </td>
                                         <td colspan="2">
-                                            <div class="flex items-center">
-                                                <i class="fa-solid fa-arrow-turn-down mr-2"></i>
+                                            <div class="flex items-center pl-6">
+                                                <i class="fa-solid fa-arrow-turn-down mr-2 text-gray-300 dark:text-gray-600"></i>
                                                 @if ($editSubId == $sub->id)
                                                     <input
                                                         class="form-input"
@@ -183,7 +189,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="text-center">
+                                            <div class="flex items-center justify-center gap-1">
                                                 @canAccess('pm.master.division.update')
                                                 @if ($editSubId != $sub->id)
                                                     <button
@@ -223,13 +229,13 @@
                                         $i2++;
                                     @endphp
                                 @endforeach
-                                <tr>
+                                <tr class="bg-gray-50/50 dark:bg-white/[0.02]">
                                     <td>
-                                        {{ $i . '.' . $i2 }}
+                                        <span class="text-gray-400 dark:text-gray-500">{{ $i . '.' . $i2 }}</span>
                                     </td>
                                     <td colspan="3">
-                                        <div class="flex items-center">
-                                            <i class="fa-solid fa-arrow-turn-down mr-2"></i>
+                                        <div class="flex items-center pl-6">
+                                            <i class="fa-solid fa-arrow-turn-down mr-2 text-gray-300 dark:text-gray-600"></i>
                                             <input
                                                 class="form-input"
                                                 type="text"
@@ -257,8 +263,17 @@
                                 @php
                                     $i++;
                                 @endphp
-                            @endforeach
-                            <tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4">
+                                        <div class="py-8 text-center">
+                                            <span class="fa-solid fa-building text-4xl text-gray-300 dark:text-gray-600"></span>
+                                            <p class="mt-3 text-gray-500 dark:text-gray-400">{{ __('pm::division.no_data') }}</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                            <tr class="!bg-gray-50/50 dark:!bg-white/[0.02]">
                                 <td>
                                     {{ $i }}
                                 </td>
@@ -285,7 +300,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="flex items-center">
+                                    <div class="flex items-center justify-center gap-1">
                                         <button
                                             class="btn success has-tooltip group"
                                             type="button"

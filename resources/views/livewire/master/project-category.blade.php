@@ -5,7 +5,12 @@
     <x-synapse-confirm-dialog />
 
     <div class="space-y-5 sm:space-y-6">
-        <div class="dark:bg-white/3 rounded-2xl border border-gray-200 bg-white dark:border-gray-800">
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+            <div class="flex items-center justify-between p-5">
+                <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
+                    {{ __('pm::project_category.list_title') }}
+                </h3>
+            </div>
             <div class="border-t border-gray-100 dark:border-gray-800">
                 <div class="max-w-full overflow-x-auto">
                     <table
@@ -37,8 +42,8 @@
                             @php
                                 $i = 1;
                             @endphp
-                            @foreach ($this->categoryList as $category)
-                                <tr>
+                            @forelse ($this->categoryList as $category)
+                                <tr @class(['!bg-blue-50/50 dark:!bg-blue-900/10' => $editId == $category->id])>
                                     <td>
                                         <div class="flex items-center">
                                             <p>{{ $i }}</p>
@@ -90,7 +95,7 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="text-center">
+                                        <div class="flex items-center justify-center gap-1">
                                             @if ($editId == $category->id)
                                                 <button
                                                     class="btn success has-tooltip group"
@@ -107,7 +112,7 @@
                                                     <span class="tooltip">{{ __('pm::labels.save') }}</span>
                                                 </button>
                                                 <button
-                                                    class="btn danger has-tooltip group ml-2"
+                                                    class="btn danger has-tooltip group"
                                                     type="button"
                                                     wire:click="cancelEdit"
                                                 >
@@ -163,8 +168,17 @@
                                 @php
                                     $i++;
                                 @endphp
-                            @endforeach
-                            <tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="py-8 text-center">
+                                            <span class="fa-solid fa-folder-tree text-4xl text-gray-300 dark:text-gray-600"></span>
+                                            <p class="mt-3 text-gray-500 dark:text-gray-400">{{ __('pm::project_category.no_data') }}</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                            <tr class="!bg-gray-50/50 dark:!bg-white/[0.02]">
                                 <td>
                                     {{ $i }}
                                 </td>
@@ -202,7 +216,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="text-center">
+                                    <div class="flex items-center justify-center gap-1">
                                         <button
                                             class="btn success has-tooltip group"
                                             type="button"
@@ -269,8 +283,8 @@
                                                 wire:key="document-index-c-{{ $k }}"
                                                 wire:model.defer="documentIndexes.{{ $k }}.C"
                                                 wire:loading.attr="disabled"
-                                                </div
-                                            >
+                                            />
+                                        </div>
                                     </td>
                                     <td>
                                         <div class="flex items-center">

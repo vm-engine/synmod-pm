@@ -2,6 +2,52 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.8] - 2026-02-05
+
+### Improved
+- **Master Data Pages Visual Polish**: Enhanced UI for Division, Client Category, and Project Category pages
+  - Fixed dark mode class (`dark:bg-white/3` → `dark:bg-white/[0.03]`)
+  - Added card headers with page titles
+  - Empty state display with icons when no data exists
+  - Edit mode row highlighting with blue tint
+  - "Add new" row styling with distinct background
+  - Action button container improvements with consistent spacing
+  - Division page: Sub-division hierarchy styling with indentation and muted numbering
+  - Project Category page: Fixed HTML bug in document index modal
+  - Added translation keys for empty states (`no_data`)
+
+- **Report Pages Visual Polish**: Enhanced Invoice Report and Project Document Report
+  - Fixed dark mode classes for proper styling
+  - Project Document Report:
+    - Color-coded document type badges (PROPOSAL=blue, SPH=purple, SPK=green, INVOICE=amber)
+    - Improved status column with circular icons (Deal=green checkmark, Pending=amber clock)
+    - Better document info layout with date and creator metadata
+    - Row numbers column added
+    - Enhanced empty state with icon
+  - Invoice Report:
+    - Removed unnecessary nested card structure
+    - Consistent card styling for table sections
+    - Improved empty states with larger icons
+    - Better footer totals styling
+
+- **Configuration Page Visual Polish**: Enhanced configuration page UI
+  - Improved tab navigation with Blade `@class` directive and bottom border indicator
+  - Better icons for tabs (hashtag for doc format, sliders for general)
+  - Card header with icon badge and description
+  - Color-coded document type icons in table (matching report pages)
+  - Added format help section showing all available placeholders with descriptions
+  - Monospace font for format input fields
+  - Row hover states and row numbers
+  - Improved General tab empty state with gear icon
+  - Removed debug statement (`@ds`)
+
+### Changed
+- **Translation Updates**: Added new translation keys
+  - `lang/en/division.php`: Added `no_data` key
+  - `lang/en/client_category.php`: Added `no_data` key
+  - `lang/en/project_category.php`: Renamed `no_categories` to `no_data`
+  - `lang/en/config.php`: Added placeholder help translations (index, yyyy, yy, mr, project_code, division_code, doc_code, cnc, client_id)
+
 ## [0.6.7] - 2026-01-31
 
 ### Added
