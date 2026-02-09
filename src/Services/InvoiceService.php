@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Services;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use VmEngine\Pm\Enums\Documents;
@@ -140,16 +141,40 @@ class InvoiceService
         ];
     }
 
-    private function baseInvoiceQuery(int $year): \Illuminate\Database\Eloquent\Builder
+    /**
+     * Get the appropriate SQL expression for extracting year or month from a date column.
+     */
+    private function dateExtract(string $part, string $column): string
     {
-        return ProjectInvoice::query()
-            ->where(DB::raw('YEAR(issue_date)'), $year)
-            ->where('archived', 0);
+        $driver = DB::getDriverName();
+
+        if ($driver === 'sqlite') {
+            $format = $part === 'YEAR' ? '%Y' : '%m';
+
+            return "CAST(strftime('{$format}', {$column}) AS INTEGER)";
+        }
+
+        return "{$part}({$column})";
     }
 
-    public function getByCreator(int $year)
+    private function baseInvoiceQuery(?int $year = null): \Illuminate\Database\Eloquent\Builder
     {
-        return $this->baseInvoiceQuery($year)
+        $query = ProjectInvoice::query()->where('archived', 0);
+
+        if ($year !== null) {
+            $query->where(DB::raw($this->dateExtract('YEAR', 'issue_date')), $year);
+        }
+
+        return $query;
+    }
+
+    /**
+     * @param  int|null  $year  Filter by year (null = all years)
+     * @param  int|null  $id  Filter by creator ID
+     */
+    public function getByCreator(?int $year = null, ?int $id = null)
+    {
+        $query = $this->baseInvoiceQuery($year)
             ->select(
                 'created_by',
                 DB::raw('COUNT(CASE WHEN is_paid = 0 THEN 1 ELSE NULL END) as unpaid_count'),
@@ -159,11 +184,16 @@ class InvoiceService
                 DB::raw('COUNT(*) as total_count'),
                 DB::raw('SUM(total_amount) as total_amount'))
             ->groupBy('created_by')
-            ->with('creator:id,name')
-            ->get();
+            ->with('creator:id,name');
+
+        if ($id !== null) {
+            $query->where('created_by', $id);
+        }
+
+        return $query->get();
     }
 
-    public function getByProject(int $year)
+    public function getByProject(?int $year = null)
     {
         return $this->baseInvoiceQuery($year)
             ->select(
@@ -179,6 +209,122 @@ class InvoiceService
             ->groupBy('project_category_id')
             ->with('projectCategory')
             ->get();
+    }
+
+    /**
+     * Return API statistics with extended metrics.
+     *
+     * @return array<string, mixed>
+     */
+    public function apiStatistics(?int $year = null): array
+    {
+        $query = $this->baseInvoiceQuery($year);
+
+        $stats = $query->selectRaw('
+            COUNT(*) as total_invoice,
+            COUNT(DISTINCT project_category_id) as total_invoice_categories,
+            COUNT(DISTINCT created_by) as total_invoice_creator,
+            SUM(total_amount) as grand_total_amount,
+            SUM(CASE WHEN is_paid = 0 THEN total_amount ELSE 0 END) as grand_total_unpaid,
+            SUM(CASE WHEN is_paid = 1 THEN total_amount ELSE 0 END) as grand_total_paid,
+            SUM(vat_amount) as total_vat,
+            SUM(amount) as total_amount,
+            SUM(CASE WHEN is_paid = 0 THEN vat_amount ELSE 0 END) as unpaid_vat,
+            SUM(CASE WHEN is_paid = 1 THEN vat_amount ELSE 0 END) as paid_vat,
+            SUM(CASE WHEN is_paid = 0 THEN amount ELSE 0 END) as unpaid_amount,
+            SUM(CASE WHEN is_paid = 1 THEN amount ELSE 0 END) as paid_amount
+        ')->first();
+
+        return [
+            'total_invoice' => (int) $stats->total_invoice,
+            'total_invoice_categories' => (int) $stats->total_invoice_categories,
+            'total_invoice_creator' => (int) $stats->total_invoice_creator,
+            'grand_total_amount' => (float) $stats->grand_total_amount,
+            'grand_total_unpaid' => (float) $stats->grand_total_unpaid,
+            'grand_total_paid' => (float) $stats->grand_total_paid,
+            'total_vat' => (float) $stats->total_vat,
+            'total_amount' => (float) $stats->total_amount,
+            'unpaid_vat' => (float) $stats->unpaid_vat,
+            'paid_vat' => (float) $stats->paid_vat,
+            'unpaid_amount' => (float) $stats->unpaid_amount,
+            'paid_amount' => (float) $stats->paid_amount,
+        ];
+    }
+
+    /**
+     * Get invoices grouped by month.
+     */
+    public function getByMonth(?int $year = null)
+    {
+        $yearExpr = $this->dateExtract('YEAR', 'issue_date');
+        $monthExpr = $this->dateExtract('MONTH', 'issue_date');
+
+        return $this->baseInvoiceQuery($year)
+            ->select(
+                DB::raw("{$yearExpr} as year"),
+                DB::raw("{$monthExpr} as month"),
+                DB::raw('COUNT(*) as total_count'),
+                DB::raw('SUM(amount) as sum_amount'),
+                DB::raw('SUM(vat_amount) as vat_amount'),
+                DB::raw('SUM(total_amount) as total_amount'),
+                DB::raw('COUNT(CASE WHEN is_paid = 0 THEN 1 ELSE NULL END) as unpaid_count'),
+                DB::raw('SUM(CASE WHEN is_paid = 0 THEN total_amount ELSE NULL END) as unpaid_amount'),
+                DB::raw('COUNT(CASE WHEN is_paid = 1 THEN 1 ELSE NULL END) as paid_count'),
+                DB::raw('SUM(CASE WHEN is_paid = 1 THEN total_amount ELSE NULL END) as paid_amount'),
+            )
+            ->groupBy(DB::raw($yearExpr), DB::raw($monthExpr))
+            ->orderBy(DB::raw($yearExpr))
+            ->orderBy(DB::raw($monthExpr))
+            ->get();
+    }
+
+    /**
+     * Get paginated invoice list with filters.
+     *
+     * @param  array<string, mixed>  $filters
+     */
+    public function getInvoiceList(array $filters): LengthAwarePaginator
+    {
+        $allowedSortColumns = [
+            'issue_date', 'due_date', 'total_amount',
+            'invoice_number', 'created_at', 'is_paid',
+        ];
+
+        $year = $filters['year'] ?? null;
+        $month = $filters['month'] ?? null;
+        $creator = $filters['creator'] ?? null;
+        $projectCategory = $filters['project_category'] ?? null;
+        $isPaid = $filters['is_paid'] ?? null;
+        $sortBy = $filters['sort_by'] ?? 'issue_date';
+        $sortDesc = $filters['sort_desc'] ?? true;
+        $limit = min((int) ($filters['limit'] ?? 20), 100);
+
+        if (! in_array($sortBy, $allowedSortColumns, true)) {
+            $sortBy = 'issue_date';
+        }
+
+        $query = $this->baseInvoiceQuery($year ? (int) $year : null);
+
+        if ($month !== null) {
+            $query->where(DB::raw($this->dateExtract('MONTH', 'issue_date')), (int) $month);
+        }
+
+        if ($creator !== null) {
+            $query->where('created_by', (int) $creator);
+        }
+
+        if ($projectCategory !== null) {
+            $query->where('project_category_id', (int) $projectCategory);
+        }
+
+        if ($isPaid !== null) {
+            $query->where('is_paid', (bool) $isPaid);
+        }
+
+        $query->with(['project:id,name', 'projectCategory:id,name', 'creator:id,name', 'client:id,company'])
+            ->orderBy($sortBy, $sortDesc ? 'desc' : 'asc');
+
+        return $query->paginate($limit);
     }
 
     /**

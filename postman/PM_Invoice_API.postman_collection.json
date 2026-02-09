@@ -1,0 +1,508 @@
+{
+	"info": {
+		"_postman_id": "pm-invoice-api-collection",
+		"name": "PM Invoice API",
+		"description": "Invoice API endpoints for the Project Management module.\n\nAll invoice endpoints require:\n- Sanctum bearer token authentication\n- `pm.report.invoice.read` permission\n\n## Setup\n1. Run the **Login** request first to get an access token.\n2. The token is automatically saved to the `access_token` collection variable.\n3. All invoice endpoints use this token via the `Authorization` header.\n\n## Status Code Format\n`\"<http_code><service_code><response_code>\"` as string.\n\n| Service | Code |\n|---------|------|\n| Statistics | 01 |\n| By Creator | 02 |\n| By Project Category | 03 |\n| By Month | 04 |\n| Invoice List | 05 |",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "year",
+			"value": "2026",
+			"type": "string"
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"description": "Authentication endpoints to obtain access tokens.",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.access_token) {",
+									"        pm.collectionVariables.set('access_token', jsonData.data.access_token);",
+									"        console.log('Access token saved.');",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"credential\": \"admin@example.com\",\n    \"password\": \"password\",\n    \"device_name\": \"Postman\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "login"]
+						},
+						"description": "Authenticate and obtain a bearer token.\n\nThe access token is automatically saved to the `access_token` collection variable on successful login."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Invoice Reports",
+			"description": "Invoice report endpoints returning aggregated/grouped data.",
+			"item": [
+				{
+					"name": "Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/pm/invoice/statistics?year={{year}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "pm", "invoice", "statistics"],
+							"query": [
+								{
+									"key": "year",
+									"value": "{{year}}",
+									"description": "Filter by year (2000-2099). Omit for all years."
+								}
+							]
+						},
+						"description": "Get invoice statistics summary.\n\nReturns: total_invoice, total_invoice_categories, total_invoice_creator, grand_total_amount, grand_total_unpaid, grand_total_paid, total_vat, total_amount, unpaid_vat, paid_vat, unpaid_amount, paid_amount."
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"status\": \"2000100\",\n    \"message\": \"Success\",\n    \"data\": {\n        \"total_invoice\": 45,\n        \"total_invoice_categories\": 5,\n        \"total_invoice_creator\": 3,\n        \"grand_total_amount\": 150000000.00,\n        \"grand_total_unpaid\": 50000000.00,\n        \"grand_total_paid\": 100000000.00,\n        \"total_vat\": 15000000.00,\n        \"total_amount\": 135000000.00,\n        \"unpaid_vat\": 5000000.00,\n        \"paid_vat\": 10000000.00,\n        \"unpaid_amount\": 45000000.00,\n        \"paid_amount\": 90000000.00\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Statistics (All Years)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/pm/invoice/statistics",
+							"host": ["{{base_url}}"],
+							"path": ["api", "pm", "invoice", "statistics"]
+						},
+						"description": "Get invoice statistics for all years (no year filter)."
+					},
+					"response": []
+				},
+				{
+					"name": "By Creator",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/pm/invoice/by-creator?year={{year}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "pm", "invoice", "by-creator"],
+							"query": [
+								{
+									"key": "year",
+									"value": "{{year}}",
+									"description": "Filter by year (2000-2099). Omit for all years."
+								},
+								{
+									"key": "id",
+									"value": "1",
+									"description": "Filter by specific creator user ID.",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get invoices grouped by creator.\n\nReturns per creator: unpaid_count, unpaid_amount, paid_count, paid_amount, total_count, total_amount, creator (id, name)."
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"status\": \"2000200\",\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"created_by\": 1,\n            \"unpaid_count\": 5,\n            \"unpaid_amount\": \"25000000.00\",\n            \"paid_count\": 10,\n            \"paid_amount\": \"50000000.00\",\n            \"total_count\": 15,\n            \"total_amount\": \"75000000.00\",\n            \"creator\": {\n                \"id\": 1,\n                \"name\": \"John Doe\"\n            }\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "By Creator (Specific User)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/pm/invoice/by-creator?year={{year}}&id=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "pm", "invoice", "by-creator"],
+							"query": [
+								{
+									"key": "year",
+									"value": "{{year}}",
+									"description": "Filter by year (2000-2099)."
+								},
+								{
+									"key": "id",
+									"value": "1",
+									"description": "Filter by specific creator user ID."
+								}
+							]
+						},
+						"description": "Get invoice report for a specific creator."
+					},
+					"response": []
+				},
+				{
+					"name": "By Project Category",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/pm/invoice/by-project-category?year={{year}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "pm", "invoice", "by-project-category"],
+							"query": [
+								{
+									"key": "year",
+									"value": "{{year}}",
+									"description": "Filter by year (2000-2099). Omit for all years."
+								}
+							]
+						},
+						"description": "Get invoices grouped by project category.\n\nReturns per category: total_count, sum_amount, unpaid_count, unpaid_amount, paid_count, paid_amount, total_amount, vat_amount, project_category (id, name)."
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"status\": \"2000300\",\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"project_category_id\": 1,\n            \"total_count\": 20,\n            \"sum_amount\": \"80000000.00\",\n            \"unpaid_count\": 8,\n            \"unpaid_amount\": \"30000000.00\",\n            \"paid_count\": 12,\n            \"paid_amount\": \"50000000.00\",\n            \"total_amount\": \"88000000.00\",\n            \"vat_amount\": \"8000000.00\",\n            \"project_category\": {\n                \"id\": 1,\n                \"name\": \"Web Development\"\n            }\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "By Month",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/pm/invoice/by-month?year={{year}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "pm", "invoice", "by-month"],
+							"query": [
+								{
+									"key": "year",
+									"value": "{{year}}",
+									"description": "Filter by year (2000-2099). Omit for all years."
+								}
+							]
+						},
+						"description": "Get invoices grouped by month.\n\nReturns per month: year, month, total_count, sum_amount, vat_amount, total_amount, unpaid_count, unpaid_amount, paid_count, paid_amount."
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"status\": \"2000400\",\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"year\": 2026,\n            \"month\": 1,\n            \"total_count\": 8,\n            \"sum_amount\": \"30000000.00\",\n            \"vat_amount\": \"3000000.00\",\n            \"total_amount\": \"33000000.00\",\n            \"unpaid_count\": 3,\n            \"unpaid_amount\": \"12000000.00\",\n            \"paid_count\": 5,\n            \"paid_amount\": \"21000000.00\"\n        }\n    ]\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Invoice List",
+			"description": "Paginated invoice listing with filtering and sorting.",
+			"item": [
+				{
+					"name": "List (Default)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/pm/invoice/list?year={{year}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "pm", "invoice", "list"],
+							"query": [
+								{
+									"key": "year",
+									"value": "{{year}}",
+									"description": "Filter by year (2000-2099)."
+								},
+								{
+									"key": "month",
+									"value": "1",
+									"description": "Filter by month (1-12).",
+									"disabled": true
+								},
+								{
+									"key": "creator",
+									"value": "1",
+									"description": "Filter by creator user ID.",
+									"disabled": true
+								},
+								{
+									"key": "project_category",
+									"value": "1",
+									"description": "Filter by project category ID.",
+									"disabled": true
+								},
+								{
+									"key": "is_paid",
+									"value": "0",
+									"description": "Filter by payment status (0=unpaid, 1=paid).",
+									"disabled": true
+								},
+								{
+									"key": "sort_by",
+									"value": "issue_date",
+									"description": "Sort column: issue_date, due_date, total_amount, invoice_number, created_at, is_paid.",
+									"disabled": true
+								},
+								{
+									"key": "sort_desc",
+									"value": "1",
+									"description": "Sort descending (1=desc, 0=asc). Default: 1.",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number. Default: 1.",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Items per page (1-100). Default: 20.",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get paginated invoice list with default settings (sorted by issue_date desc, 20 per page)."
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"status\": \"2000500\",\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"invoice_number\": \"INV-000001\",\n            \"issue_date\": \"2026-01-15\",\n            \"due_date\": \"2026-02-14\",\n            \"recipient\": \"PT Example Corp\",\n            \"amount\": 10000000.00,\n            \"vat_amount\": 1100000.00,\n            \"discount_amount\": 0,\n            \"total_amount\": 11100000.00,\n            \"is_paid\": false,\n            \"paid_at\": null,\n            \"receipt_number\": null,\n            \"project\": {\n                \"id\": 1,\n                \"name\": \"Website Redesign\"\n            },\n            \"project_category\": {\n                \"id\": 1,\n                \"name\": \"Web Development\"\n            },\n            \"creator\": {\n                \"id\": 1,\n                \"name\": \"John Doe\"\n            },\n            \"client\": {\n                \"id\": 1,\n                \"company\": \"PT Example Corp\"\n            }\n        }\n    ],\n    \"meta\": {\n        \"current_page\": 1,\n        \"last_page\": 3,\n        \"per_page\": 20,\n        \"total\": 45\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "List (Unpaid Only)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/pm/invoice/list?year={{year}}&is_paid=0&sort_by=total_amount&sort_desc=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "pm", "invoice", "list"],
+							"query": [
+								{
+									"key": "year",
+									"value": "{{year}}"
+								},
+								{
+									"key": "is_paid",
+									"value": "0"
+								},
+								{
+									"key": "sort_by",
+									"value": "total_amount"
+								},
+								{
+									"key": "sort_desc",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Get unpaid invoices sorted by total amount descending."
+					},
+					"response": []
+				},
+				{
+					"name": "List (By Month & Creator)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/pm/invoice/list?year={{year}}&month=1&creator=1&limit=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "pm", "invoice", "list"],
+							"query": [
+								{
+									"key": "year",
+									"value": "{{year}}"
+								},
+								{
+									"key": "month",
+									"value": "1"
+								},
+								{
+									"key": "creator",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get invoices for a specific month and creator, 10 per page."
+					},
+					"response": []
+				},
+				{
+					"name": "List (Paginated Page 2)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/pm/invoice/list?year={{year}}&page=2&limit=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "pm", "invoice", "list"],
+							"query": [
+								{
+									"key": "year",
+									"value": "{{year}}"
+								},
+								{
+									"key": "page",
+									"value": "2"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get page 2 of invoices with 10 items per page."
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

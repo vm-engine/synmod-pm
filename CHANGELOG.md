@@ -2,6 +2,55 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+- **Invoice API Endpoints**: 5 new REST API endpoints at `/api/pm/invoice/`
+  - `GET /statistics` - Invoice statistics summary (total invoices, amounts, VAT, paid/unpaid breakdowns)
+  - `GET /by-creator` - Invoices grouped by creator with optional creator ID filter
+  - `GET /by-project-category` - Invoices grouped by project category
+  - `GET /by-month` - Monthly invoice breakdown with paid/unpaid metrics
+  - `GET /list` - Paginated invoice list with filters (year, month, creator, project_category, is_paid) and sorting
+  - All endpoints protected with `auth:sanctum`, `api.auth`, `api.token.expiry`, `api.permission:pm.report.invoice.read`, `throttle:api`
+  - Custom status code format: `"<http_code><service_code><response_code>"` per endpoint
+- **API Request Logging**: Terminable middleware that logs all API requests/responses
+  - `ApiLogger` middleware registered as `pm.api.logger`
+  - `api_logs` table with migration tracking: user, method, URL, route, headers, input, IP, user agent, status code, response body, duration
+  - `ApiLog` model with array casts for headers, input, and response_body
+  - Authorization token masked in stored headers
+  - Response body truncated at 64KB to prevent oversized logs
+- **API Response Trait**: `ApiResponse` trait with custom status code builder
+  - Service codes per endpoint (01-05) and response codes (00=success, 01=invalid year, 02=not found, 03=validation error)
+  - `apiSuccess()` and `apiError()` helper methods for consistent response format
+- **Invoice API Resource**: `InvoiceResource` for consistent invoice serialization
+  - Fields: id, invoice_number, issue_date, due_date, recipient, amount, vat_amount, discount_amount, total_amount, is_paid, paid_at, receipt_number
+  - Eager-loaded relations: project (id, name), project_category (id, name), creator (id, name), client (id, company)
+- **API Feature Tests**: 14 new tests in `tests/Feature/Api/InvoiceApiTest.php`
+  - Statistics endpoint (with/without year, invalid year)
+  - By-creator endpoint (grouped data, specific creator filter)
+  - By-project-category endpoint
+  - By-month endpoint (monthly breakdown)
+  - Invoice list (pagination, filters, resource fields, sort validation)
+  - Authentication (401 unauthenticated) and authorization (403 no permission)
+- **API Documentation**: `API_DOCS.md` in project root with all endpoints, parameters, example requests/responses, and error codes
+- **Postman Collection**: `postman/PM_Invoice_API.postman_collection.json`
+  - 11 requests across 3 folders (Auth, Invoice Reports, Invoice List)
+  - Auto-saves access token from login via test script
+  - Collection variables for base_url, access_token, year
+  - Example responses and disabled optional params for easy toggling
+- **PHPStan Configuration**: Added `phpstan.neon` and `phpstan-baseline.neon` for module-level static analysis at level 5
+
+### Changed
+- **InvoiceService**: Extended with new API methods
+  - `baseInvoiceQuery()`: Now accepts optional `?int $year` (null = all years), backward compatible
+  - `getByCreator()`: Now accepts optional `?int $id` to filter by specific creator
+  - `getByProject()`: Now accepts optional `?int $year`
+  - Added `dateExtract()` helper for SQLite/MySQL compatibility (`YEAR()`/`MONTH()` vs `strftime()`)
+  - New `apiStatistics()` method with extended metrics via single aggregate query
+  - New `getByMonth()` method grouping by year and month
+  - New `getInvoiceList()` method with pagination, filtering, sorting, and whitelisted sort columns
+- **PmServiceProvider**: Registered `pm.api.logger` middleware alias in `boot()`
+
 ## [0.6.8] - 2026-02-05
 
 ### Improved
