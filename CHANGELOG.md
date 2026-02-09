@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.7.0] - 2026-02-09
 
 ### Added
 - **Invoice API Endpoints**: 5 new REST API endpoints at `/api/pm/invoice/`
@@ -33,11 +33,16 @@ All notable changes to this project will be documented in this file.
   - Invoice list (pagination, filters, resource fields, sort validation)
   - Authentication (401 unauthenticated) and authorization (403 no permission)
 - **API Documentation**: `API_DOCS.md` in project root with all endpoints, parameters, example requests/responses, and error codes
+  - Two authentication methods: H2H permanent tokens and login flow
 - **Postman Collection**: `postman/PM_Invoice_API.postman_collection.json`
-  - 11 requests across 3 folders (Auth, Invoice Reports, Invoice List)
-  - Auto-saves access token from login via test script
-  - Collection variables for base_url, access_token, year
+  - 12 requests across 3 folders (Auth, Invoice Reports, Invoice List)
+  - H2H permanent token setup request with pre-request script
+  - Login request with auto-save access token via test script
+  - Collection variables for base_url, access_token, permanent_token, year
   - Example responses and disabled optional params for easy toggling
+- **Postman Environment**: `postman/PM_Invoice_API.postman_environment.json`
+  - Environment variables: base_url, access_token, permanent_token, year, credential, password
+  - Secret type for sensitive values (tokens, password)
 - **PHPStan Configuration**: Added `phpstan.neon` and `phpstan-baseline.neon` for module-level static analysis at level 5
 
 ### Changed
@@ -50,6 +55,7 @@ All notable changes to this project will be documented in this file.
   - New `getByMonth()` method grouping by year and month
   - New `getInvoiceList()` method with pagination, filtering, sorting, and whitelisted sort columns
 - **PmServiceProvider**: Registered `pm.api.logger` middleware alias in `boot()`
+- **Dependencies**: Updated `vm-engine/synapps-auth` requirement from `^1.2` to `^1.3` for H2H permanent token support
 
 ## [0.6.8] - 2026-02-05
 

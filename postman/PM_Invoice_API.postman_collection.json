@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "pm-invoice-api-collection",
 		"name": "PM Invoice API",
-		"description": "Invoice API endpoints for the Project Management module.\n\nAll invoice endpoints require:\n- Sanctum bearer token authentication\n- `pm.report.invoice.read` permission\n\n## Setup\n1. Run the **Login** request first to get an access token.\n2. The token is automatically saved to the `access_token` collection variable.\n3. All invoice endpoints use this token via the `Authorization` header.\n\n## Status Code Format\n`\"<http_code><service_code><response_code>\"` as string.\n\n| Service | Code |\n|---------|------|\n| Statistics | 01 |\n| By Creator | 02 |\n| By Project Category | 03 |\n| By Month | 04 |\n| Invoice List | 05 |",
+		"description": "Invoice API endpoints for the Project Management module.\n\nAll invoice endpoints require:\n- Sanctum bearer token authentication\n- `pm.report.invoice.read` permission\n\n## Authentication\n\nThere are two ways to authenticate:\n\n### Option A: Permanent Token (H2H / Server-to-Server)\nFor automated systems and third-party integrations. Permanent tokens never expire.\n1. Create an API User in **Auth > API Users** admin panel.\n2. Copy the generated token (shown once).\n3. Paste the token into the `access_token` collection variable.\n4. All requests will use it automatically.\n\n### Option B: Login Flow (Interactive Users)\nFor interactive applications (mobile apps, SPAs).\n1. Run the **Login** request in the Auth folder.\n2. The token is automatically saved to the `access_token` collection variable.\n3. All subsequent requests use the token automatically.\n\n## Status Code Format\n`\"<http_code><service_code><response_code>\"` as string.\n\n| Service | Code |\n|---------|------|\n| Statistics | 01 |\n| By Creator | 02 |\n| By Project Category | 03 |\n| By Month | 04 |\n| Invoice List | 05 |",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"variable": [
@@ -15,6 +15,12 @@
 			"key": "access_token",
 			"value": "",
 			"type": "string"
+		},
+		{
+			"key": "permanent_token",
+			"value": "",
+			"type": "string",
+			"description": "Paste your H2H permanent token here (from Auth > API Users). Run 'Set Permanent Token' request to activate it."
 		},
 		{
 			"key": "year",
@@ -35,8 +41,64 @@
 	"item": [
 		{
 			"name": "Auth",
-			"description": "Authentication endpoints to obtain access tokens.",
+			"description": "Authentication endpoints to obtain access tokens.\n\n**Option A (H2H):** If using a permanent token, skip this folder — just paste the token into the `access_token` collection variable.\n\n**Option B (Login):** Run the Login request to authenticate and auto-save the token.",
 			"item": [
+				{
+					"name": "Set Permanent Token (H2H)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set your permanent token here.",
+									"// This token is obtained from Auth > API Users in the admin panel.",
+									"// It never expires and is ideal for server-to-server integrations.",
+									"",
+									"var token = pm.variables.replaceIn('{{permanent_token}}');",
+									"if (token && token !== '{{permanent_token}}') {",
+									"    pm.collectionVariables.set('access_token', token);",
+									"    console.log('Permanent token set as access_token.');",
+									"} else {",
+									"    console.warn('Please set the permanent_token collection variable first.');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var token = pm.collectionVariables.get('access_token');",
+									"if (token) {",
+									"    pm.test('Permanent token is set', function () {",
+									"        pm.expect(token).to.not.be.empty;",
+									"    });",
+									"} else {",
+									"    pm.test('Permanent token is NOT set', function () {",
+									"        pm.expect.fail('Set the permanent_token collection variable first.');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/pm/invoice/statistics",
+							"host": ["{{base_url}}"],
+							"path": ["api", "pm", "invoice", "statistics"]
+						},
+						"description": "Helper request to set a permanent (H2H) token as the active access token.\n\n## How to use\n1. Go to the collection **Variables** tab.\n2. Set the `permanent_token` variable to your API user token (e.g. `1|abc123def456...`).\n3. **Send** this request — the pre-request script copies the permanent token into `access_token`.\n4. All subsequent requests will use the permanent token automatically.\n\n## Getting a permanent token\n1. Go to **Auth > API Users** in the admin panel.\n2. Create an API User with the required roles/permissions.\n3. Copy the generated token (shown once).\n\nNote: This request also serves as a quick connectivity test by hitting the statistics endpoint."
+					},
+					"response": []
+				},
 				{
 					"name": "Login",
 					"event": [
@@ -73,7 +135,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"credential\": \"admin@example.com\",\n    \"password\": \"password\",\n    \"device_name\": \"Postman\"\n}"
+							"raw": "{\n    \"credential\": \"{{credential}}\",\n    \"password\": \"{{password}}\",\n    \"device_name\": \"Postman\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/auth/login",

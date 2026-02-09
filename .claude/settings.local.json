@@ -30,7 +30,8 @@
       "Bash(for file in ProjectCategoryTest.php SignatureFormTest.php)",
       "Bash(do sed -i '/assertDispatched.*notify.*function/,/}\\);/c\\\\        ->assertDispatched\\(''''notify''''\\);' \"$file\")",
       "Bash(done)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(git status:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
