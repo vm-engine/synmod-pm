@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use VmEngine\Pm\Models\DocumentIssuer;
+
+uses(RefreshDatabase::class);
 
 test('document issuer has correct fillable fields', function () {
     $fillable = [

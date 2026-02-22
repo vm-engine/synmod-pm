@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Route;
 use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Pm\Models\ProjectCategory;
@@ -12,6 +12,8 @@ use VmEngine\Pm\Models\ProjectInvoice;
 use VmEngine\SynAuth\Models\Role;
 use VmEngine\SynAuth\Models\RolePermission;
 use VmEngine\SynAuth\Models\User;
+
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Config::set('synapps.auth.login_credential', 'both');

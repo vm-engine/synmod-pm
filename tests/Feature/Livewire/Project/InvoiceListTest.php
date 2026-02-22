@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use VmEngine\Pm\Livewire\Project\InvoiceList;
 use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\DocumentIssuer;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Pm\Models\ProjectInvoice;
+
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $UserModel = config('auth.providers.users.model');
@@ -15,14 +17,14 @@ beforeEach(function () {
 });
 
 test('component can be rendered', function () {
-    Livewire::test(InvoiceList::class)
+    Livewire::test('pm::project.invoice-list')
         ->assertStatus(200);
 });
 
 test('component can be rendered with project id', function () {
     $project = Project::factory()->create();
 
-    Livewire::test(InvoiceList::class, ['projectId' => $project->id])
+    Livewire::test('pm::project.invoice-list', ['projectId' => $project->id])
         ->assertStatus(200)
         ->assertSet('projectId', $project->id);
 });
@@ -34,7 +36,7 @@ test('loads invoices for specific project', function () {
     ProjectInvoice::factory()->count(3)->create(['project_id' => $project1->id]);
     ProjectInvoice::factory()->count(2)->create(['project_id' => $project2->id]);
 
-    $component = Livewire::test(InvoiceList::class, ['projectId' => $project1->id]);
+    $component = Livewire::test('pm::project.invoice-list', ['projectId' => $project1->id]);
 
     expect($component->invoiceList)->toHaveCount(3);
 });
@@ -42,7 +44,7 @@ test('loads invoices for specific project', function () {
 test('loads all invoices when no project id is set', function () {
     ProjectInvoice::factory()->count(5)->create();
 
-    $component = Livewire::test(InvoiceList::class);
+    $component = Livewire::test('pm::project.invoice-list');
 
     expect($component->invoiceList)->toHaveCount(5);
 });
@@ -55,7 +57,7 @@ test('getPaymentStatus returns paid when is_paid is true', function () {
         'total_amount' => 1000000,
     ]);
 
-    $component = Livewire::test(InvoiceList::class)->instance();
+    $component = Livewire::test('pm::project.invoice-list')->instance();
     $status = $component->getPaymentStatus($invoice);
 
     expect($status['label'])->toContain('Paid');
@@ -69,7 +71,7 @@ test('getPaymentStatus returns unpaid when is_paid is false', function () {
         'total_amount' => 1000000,
     ]);
 
-    $component = Livewire::test(InvoiceList::class)->instance();
+    $component = Livewire::test('pm::project.invoice-list')->instance();
     $status = $component->getPaymentStatus($invoice);
 
     expect($status['label'])->toContain('Unpaid');
@@ -86,7 +88,7 @@ test('getPaymentStatus returns unpaid when is_paid is false explicitly', functio
         'total_amount' => 1000000,
     ]);
 
-    $component = Livewire::test(InvoiceList::class)->instance();
+    $component = Livewire::test('pm::project.invoice-list')->instance();
     $status = $component->getPaymentStatus($invoice);
 
     expect($status['label'])->toContain('Unpaid');
@@ -101,7 +103,7 @@ test('getPaymentStatus uses is_paid flag', function () {
         'total_amount' => 1000000,
     ]);
 
-    $component = Livewire::test(InvoiceList::class)->instance();
+    $component = Livewire::test('pm::project.invoice-list')->instance();
     $status = $component->getPaymentStatus($invoice);
 
     expect($status['label'])->toContain('Paid');
@@ -123,7 +125,7 @@ test('filters paid invoices correctly', function () {
         'total_amount' => 1000000,
     ]);
 
-    $component = Livewire::test(InvoiceList::class)
+    $component = Livewire::test('pm::project.invoice-list')
         ->set('filterStatus', 'paid');
 
     $invoices = $component->invoiceList;
@@ -146,7 +148,7 @@ test('filters unpaid invoices correctly', function () {
         'total_amount' => 1000000,
     ]);
 
-    $component = Livewire::test(InvoiceList::class)
+    $component = Livewire::test('pm::project.invoice-list')
         ->set('filterStatus', 'unpaid');
 
     $invoices = $component->invoiceList;
@@ -169,7 +171,7 @@ test('partial filter now shows unpaid invoices (partial payment no longer suppor
         'total_amount' => 1000000,
     ]);
 
-    $component = Livewire::test(InvoiceList::class)
+    $component = Livewire::test('pm::project.invoice-list')
         ->set('filterStatus', 'partial');
 
     $invoices = $component->invoiceList;
@@ -189,7 +191,7 @@ test('filters by year', function () {
         'created_at' => '2024-06-20',
     ]);
 
-    $component = Livewire::test(InvoiceList::class)
+    $component = Livewire::test('pm::project.invoice-list')
         ->set('filterYear', '2024');
 
     $invoices = $component->invoiceList;
@@ -204,7 +206,7 @@ test('filters by issuer', function () {
     $invoice1 = ProjectInvoice::factory()->create(['issuer_id' => $issuer1->id]);
     $invoice2 = ProjectInvoice::factory()->create(['issuer_id' => $issuer2->id]);
 
-    $component = Livewire::test(InvoiceList::class)
+    $component = Livewire::test('pm::project.invoice-list')
         ->set('filterIssuer', (string) $issuer1->id);
 
     $invoices = $component->invoiceList;
@@ -222,7 +224,7 @@ test('filters by creator', function () {
     $invoice1 = ProjectInvoice::factory()->create(['created_by' => $creator1->id]);
     $invoice2 = ProjectInvoice::factory()->create(['created_by' => $creator2->id]);
 
-    $component = Livewire::test(InvoiceList::class)
+    $component = Livewire::test('pm::project.invoice-list')
         ->set('filterCreator', (string) $creator1->id)
         ->update();
 
@@ -239,7 +241,7 @@ test('searches by invoice number', function () {
     $invoice2 = ProjectInvoice::factory()->create(['invoice_number' => 'INV-2024-002']);
     $invoice3 = ProjectInvoice::factory()->create(['invoice_number' => 'INV-2023-001']);
 
-    $component = Livewire::test(InvoiceList::class)
+    $component = Livewire::test('pm::project.invoice-list')
         ->set('q', '2024');
 
     $invoices = $component->invoiceList;
@@ -254,7 +256,7 @@ test('searches by invoice number', function () {
 test('search requires minimum 3 characters', function () {
     ProjectInvoice::factory()->count(5)->create();
 
-    $component = Livewire::test(InvoiceList::class)
+    $component = Livewire::test('pm::project.invoice-list')
         ->set('q', 'ab'); // Only 2 characters
 
     expect($component->invoiceList)->toHaveCount(5); // Should return all
@@ -264,7 +266,7 @@ test('sorting works correctly', function () {
     $invoice1 = ProjectInvoice::factory()->create(['invoice_number' => 'INV-001']);
     $invoice2 = ProjectInvoice::factory()->create(['invoice_number' => 'INV-002']);
 
-    $component = Livewire::test(InvoiceList::class)
+    $component = Livewire::test('pm::project.invoice-list')
         ->set('sort', 'invoice_number')
         ->set('sortDirection', 'asc');
 
@@ -276,7 +278,7 @@ test('sorting works correctly', function () {
 test('pagination works with limit', function () {
     ProjectInvoice::factory()->count(15)->create();
 
-    $component = Livewire::test(InvoiceList::class)
+    $component = Livewire::test('pm::project.invoice-list')
         ->set('limit', 5);
 
     expect($component->invoiceList)->toHaveCount(5);
@@ -294,7 +296,7 @@ test('can delete invoice', function () {
 
     $token = $invoice->delete_token;
 
-    Livewire::test(InvoiceList::class, ['projectId' => $project->id])
+    Livewire::test('pm::project.invoice-list', ['projectId' => $project->id])
         ->call('delete', $token)
         ->assertDispatched('synapse-confirmed')
         ->assertDispatched('activity-refresh')
@@ -308,7 +310,7 @@ test('available years computed property returns distinct years', function () {
     ProjectInvoice::factory()->create(['created_at' => '2023-06-01']);
     ProjectInvoice::factory()->create(['created_at' => '2024-01-01']);
 
-    $component = Livewire::test(InvoiceList::class);
+    $component = Livewire::test('pm::project.invoice-list');
 
     $years = $component->availableYears;
     expect($years)->toHaveCount(2);
@@ -320,7 +322,7 @@ test('issuers computed property returns document issuers', function () {
     $issuer1 = DocumentIssuer::factory()->create(['name' => 'Issuer A']);
     $issuer2 = DocumentIssuer::factory()->create(['name' => 'Issuer B']);
 
-    $component = Livewire::test(InvoiceList::class);
+    $component = Livewire::test('pm::project.invoice-list');
 
     $issuers = $component->issuers;
     expect($issuers)->toHaveCount(2);
@@ -331,7 +333,7 @@ test('issuers computed property returns document issuers', function () {
 test('refreshes project on document upload event', function () {
     $project = Project::factory()->create();
 
-    $component = Livewire::test(InvoiceList::class, ['projectId' => $project->id])
+    $component = Livewire::test('pm::project.invoice-list', ['projectId' => $project->id])
         ->dispatch('document-uploaded');
 
     expect($component->project)->not->toBeNull();

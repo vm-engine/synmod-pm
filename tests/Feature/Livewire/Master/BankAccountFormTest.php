@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
-use VmEngine\Pm\Livewire\Master\BankAccountForm;
 use VmEngine\Pm\Models\BankAccount;
+
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Storage::fake('public');
@@ -16,14 +18,14 @@ beforeEach(function () {
 });
 
 test('component can be rendered', function () {
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->assertStatus(200);
 });
 
 test('can create new bank account', function () {
     $logo = UploadedFile::fake()->image('bank-logo.png');
 
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->set('form.name', 'Main Account')
         ->set('form.number', '1234567890')
         ->set('form.bank_name', 'Bank of America')
@@ -46,7 +48,7 @@ test('can create new bank account', function () {
 test('stores bank logo file', function () {
     $logo = UploadedFile::fake()->image('bank-logo.png');
 
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->set('form.name', 'Main Account')
         ->set('form.number', '1234567890')
         ->set('form.bank_name', 'Bank of America')
@@ -65,7 +67,7 @@ test('can update existing bank account', function () {
         'bank_name' => 'Old Bank',
     ]);
 
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->dispatch('load-bank-account', id: $account->id)
         ->set('form.name', 'Updated Account')
         ->set('form.number', '1111111111')
@@ -91,7 +93,7 @@ test('can update bank account with new logo', function () {
 
     $newLogo = UploadedFile::fake()->image('new-logo.png');
 
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->dispatch('load-bank-account', id: $account->id)
         ->set('form.name', 'Main Account')
         ->set('form.number', '1234567890')
@@ -111,7 +113,7 @@ test('can update bank account with new logo', function () {
 test('validates required name', function () {
     $logo = UploadedFile::fake()->image('logo.png');
 
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->set('form.name', '')
         ->set('form.number', '1234567890')
         ->set('form.bank_name', 'Bank Name')
@@ -123,7 +125,7 @@ test('validates required name', function () {
 test('validates required number', function () {
     $logo = UploadedFile::fake()->image('logo.png');
 
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->set('form.name', 'Account Name')
         ->set('form.number', '')
         ->set('form.bank_name', 'Bank Name')
@@ -135,7 +137,7 @@ test('validates required number', function () {
 test('validates required bank name', function () {
     $logo = UploadedFile::fake()->image('logo.png');
 
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->set('form.name', 'Account Name')
         ->set('form.number', '1234567890')
         ->set('form.bank_name', '')
@@ -145,7 +147,7 @@ test('validates required bank name', function () {
 });
 
 test('validates required logo for new account', function () {
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->set('form.name', 'Account Name')
         ->set('form.number', '1234567890')
         ->set('form.bank_name', 'Bank Name')
@@ -160,7 +162,7 @@ test('logo is optional when updating account', function () {
         'bank_logo' => 'bank_accounts/logos/existing.png',
     ]);
 
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->dispatch('load-bank-account', id: $account->id)
         ->set('form.name', 'Updated Name')
         ->set('form.number', '1234567890')
@@ -176,7 +178,7 @@ test('logo is optional when updating account', function () {
 test('validates logo mime types', function () {
     $file = UploadedFile::fake()->create('document.pdf', 100, 'application/pdf');
 
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->set('form.name', 'Account Name')
         ->set('form.number', '1234567890')
         ->set('form.bank_name', 'Bank Name')
@@ -188,7 +190,7 @@ test('validates logo mime types', function () {
 test('validates logo max size', function () {
     $file = UploadedFile::fake()->create('large-logo.png', 6000); // 6MB
 
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->set('form.name', 'Account Name')
         ->set('form.number', '1234567890')
         ->set('form.bank_name', 'Bank Name')
@@ -200,7 +202,7 @@ test('validates logo max size', function () {
 test('validates name max length', function () {
     $logo = UploadedFile::fake()->image('logo.png');
 
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->set('form.name', str_repeat('a', 256))
         ->set('form.number', '1234567890')
         ->set('form.bank_name', 'Bank Name')
@@ -212,7 +214,7 @@ test('validates name max length', function () {
 test('validates number max length', function () {
     $logo = UploadedFile::fake()->image('logo.png');
 
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->set('form.name', 'Account Name')
         ->set('form.number', str_repeat('1', 256))
         ->set('form.bank_name', 'Bank Name')
@@ -224,7 +226,7 @@ test('validates number max length', function () {
 test('validates bank name max length', function () {
     $logo = UploadedFile::fake()->image('logo.png');
 
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->set('form.name', 'Account Name')
         ->set('form.number', '1234567890')
         ->set('form.bank_name', str_repeat('a', 256))
@@ -241,7 +243,7 @@ test('loads bank account data correctly', function () {
         'bank_logo' => 'bank_accounts/logos/logo.png',
     ]);
 
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->dispatch('load-bank-account', id: $account->id)
         ->assertSet('form.name', 'Main Account')
         ->assertSet('form.number', '1234567890')
@@ -250,7 +252,7 @@ test('loads bank account data correctly', function () {
 });
 
 test('handles loading non-existent account', function () {
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->dispatch('load-bank-account', id: 99999)
         ->assertDispatched('notify')
         ->assertDispatched('close-modal-bank-account-form');
@@ -259,7 +261,7 @@ test('handles loading non-existent account', function () {
 test('resets form on close modal event', function () {
     $account = BankAccount::factory()->create();
 
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->dispatch('load-bank-account', id: $account->id)
         ->assertSet('form.name', $account->name)
         ->dispatch('close-modal-bank-account-form')
@@ -269,7 +271,7 @@ test('resets form on close modal event', function () {
 test('resets form on reset event', function () {
     $logo = UploadedFile::fake()->image('logo.png');
 
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->set('form.name', 'Account Name')
         ->set('form.number', '1234567890')
         ->set('form.bank_name', 'Bank Name')
@@ -284,7 +286,7 @@ test('resets form on reset event', function () {
 test('dispatches dragndrop clear event on save', function () {
     $logo = UploadedFile::fake()->image('logo.png');
 
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->set('form.name', 'Account Name')
         ->set('form.number', '1234567890')
         ->set('form.bank_name', 'Bank Name')
@@ -294,7 +296,7 @@ test('dispatches dragndrop clear event on save', function () {
 });
 
 test('dispatches dragndrop clear event on reset', function () {
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->dispatch('reset-bank-account-form')
         ->assertDispatched('dragndrop-clear-input');
 });
@@ -302,7 +304,7 @@ test('dispatches dragndrop clear event on reset', function () {
 test('accepts jpeg image format', function () {
     $logo = UploadedFile::fake()->image('logo.jpg');
 
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->set('form.name', 'Account Name')
         ->set('form.number', '1234567890')
         ->set('form.bank_name', 'Bank Name')
@@ -314,7 +316,7 @@ test('accepts jpeg image format', function () {
 test('accepts png image format', function () {
     $logo = UploadedFile::fake()->image('logo.png');
 
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->set('form.name', 'Account Name')
         ->set('form.number', '1234567890')
         ->set('form.bank_name', 'Bank Name')
@@ -326,7 +328,7 @@ test('accepts png image format', function () {
 test('accepts webp image format', function () {
     $logo = UploadedFile::fake()->create('logo.webp', 100, 'image/webp');
 
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->set('form.name', 'Account Name')
         ->set('form.number', '1234567890')
         ->set('form.bank_name', 'Bank Name')
@@ -338,7 +340,7 @@ test('accepts webp image format', function () {
 test('shows success message for create', function () {
     $logo = UploadedFile::fake()->image('logo.png');
 
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->set('form.name', 'Account Name')
         ->set('form.number', '1234567890')
         ->set('form.bank_name', 'Bank Name')
@@ -350,7 +352,7 @@ test('shows success message for create', function () {
 test('shows success message for update', function () {
     $account = BankAccount::factory()->create();
 
-    Livewire::test(BankAccountForm::class)
+    Livewire::test('pm::master.bank-account-form')
         ->dispatch('load-bank-account', id: $account->id)
         ->set('form.name', 'Updated Name')
         ->set('form.number', '1234567890')

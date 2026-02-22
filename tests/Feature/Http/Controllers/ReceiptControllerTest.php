@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Pm\Models\ProjectDocument;
 use VmEngine\Pm\Models\ProjectInvoice;
+
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Storage::fake('local');

@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
-use Livewire\Volt\Volt;
-use VmEngine\Pm\Livewire\Master\Issuer;
+use Livewire\Livewire;
 use VmEngine\Pm\Models\DocumentIssuer;
+
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $UserModel = config('auth.providers.users.model');
@@ -13,7 +15,7 @@ beforeEach(function () {
 });
 
 test('component can be rendered', function () {
-    Volt::test(Issuer::class)
+    Livewire::test('pm::master.issuer-list')
         ->assertStatus(200);
 });
 
@@ -21,13 +23,13 @@ test('displays issuer list', function () {
     DocumentIssuer::factory()->create(['name' => 'Company A']);
     DocumentIssuer::factory()->create(['name' => 'Company B']);
 
-    Volt::test(Issuer::class)
+    Livewire::test('pm::master.issuer-list')
         ->assertSee('Company A')
         ->assertSee('Company B');
 });
 
 test('displays no data message when empty', function () {
-    Volt::test(Issuer::class)
+    Livewire::test('pm::master.issuer-list')
         ->assertSee(__('pm::issuer.no_data'));
 });
 
@@ -35,7 +37,7 @@ test('can search by name', function () {
     DocumentIssuer::factory()->create(['name' => 'Acme Corporation']);
     DocumentIssuer::factory()->create(['name' => 'Tech Solutions']);
 
-    Volt::test(Issuer::class)
+    Livewire::test('pm::master.issuer-list')
         ->set('q', 'Acme')
         ->assertSee('Acme Corporation')
         ->assertDontSee('Tech Solutions');
@@ -51,7 +53,7 @@ test('can search by tax ID number', function () {
         'tax_id_number' => '2222222222222222',
     ]);
 
-    Volt::test(Issuer::class)
+    Livewire::test('pm::master.issuer-list')
         ->set('q', '1111')
         ->assertSee('Company A')
         ->assertDontSee('Company B');
@@ -67,7 +69,7 @@ test('can search by tax ID name', function () {
         'tax_id_name' => 'Legal Name B',
     ]);
 
-    Volt::test(Issuer::class)
+    Livewire::test('pm::master.issuer-list')
         ->set('q', 'Legal Name A')
         ->assertSee('Company A')
         ->assertDontSee('Company B');
@@ -77,7 +79,7 @@ test('search requires minimum 3 characters', function () {
     DocumentIssuer::factory()->create(['name' => 'Acme Corporation']);
 
     // Search with 2 characters should show all
-    $component = Volt::test(Issuer::class)
+    $component = Livewire::test('pm::master.issuer-list')
         ->set('q', 'Ac');
 
     expect($component->get('issuerList')->count())->toBe(1);
@@ -90,7 +92,7 @@ test('search requires minimum 3 characters', function () {
 test('pagination works correctly', function () {
     DocumentIssuer::factory()->count(15)->create();
 
-    $component = Volt::test(Issuer::class)
+    $component = Livewire::test('pm::master.issuer-list')
         ->set('limit', 12);
 
     expect($component->get('issuerList')->count())->toBe(12);
@@ -99,7 +101,7 @@ test('pagination works correctly', function () {
 test('can change pagination limit', function () {
     DocumentIssuer::factory()->count(10)->create();
 
-    Volt::test(Issuer::class)
+    Livewire::test('pm::master.issuer-list')
         ->set('limit', 6)
         ->assertSet('limit', 6);
 });
@@ -117,7 +119,7 @@ test('can delete issuer with valid token', function () {
 
     $token = $issuer->delete_token;
 
-    Volt::test(Issuer::class)
+    Livewire::test('pm::master.issuer-list')
         ->call('delete', $token)
         ->assertDispatched('notify');
 
@@ -126,7 +128,7 @@ test('can delete issuer with valid token', function () {
 });
 
 test('delete dispatches error for invalid token', function () {
-    Volt::test(Issuer::class)
+    Livewire::test('pm::master.issuer-list')
         ->call('delete', 'invalid-token')
         ->assertDispatched('notify');
 });
@@ -136,7 +138,7 @@ test('delete dispatches error for invalid token', function () {
 test('reset page on search', function () {
     DocumentIssuer::factory()->count(20)->create();
 
-    $component = Volt::test(Issuer::class)
+    $component = Livewire::test('pm::master.issuer-list')
         ->set('limit', 10);
 
     // Go to page 2
@@ -158,7 +160,7 @@ test('displays header image when available', function () {
         'header_image' => $path,
     ]);
 
-    Volt::test(Issuer::class)
+    Livewire::test('pm::master.issuer-list')
         ->assertSee(Storage::url($path));
 });
 
@@ -170,7 +172,7 @@ test('displays issuer information in cards', function () {
         'tax_id_address' => '123 Test Street, Test City',
     ]);
 
-    Volt::test(Issuer::class)
+    Livewire::test('pm::master.issuer-list')
         ->assertSee('Test Company')
         ->assertSee('Test Legal Name')
         ->assertSee('1234567890123456')
@@ -185,7 +187,7 @@ test('truncates long addresses', function () {
         'tax_id_address' => $longAddress,
     ]);
 
-    $component = Volt::test(Issuer::class);
+    $component = Livewire::test('pm::master.issuer-list');
 
     // Should see truncated version (first 80 chars)
     expect($component->html())->toContain(substr($longAddress, 0, 77)); // Str::limit adds ...
@@ -194,15 +196,15 @@ test('truncates long addresses', function () {
 test('search is case insensitive', function () {
     DocumentIssuer::factory()->create(['name' => 'Acme Corporation']);
 
-    Volt::test(Issuer::class)
+    Livewire::test('pm::master.issuer-list')
         ->set('q', 'acme')
         ->assertSee('Acme Corporation');
 
-    Volt::test(Issuer::class)
+    Livewire::test('pm::master.issuer-list')
         ->set('q', 'ACME')
         ->assertSee('Acme Corporation');
 
-    Volt::test(Issuer::class)
+    Livewire::test('pm::master.issuer-list')
         ->set('q', 'AcMe')
         ->assertSee('Acme Corporation');
 });

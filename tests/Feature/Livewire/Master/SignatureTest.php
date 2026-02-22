@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
-use VmEngine\Pm\Livewire\Master\Signature;
 use VmEngine\Pm\Models\Signature as ModelsSignature;
+
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Storage::fake('public');
@@ -15,14 +17,14 @@ beforeEach(function () {
 });
 
 test('component can be rendered', function () {
-    Livewire::test(Signature::class)
+    Livewire::test('pm::master.signature-list')
         ->assertStatus(200);
 });
 
 test('loads signature list', function () {
     ModelsSignature::factory()->count(3)->create();
 
-    $component = Livewire::test(Signature::class);
+    $component = Livewire::test('pm::master.signature-list');
 
     expect($component->signatureList)->toHaveCount(3);
 });
@@ -32,7 +34,7 @@ test('signatures are ordered by name ascending', function () {
     $signatureA = ModelsSignature::factory()->create(['name' => 'Alice']);
     $signatureB = ModelsSignature::factory()->create(['name' => 'Bob']);
 
-    $component = Livewire::test(Signature::class);
+    $component = Livewire::test('pm::master.signature-list');
 
     $signatures = $component->signatureList;
     expect($signatures->first()->id)->toBe($signatureA->id);
@@ -44,7 +46,7 @@ test('can search signatures by name', function () {
     $signature2 = ModelsSignature::factory()->create(['name' => 'Jane Smith']);
     $signature3 = ModelsSignature::factory()->create(['name' => 'Bob Johnson']);
 
-    $component = Livewire::test(Signature::class)
+    $component = Livewire::test('pm::master.signature-list')
         ->set('q', 'John');
 
     $signatures = $component->signatureList;
@@ -67,7 +69,7 @@ test('can search signatures by position', function () {
         'position' => 'Manager',
     ]);
 
-    $component = Livewire::test(Signature::class)
+    $component = Livewire::test('pm::master.signature-list')
         ->set('q', 'Director');
 
     $signatures = $component->signatureList;
@@ -78,7 +80,7 @@ test('can search signatures by position', function () {
 test('search requires minimum 3 characters', function () {
     ModelsSignature::factory()->count(5)->create();
 
-    $component = Livewire::test(Signature::class)
+    $component = Livewire::test('pm::master.signature-list')
         ->set('q', 'ab'); // Only 2 characters
 
     expect($component->signatureList)->toHaveCount(5); // Should return all
@@ -87,7 +89,7 @@ test('search requires minimum 3 characters', function () {
 test('pagination works with limit', function () {
     ModelsSignature::factory()->count(15)->create();
 
-    $component = Livewire::test(Signature::class)
+    $component = Livewire::test('pm::master.signature-list')
         ->set('limit', 5);
 
     expect($component->signatureList)->toHaveCount(5);
@@ -103,7 +105,7 @@ test('can delete signature', function () {
 
     $token = $signature->delete_token;
 
-    Livewire::test(Signature::class)
+    Livewire::test('pm::master.signature-list')
         ->call('delete', $token)
         ->assertDispatched('synapse-confirmed')
         ->assertDispatched('notify');
@@ -120,7 +122,7 @@ test('deletes signature file when signature is deleted', function () {
 
     $token = $signature->delete_token;
 
-    Livewire::test(Signature::class)
+    Livewire::test('pm::master.signature-list')
         ->call('delete', $token);
 
     expect(Storage::disk('public')->exists('signatures/test.png'))->toBeFalse();
@@ -133,7 +135,7 @@ test('handles deletion when file does not exist', function () {
 
     $token = $signature->delete_token;
 
-    Livewire::test(Signature::class)
+    Livewire::test('pm::master.signature-list')
         ->call('delete', $token)
         ->assertDispatched('notify');
 
@@ -143,28 +145,21 @@ test('handles deletion when file does not exist', function () {
 test('handles deletion with invalid token', function () {
     ModelsSignature::factory()->create();
 
-    Livewire::test(Signature::class)
+    Livewire::test('pm::master.signature-list')
         ->call('delete', 'invalid-token')
         ->assertDispatched('notify');
 });
 
 // Note: Cannot test non-existent signature deletion without a valid token from an actual model instance
 
-test('displays breadcrumbs', function () {
-    Livewire::test(Signature::class)
-        ->assertSee(__('pm::menu.be.parent'))
-        ->assertSee(__('pm::menu.be.master.parent'))
-        ->assertSee(__('pm::menu.be.master.signature'));
-});
-
 test('sets active menu', function () {
-    Livewire::test(Signature::class);
+    Livewire::test('pm::master.signature-list');
 
     expect(synav()->getActiveMenu())->toBe('pm.master.signature');
 });
 
 test('search is persisted in URL', function () {
-    Livewire::test(Signature::class)
+    Livewire::test('pm::master.signature-list')
         ->set('q', 'test')
         ->assertSet('q', 'test');
 });

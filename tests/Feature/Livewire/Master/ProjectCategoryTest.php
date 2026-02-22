@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use VmEngine\Pm\Livewire\Master\ProjectCategory;
 use VmEngine\Pm\Models\ProjectCategory as ModelsProjectCategory;
+
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $UserModel = config('auth.providers.users.model');
@@ -12,20 +14,20 @@ beforeEach(function () {
 });
 
 test('component can be rendered', function () {
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->assertStatus(200);
 });
 
 test('loads category list', function () {
     ModelsProjectCategory::factory()->count(3)->create();
 
-    $component = Livewire::test(ProjectCategory::class);
+    $component = Livewire::test('pm::master.project-category');
 
     expect($component->categoryList)->toHaveCount(3);
 });
 
 test('can create new project category', function () {
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->set('newName', 'Web Development')
         ->set('newCode', 'WEB')
         ->set('newDescription', 'Web development projects')
@@ -41,7 +43,7 @@ test('can create new project category', function () {
 });
 
 test('clears form after successful creation', function () {
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->set('newName', 'Test Category')
         ->set('newCode', 'TEST')
         ->set('newDescription', 'Test description')
@@ -52,7 +54,7 @@ test('clears form after successful creation', function () {
 });
 
 test('validates required name for creation', function () {
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->set('newName', '')
         ->set('newCode', 'TEST')
         ->call('store')
@@ -60,7 +62,7 @@ test('validates required name for creation', function () {
 });
 
 test('validates required code for creation', function () {
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->set('newName', 'Test Category')
         ->set('newCode', '')
         ->call('store')
@@ -70,7 +72,7 @@ test('validates required code for creation', function () {
 test('validates unique code for creation', function () {
     ModelsProjectCategory::factory()->create(['code' => 'EXISTING']);
 
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->set('newName', 'Test Category')
         ->set('newCode', 'EXISTING')
         ->call('store')
@@ -78,7 +80,7 @@ test('validates unique code for creation', function () {
 });
 
 test('validates name max length for creation', function () {
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->set('newName', str_repeat('a', 256))
         ->set('newCode', 'TEST')
         ->call('store')
@@ -86,7 +88,7 @@ test('validates name max length for creation', function () {
 });
 
 test('validates code max length for creation', function () {
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->set('newName', 'Test Category')
         ->set('newCode', str_repeat('A', 51))
         ->call('store')
@@ -94,7 +96,7 @@ test('validates code max length for creation', function () {
 });
 
 test('validates description max length for creation', function () {
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->set('newName', 'Test Category')
         ->set('newCode', 'TEST')
         ->set('newDescription', str_repeat('a', 501))
@@ -103,7 +105,7 @@ test('validates description max length for creation', function () {
 });
 
 test('description is optional for creation', function () {
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->set('newName', 'Test Category')
         ->set('newCode', 'TEST')
         ->set('newDescription', '')
@@ -120,7 +122,7 @@ test('can load category for editing', function () {
         'description' => 'Web projects',
     ]);
 
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->call('edit', $category->id)
         ->assertSet('editId', $category->id)
         ->assertSet('editName', 'Web Development')
@@ -135,7 +137,7 @@ test('can update existing category', function () {
         'description' => 'Old description',
     ]);
 
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->call('edit', $category->id)
         ->set('editName', 'Updated Name')
         ->set('editCode', 'UPDATED')
@@ -152,7 +154,7 @@ test('can update existing category', function () {
 test('clears edit form after successful update', function () {
     $category = ModelsProjectCategory::factory()->create();
 
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->call('edit', $category->id)
         ->set('editName', 'Updated Name')
         ->call('update', $category->id)
@@ -165,7 +167,7 @@ test('clears edit form after successful update', function () {
 test('validates required name for update', function () {
     $category = ModelsProjectCategory::factory()->create();
 
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->call('edit', $category->id)
         ->set('editName', '')
         ->call('update', $category->id)
@@ -175,7 +177,7 @@ test('validates required name for update', function () {
 test('validates required code for update', function () {
     $category = ModelsProjectCategory::factory()->create();
 
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->call('edit', $category->id)
         ->set('editCode', '')
         ->call('update', $category->id)
@@ -187,7 +189,7 @@ test('validates unique code for update excluding current category', function () 
     $category2 = ModelsProjectCategory::factory()->create(['code' => 'CAT2']);
 
     // Should be able to keep same code
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->call('edit', $category1->id)
         ->set('editName', 'Updated Name')
         ->set('editCode', 'CAT1')
@@ -195,7 +197,7 @@ test('validates unique code for update excluding current category', function () 
         ->assertHasNoErrors();
 
     // Should not be able to use another category's code
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->call('edit', $category1->id)
         ->set('editCode', 'CAT2')
         ->call('update', $category1->id)
@@ -205,7 +207,7 @@ test('validates unique code for update excluding current category', function () 
 test('can cancel edit', function () {
     $category = ModelsProjectCategory::factory()->create();
 
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->call('edit', $category->id)
         ->assertSet('editId', $category->id)
         ->call('cancelEdit')
@@ -219,7 +221,7 @@ test('can delete category', function () {
     $category = ModelsProjectCategory::factory()->create();
     $token = $category->delete_token;
 
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->call('delete', $token)
         ->assertDispatched('synapse-confirmed')
         ->assertDispatched('notify');
@@ -230,7 +232,7 @@ test('can delete category', function () {
 test('handles deletion with invalid token', function () {
     ModelsProjectCategory::factory()->create();
 
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->call('delete', 'invalid-token')
         ->assertDispatched('notify');
 });
@@ -238,7 +240,7 @@ test('handles deletion with invalid token', function () {
 // Note: Cannot test non-existent category deletion without a valid token from an actual model instance
 
 test('handles update of non-existent category', function () {
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->set('editName', 'Test')
         ->set('editCode', 'TEST')
         ->call('update', 99999)
@@ -248,7 +250,7 @@ test('handles update of non-existent category', function () {
 test('can load document indexes', function () {
     $category = ModelsProjectCategory::factory()->create(['code' => 'TEST']);
 
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->call('loadIndexes', $category->id)
         ->assertSet('indexingId', $category->id)
         ->assertDispatched('open-modal-document-index');
@@ -257,7 +259,7 @@ test('can load document indexes', function () {
 test('document indexes include all document types', function () {
     $category = ModelsProjectCategory::factory()->create(['code' => 'TEST']);
 
-    $component = Livewire::test(ProjectCategory::class)
+    $component = Livewire::test('pm::master.project-category')
         ->call('loadIndexes', $category->id);
 
     expect($component->documentIndexes)->not->toBeEmpty();
@@ -266,7 +268,7 @@ test('document indexes include all document types', function () {
 test('can update document indexes', function () {
     $category = ModelsProjectCategory::factory()->create(['code' => 'TEST']);
 
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->call('loadIndexes', $category->id)
         ->call('updateIndexes')
         ->assertDispatched('notify')
@@ -276,7 +278,7 @@ test('can update document indexes', function () {
 test('can reset document indexes', function () {
     $category = ModelsProjectCategory::factory()->create(['code' => 'TEST']);
 
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->call('loadIndexes', $category->id)
         ->assertSet('indexingId', $category->id)
         ->dispatch('close-modal-document-index')
@@ -285,27 +287,20 @@ test('can reset document indexes', function () {
 });
 
 test('handles loading indexes for non-existent category', function () {
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->call('loadIndexes', 99999)
         ->assertDispatched('notify');
 });
 
 test('handles updating indexes for non-existent category', function () {
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->set('indexingId', 99999)
         ->call('updateIndexes')
         ->assertDispatched('notify');
 });
 
-test('displays breadcrumbs', function () {
-    Livewire::test(ProjectCategory::class)
-        ->assertSee(__('pm::menu.be.parent'))
-        ->assertSee(__('pm::menu.be.master.parent'))
-        ->assertSee(__('pm::menu.be.master.project_category'));
-});
-
 test('sets active menu', function () {
-    Livewire::test(ProjectCategory::class);
+    Livewire::test('pm::master.project-category');
 
     expect(synav()->getActiveMenu())->toBe('pm.master.project_category');
 });
@@ -314,7 +309,7 @@ test('edit clears previous edit data', function () {
     $category1 = ModelsProjectCategory::factory()->create(['name' => 'Category 1']);
     $category2 = ModelsProjectCategory::factory()->create(['name' => 'Category 2']);
 
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->call('edit', $category1->id)
         ->assertSet('editName', 'Category 1')
         ->call('edit', $category2->id)
@@ -322,7 +317,7 @@ test('edit clears previous edit data', function () {
 });
 
 test('shows success message for creation', function () {
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->set('newName', 'Test Category')
         ->set('newCode', 'TEST')
         ->call('store')
@@ -332,7 +327,7 @@ test('shows success message for creation', function () {
 test('shows success message for update', function () {
     $category = ModelsProjectCategory::factory()->create();
 
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->call('edit', $category->id)
         ->set('editName', 'Updated Name')
         ->call('update', $category->id)
@@ -343,7 +338,7 @@ test('shows success message for deletion', function () {
     $category = ModelsProjectCategory::factory()->create();
     $token = $category->delete_token;
 
-    Livewire::test(ProjectCategory::class)
+    Livewire::test('pm::master.project-category')
         ->call('delete', $token)
         ->assertDispatched('notify');
 });

@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.1] - 2026-02-22
+
+### Changed
+- **Livewire v4 MFC Migration**: Migrated all Livewire components to Multi-File Component (MFC) format under `resources/views/components/`
+  - Removed legacy single-file Livewire components from `src/Livewire/` and `resources/views/livewire/`
+  - All components now use anonymous classes in `resources/views/components/`
+
+### Fixed
+- **File upload bug**: Fixed `UnableToRetrieveMetadata` error when uploading documents in project detail
+  - Root cause: Livewire v4 same-disk optimization moves temp files on `store()`, making subsequent `getSize()`/`getMimeType()` calls fail
+  - Fix: collect file metadata (name, size, mime type) before calling `store()`
+- **Invoice PDF modal**: Modal no longer closes automatically after generating invoice PDF; stays open for review
+- **Receipt modal**: Modal no longer closes automatically after generating receipt PDF or saving payment status; stays open for review
+- **Invoice list refresh**: Invoice list now correctly refreshes (showing download/receipt buttons) when invoice detail or receipt modal is closed, via `#[On]` handlers on the invoice list component
+- **Dropdown alignment**: Fixed centered alignment of `<button>` items in the invoice list action dropdown
+  - Root cause: `theme.css` global `button[type="button"]` rule (`justify-content: center`, `display: inline-flex`) had higher specificity than `.icon-dropdown-item`
+  - Fix: added `.icon-dropdown .icon-dropdown-item` override rule with higher specificity and made `.icon-dropdown` a flex column container
+
 ## [0.7.0] - 2026-02-09
 
 ### Added

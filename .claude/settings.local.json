@@ -31,7 +31,11 @@
       "Bash(do sed -i '/assertDispatched.*notify.*function/,/}\\);/c\\\\        ->assertDispatched\\(''''notify''''\\);' \"$file\")",
       "Bash(done)",
       "Bash(ls:*)",
-      "Bash(git status:*)"
+      "Bash(git status:*)",
+      "Bash(echo:*)",
+      "Bash(composer update:*)",
+      "Bash(head -10 grep -n \"invoice-refresh\\\\|invoice_refresh\" /media/adods/Data/Herd/synapse-lw4/packages/synmod-pm/resources/views/components/project/invoice-list/invoice-list.blade.php)",
+      "Bash(npm run build:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

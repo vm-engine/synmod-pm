@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Livewire\Volt\Volt;
-use VmEngine\Pm\Livewire\Master\IssuerForm;
+use Livewire\Livewire;
 use VmEngine\Pm\Models\DocumentIssuer;
+
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $UserModel = config('auth.providers.users.model');
@@ -15,14 +17,14 @@ beforeEach(function () {
 });
 
 test('component can be rendered', function () {
-    Volt::test(IssuerForm::class)
+    Livewire::test('pm::master.issuer-form')
         ->assertStatus(200);
 });
 
 test('can create new issuer with valid data', function () {
     $file = UploadedFile::fake()->image('header.jpg', 1200, 300);
 
-    Volt::test(IssuerForm::class)
+    Livewire::test('pm::master.issuer-form')
         ->set('form.name', 'Test Company')
         ->set('form.header_image', $file)
         ->set('form.tax_id_name', 'Test Legal Name')
@@ -46,7 +48,7 @@ test('can create new issuer with valid data', function () {
 test('validation fails when name is missing', function () {
     $file = UploadedFile::fake()->image('header.jpg');
 
-    Volt::test(IssuerForm::class)
+    Livewire::test('pm::master.issuer-form')
         ->set('form.header_image', $file)
         ->set('form.tax_id_name', 'Test Legal Name')
         ->set('form.tax_id_address', '123 Test Street')
@@ -56,7 +58,7 @@ test('validation fails when name is missing', function () {
 });
 
 test('validation fails when header image is missing on create', function () {
-    Volt::test(IssuerForm::class)
+    Livewire::test('pm::master.issuer-form')
         ->set('form.name', 'Test Company')
         ->set('form.tax_id_name', 'Test Legal Name')
         ->set('form.tax_id_address', '123 Test Street')
@@ -68,7 +70,7 @@ test('validation fails when header image is missing on create', function () {
 test('validation fails when tax ID name is missing', function () {
     $file = UploadedFile::fake()->image('header.jpg');
 
-    Volt::test(IssuerForm::class)
+    Livewire::test('pm::master.issuer-form')
         ->set('form.name', 'Test Company')
         ->set('form.header_image', $file)
         ->set('form.tax_id_address', '123 Test Street')
@@ -80,7 +82,7 @@ test('validation fails when tax ID name is missing', function () {
 test('validation fails when tax ID address is missing', function () {
     $file = UploadedFile::fake()->image('header.jpg');
 
-    Volt::test(IssuerForm::class)
+    Livewire::test('pm::master.issuer-form')
         ->set('form.name', 'Test Company')
         ->set('form.header_image', $file)
         ->set('form.tax_id_name', 'Test Legal Name')
@@ -92,7 +94,7 @@ test('validation fails when tax ID address is missing', function () {
 test('validation fails when tax ID number is missing', function () {
     $file = UploadedFile::fake()->image('header.jpg');
 
-    Volt::test(IssuerForm::class)
+    Livewire::test('pm::master.issuer-form')
         ->set('form.name', 'Test Company')
         ->set('form.header_image', $file)
         ->set('form.tax_id_name', 'Test Legal Name')
@@ -104,7 +106,7 @@ test('validation fails when tax ID number is missing', function () {
 test('validation fails when tax ID number is not numeric', function () {
     $file = UploadedFile::fake()->image('header.jpg');
 
-    Volt::test(IssuerForm::class)
+    Livewire::test('pm::master.issuer-form')
         ->set('form.name', 'Test Company')
         ->set('form.header_image', $file)
         ->set('form.tax_id_name', 'Test Legal Name')
@@ -117,7 +119,7 @@ test('validation fails when tax ID number is not numeric', function () {
 test('validation fails when tax ID number is not 16 digits', function () {
     $file = UploadedFile::fake()->image('header.jpg');
 
-    Volt::test(IssuerForm::class)
+    Livewire::test('pm::master.issuer-form')
         ->set('form.name', 'Test Company')
         ->set('form.header_image', $file)
         ->set('form.tax_id_name', 'Test Legal Name')
@@ -130,7 +132,7 @@ test('validation fails when tax ID number is not 16 digits', function () {
 test('validation fails when header image is not valid image file', function () {
     $file = UploadedFile::fake()->create('document.pdf', 100);
 
-    Volt::test(IssuerForm::class)
+    Livewire::test('pm::master.issuer-form')
         ->set('form.name', 'Test Company')
         ->set('form.header_image', $file)
         ->set('form.tax_id_name', 'Test Legal Name')
@@ -143,7 +145,7 @@ test('validation fails when header image is not valid image file', function () {
 test('validation fails when header image exceeds 5MB', function () {
     $file = UploadedFile::fake()->image('header.jpg')->size(6000); // 6MB
 
-    Volt::test(IssuerForm::class)
+    Livewire::test('pm::master.issuer-form')
         ->set('form.name', 'Test Company')
         ->set('form.header_image', $file)
         ->set('form.tax_id_name', 'Test Legal Name')
@@ -162,7 +164,7 @@ test('can load existing issuer for editing', function () {
         'header_image' => 'test/path.jpg',
     ]);
 
-    Volt::test(IssuerForm::class)
+    Livewire::test('pm::master.issuer-form')
         ->call('loadIssuer', $issuer->id)
         ->assertSet('form.name', 'Original Name')
         ->assertSet('form.tax_id_name', 'Original Legal Name')
@@ -177,7 +179,7 @@ test('can update existing issuer', function () {
         'header_image' => 'old/path.jpg',
     ]);
 
-    Volt::test(IssuerForm::class)
+    Livewire::test('pm::master.issuer-form')
         ->call('loadIssuer', $issuer->id)
         ->set('form.name', 'Updated Name')
         ->set('form.tax_id_name', 'Updated Legal Name')
@@ -203,7 +205,7 @@ test('can update issuer without changing header image', function () {
         'tax_id_number' => '1111111111111111',
     ]);
 
-    Volt::test(IssuerForm::class)
+    Livewire::test('pm::master.issuer-form')
         ->call('loadIssuer', $issuer->id)
         ->set('form.name', 'Updated Name')
         ->set('form.tax_id_name', 'Updated Legal Name')
@@ -229,7 +231,7 @@ test('can update issuer with new header image', function () {
 
     $newFile = UploadedFile::fake()->image('new_header.jpg');
 
-    Volt::test(IssuerForm::class)
+    Livewire::test('pm::master.issuer-form')
         ->call('loadIssuer', $issuer->id)
         ->set('form.header_image', $newFile)
         ->set('form.name', 'Updated Name')
@@ -249,7 +251,7 @@ test('can update issuer with new header image', function () {
 });
 
 test('dispatches error when loading non-existent issuer', function () {
-    Volt::test(IssuerForm::class)
+    Livewire::test('pm::master.issuer-form')
         ->call('loadIssuer', 99999)
         ->assertDispatched('notify')
         ->assertDispatched('close-modal-issuer-form');
@@ -258,7 +260,7 @@ test('dispatches error when loading non-existent issuer', function () {
 test('reset form clears all fields', function () {
     $issuer = DocumentIssuer::factory()->create();
 
-    $component = Volt::test(IssuerForm::class)
+    $component = Livewire::test('pm::master.issuer-form')
         ->call('loadIssuer', $issuer->id);
 
     // Verify fields are populated
@@ -280,7 +282,7 @@ test('header image is stored correctly', function () {
     // Create a wide image (landscape)
     $file = UploadedFile::fake()->image('header.jpg', 2000, 500);
 
-    Volt::test(IssuerForm::class)
+    Livewire::test('pm::master.issuer-form')
         ->set('form.name', 'Test Company')
         ->set('form.header_image', $file)
         ->set('form.tax_id_name', 'Test Legal Name')
@@ -299,7 +301,7 @@ test('header image is stored correctly', function () {
 test('accepts PNG images', function () {
     $file = UploadedFile::fake()->image('header.png');
 
-    Volt::test(IssuerForm::class)
+    Livewire::test('pm::master.issuer-form')
         ->set('form.name', 'Test Company')
         ->set('form.header_image', $file)
         ->set('form.tax_id_name', 'Test Legal Name')
@@ -316,7 +318,7 @@ test('accepts PNG images', function () {
 test('accepts WebP images', function () {
     $file = UploadedFile::fake()->create('header.webp', 100, 'image/webp');
 
-    Volt::test(IssuerForm::class)
+    Livewire::test('pm::master.issuer-form')
         ->set('form.name', 'Test Company')
         ->set('form.header_image', $file)
         ->set('form.tax_id_name', 'Test Legal Name')

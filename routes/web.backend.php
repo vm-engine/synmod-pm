@@ -4,20 +4,6 @@ use Illuminate\Support\Facades\Route;
 use VmEngine\Pm\Http\Controllers\DocumentController;
 use VmEngine\Pm\Http\Controllers\InvoiceController;
 use VmEngine\Pm\Http\Controllers\ReceiptController;
-use VmEngine\Pm\Livewire\ClientForm;
-use VmEngine\Pm\Livewire\ClientList;
-use VmEngine\Pm\Livewire\Config;
-use VmEngine\Pm\Livewire\Master\BankAccount;
-use VmEngine\Pm\Livewire\Master\ClientCategory;
-use VmEngine\Pm\Livewire\Master\Division;
-use VmEngine\Pm\Livewire\Master\Issuer;
-use VmEngine\Pm\Livewire\Master\ProjectCategory;
-use VmEngine\Pm\Livewire\Master\Signature;
-use VmEngine\Pm\Livewire\Project\ProjectDetail;
-use VmEngine\Pm\Livewire\Project\ProjectForm;
-use VmEngine\Pm\Livewire\Project\ProjectList;
-use VmEngine\Pm\Livewire\Report\Invoice;
-use VmEngine\Pm\Livewire\Report\ProjectDocument;
 
 Route::group([], function () {
     Route::get('/', function () {
@@ -25,13 +11,13 @@ Route::group([], function () {
     })->name('index')->middleware('can-access:pm.manage');
 
     // Project routes
-    Route::get('/project', ProjectList::class)
+    Route::livewire('/project', 'pm::project.project-list')
         ->name('project.index')->middleware('can-access:pm.project.read');
-    Route::get('/project/create', ProjectForm::class)
+    Route::livewire('/project/create', 'pm::project.project-form')
         ->name('project.create')->middleware('can-access:pm.project.create');
-    Route::get('/project/{id}/edit', ProjectForm::class)
+    Route::livewire('/project/{id}/edit', 'pm::project.project-form')
         ->name('project.edit')->middleware('can-access:pm.project.update');
-    Route::get('/project/{id}', ProjectDetail::class)
+    Route::livewire('/project/{id}', 'pm::project.project-detail')
         ->name('project.detail')->middleware('can-access:pm.project.read');
 
     // Document Download routes
@@ -55,33 +41,33 @@ Route::group([], function () {
         ->name('receipt.payment-proof')->middleware('can-access:pm.invoice.read');
 
     // Client routes
-    Route::get('/client', ClientList::class)
+    Route::livewire('/client', 'pm::client-list')
         ->name('client.index')->middleware('can-access:pm.client.read');
-    Route::get('/client/create', ClientForm::class)
+    Route::livewire('/client/create', 'pm::client-form')
         ->name('client.create')->middleware('can-access:pm.client.create');
-    Route::get('/client/{id}/edit', ClientForm::class)
+    Route::livewire('/client/{id}/edit', 'pm::client-form')
         ->name('client.edit')->middleware('can-access:pm.client.update');
 
     // Master data routes
-    Route::get('/master/division', Division::class)
+    Route::livewire('/master/division', 'pm::master.division')
         ->name('master.division')->middleware('can-access:pm.master.division');
-    Route::get('/master/client-category', ClientCategory::class)
+    Route::livewire('/master/client-category', 'pm::master.client-category')
         ->name('master.client_category')->middleware('can-access:pm.master.client_category');
-    Route::get('/master/project-category', ProjectCategory::class)
+    Route::livewire('/master/project-category', 'pm::master.project-category')
         ->name('master.project_category')->middleware('can-access:pm.master.project_category');
-    Route::get('/master/issuer', Issuer::class)
+    Route::livewire('/master/issuer', 'pm::master.issuer-list')
         ->name('master.issuer')->middleware('can-access:pm.master.issuer');
-    Route::get('/master/bank-account', BankAccount::class)
+    Route::livewire('/master/bank-account', 'pm::master.bank-account-list')
         ->name('master.bank_account')->middleware('can-access:pm.master.bank_account');
-    Route::get('/master/signature', Signature::class)
+    Route::livewire('/master/signature', 'pm::master.signature-list')
         ->name('master.signature')->middleware('can-access:pm.master.signature');
 
     // Report routes
-    Route::get('/report/project-document', ProjectDocument::class)
+    Route::livewire('/report/project-document', 'pm::report.project-document')
         ->name('report.project_document')->middleware('can-access:pm.report.project_document');
-    Route::get('/report/invoice', Invoice::class)
+    Route::livewire('/report/invoice', 'pm::report.invoice')
         ->name('report.invoice')->middleware('can-access:pm.report.invoice');
 
-    Route::get('/config', Config::class)
+    Route::livewire('/config', 'pm::config-page')
         ->name('config')->middleware('can-access:pm.config.read');
 });

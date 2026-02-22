@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use VmEngine\Pm\Livewire\Project\Activity;
 use VmEngine\Pm\Models\Project;
 use VmEngine\SynAuth\Models\UserActivity;
+
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $UserModel = config('auth.providers.users.model');
@@ -15,7 +17,7 @@ beforeEach(function () {
 test('component can be rendered', function () {
     $project = Project::factory()->create();
 
-    Livewire::test(Activity::class, ['projectId' => $project->id])
+    Livewire::test('pm::project.activity', ['projectId' => $project->id])
         ->assertStatus(200);
 });
 
@@ -40,7 +42,7 @@ test('loads activities for specific project', function () {
         'feature' => 'project.'.$project->id.'.test',
     ]);
 
-    $component = Livewire::test(Activity::class, ['projectId' => $project->id]);
+    $component = Livewire::test('pm::project.activity', ['projectId' => $project->id]);
 
     // Should only show 3 activities for this project
     expect($component->activities)->toHaveCount(3);
@@ -61,7 +63,7 @@ test('activities are ordered by created_at descending', function () {
         'created_at' => now(),
     ]);
 
-    $component = Livewire::test(Activity::class, ['projectId' => $project->id]);
+    $component = Livewire::test('pm::project.activity', ['projectId' => $project->id]);
 
     $activities = $component->activities;
     expect($activities->first()->id)->toBe($newActivity->id);
@@ -77,7 +79,7 @@ test('activities are paginated', function () {
         'feature' => 'project.'.$project->id.'.test',
     ]);
 
-    $component = Livewire::test(Activity::class, ['projectId' => $project->id]);
+    $component = Livewire::test('pm::project.activity', ['projectId' => $project->id]);
 
     // Default perPage is 25
     expect($component->activities)->toHaveCount(25);
@@ -91,7 +93,7 @@ test('can change per page value', function () {
         'feature' => 'project.'.$project->id.'.test',
     ]);
 
-    Livewire::test(Activity::class, ['projectId' => $project->id])
+    Livewire::test('pm::project.activity', ['projectId' => $project->id])
         ->set('perPage', 10)
         ->assertSet('perPage', 10);
 });
@@ -107,7 +109,7 @@ test('eager loads user relationship', function () {
         'user_id' => $this->user->id,
     ]);
 
-    $component = Livewire::test(Activity::class, ['projectId' => $project->id]);
+    $component = Livewire::test('pm::project.activity', ['projectId' => $project->id]);
 
     $activity = $component->activities->first();
     expect($activity->relationLoaded('user'))->toBeTrue();
@@ -125,7 +127,7 @@ test('can show activity detail', function () {
         'description' => 'Test description',
     ]);
 
-    Livewire::test(Activity::class, ['projectId' => $project->id])
+    Livewire::test('pm::project.activity', ['projectId' => $project->id])
         ->call('showDetail', $activity->id)
         ->assertSet('selectedActivity.id', $activity->id)
         ->assertSet('selectedActivity.action', 'test_action')
@@ -141,7 +143,7 @@ test('selected activity loads user relationship', function () {
         'user_id' => $this->user->id,
     ]);
 
-    $component = Livewire::test(Activity::class, ['projectId' => $project->id])
+    $component = Livewire::test('pm::project.activity', ['projectId' => $project->id])
         ->call('showDetail', $activity->id);
 
     expect($component->selectedActivity->relationLoaded('user'))->toBeTrue();
@@ -156,7 +158,7 @@ test('resets detail on close modal event', function () {
         'feature' => 'project.'.$project->id.'.test',
     ]);
 
-    Livewire::test(Activity::class, ['projectId' => $project->id])
+    Livewire::test('pm::project.activity', ['projectId' => $project->id])
         ->call('showDetail', $activity->id)
         ->assertSet('selectedActivity.id', $activity->id)
         ->dispatch('close-modal-activity-detail')
@@ -166,7 +168,7 @@ test('resets detail on close modal event', function () {
 test('handles non-existent activity gracefully', function () {
     $project = Project::factory()->create();
 
-    Livewire::test(Activity::class, ['projectId' => $project->id])
+    Livewire::test('pm::project.activity', ['projectId' => $project->id])
         ->call('showDetail', 99999)
         ->assertSet('selectedActivity', null);
 });
@@ -187,7 +189,7 @@ test('filters by project id in feature field', function () {
         'feature' => 'project.'.$project2->id.'.invoice',
     ]);
 
-    $component = Livewire::test(Activity::class, ['projectId' => $project1->id]);
+    $component = Livewire::test('pm::project.activity', ['projectId' => $project1->id]);
 
     $activities = $component->activities;
     expect($activities)->toHaveCount(1);
@@ -212,7 +214,7 @@ test('includes activities with any feature starting with project id', function (
         'feature' => 'project.'.$project->id,
     ]);
 
-    $component = Livewire::test(Activity::class, ['projectId' => $project->id]);
+    $component = Livewire::test('pm::project.activity', ['projectId' => $project->id]);
 
     expect($component->activities)->toHaveCount(3);
 });
