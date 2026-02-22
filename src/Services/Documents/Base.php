@@ -16,9 +16,9 @@ abstract class Base
         // Ensure relationships are loaded
         $project->loadMissing(['client', 'projectCategory']);
 
-        $format = dbconf('pm.documents.'.$document->code(true).'.number_format', '');
+        $format = dbconf('pm.documents.'.($document->code(true) ?: $document->name).'.number_format', '');
         $cnc = $project->client->status == Client::STATUS_PROSPECT && $document->hasNCIndex() ? 'NC' : 'C';
-        $index = dbconf('pm.documents.'.$project->category?->code.'.'.$document->code().'.next_'.strtolower($cnc).'_index', 1);
+        $index = dbconf('pm.documents.'.$project->category?->code.'.'.($document->code() ?: $document->name).'.next_'.strtolower($cnc).'_index', 1);
 
         return $this->replaceFormat($format, $cnc, $index, $project, $document);
     }

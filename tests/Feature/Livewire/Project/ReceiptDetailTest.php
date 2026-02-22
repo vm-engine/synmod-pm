@@ -2,16 +2,18 @@
 
 declare(strict_types=1);
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use VmEngine\Pm\Enums\Documents;
-use VmEngine\Pm\Livewire\Project\ReceiptDetail;
 use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\DocumentIssuer;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Pm\Models\ProjectInvoice;
 use VmEngine\Pm\Models\Signature;
+
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Storage::fake('local');
@@ -51,7 +53,7 @@ function createTestProject(array $attributes = []): Project
 }
 
 test('component can be rendered', function () {
-    Livewire::test(ReceiptDetail::class)
+    Livewire::test('pm::project.receipt-detail')
         ->assertStatus(200);
 });
 
@@ -64,7 +66,7 @@ test('loads invoice data when dispatched', function () {
         'invoice_number' => 'INV-001',
     ]);
 
-    Livewire::test(ReceiptDetail::class)
+    Livewire::test('pm::project.receipt-detail')
         ->dispatch('load-receipt-detail', id: $invoice->id)
         ->assertSet('invoice.invoice_number', 'INV-001')
         ->assertSet('invoiceId', $invoice->id);
@@ -78,7 +80,7 @@ test('generates receipt number preview', function () {
         'client_id' => $client->id,
     ]);
 
-    $component = Livewire::test(ReceiptDetail::class)
+    $component = Livewire::test('pm::project.receipt-detail')
         ->dispatch('load-receipt-detail', id: $invoice->id);
 
     expect($component->get('receiptNumber'))->not->toBeEmpty();
@@ -93,7 +95,7 @@ test('generates amount text preview', function () {
         'total_amount' => 1000000,
     ]);
 
-    $component = Livewire::test(ReceiptDetail::class)
+    $component = Livewire::test('pm::project.receipt-detail')
         ->dispatch('load-receipt-detail', id: $invoice->id);
 
     expect($component->get('amountText'))->toContain('Rupiah');
@@ -115,7 +117,7 @@ test('can generate receipt pdf', function () {
         'total_amount' => 1000000,
     ]);
 
-    Livewire::test(ReceiptDetail::class)
+    Livewire::test('pm::project.receipt-detail')
         ->dispatch('load-receipt-detail', id: $invoice->id)
         ->call('generateReceipt')
         ->assertHasNoErrors();
@@ -139,7 +141,7 @@ test('displays has receipt status correctly', function () {
         'receipt_document_id' => 1,
     ]);
 
-    $component = Livewire::test(ReceiptDetail::class)
+    $component = Livewire::test('pm::project.receipt-detail')
         ->dispatch('load-receipt-detail', id: $invoice->id);
 
     expect($component->get('hasReceipt'))->toBeTrue();
@@ -154,7 +156,7 @@ test('payment status checkbox updates correctly', function () {
         'is_paid' => false,
     ]);
 
-    Livewire::test(ReceiptDetail::class)
+    Livewire::test('pm::project.receipt-detail')
         ->dispatch('load-receipt-detail', id: $invoice->id)
         ->assertSet('isPaid', false)
         ->set('isPaid', true)
@@ -174,7 +176,7 @@ test('unchecking payment status clears paid at field', function () {
         'paid_at' => now(),
     ]);
 
-    Livewire::test(ReceiptDetail::class)
+    Livewire::test('pm::project.receipt-detail')
         ->dispatch('load-receipt-detail', id: $invoice->id)
         ->set('isPaid', false)
         ->assertSet('paidAt', null);
@@ -194,12 +196,12 @@ test('can save payment status with datetime', function () {
     ]);
 
     // Generate receipt first
-    Livewire::test(ReceiptDetail::class)
+    Livewire::test('pm::project.receipt-detail')
         ->dispatch('load-receipt-detail', id: $invoice->id)
         ->call('generateReceipt');
 
     // Now save payment status
-    Livewire::test(ReceiptDetail::class)
+    Livewire::test('pm::project.receipt-detail')
         ->dispatch('load-receipt-detail', id: $invoice->id)
         ->set('isPaid', true)
         ->set('paidAt', '2024-01-15 10:30')
@@ -224,13 +226,13 @@ test('can save payment status with proof file', function () {
     ]);
 
     // Generate receipt first
-    Livewire::test(ReceiptDetail::class)
+    Livewire::test('pm::project.receipt-detail')
         ->dispatch('load-receipt-detail', id: $invoice->id)
         ->call('generateReceipt');
 
     $file = UploadedFile::fake()->create('payment-proof.pdf', 1000, 'application/pdf');
 
-    Livewire::test(ReceiptDetail::class)
+    Livewire::test('pm::project.receipt-detail')
         ->dispatch('load-receipt-detail', id: $invoice->id)
         ->set('isPaid', true)
         ->set('paidAt', '2024-01-15 10:30')
@@ -251,7 +253,7 @@ test('cannot save payment status without generating receipt first', function () 
         'receipt_document_id' => null,
     ]);
 
-    Livewire::test(ReceiptDetail::class)
+    Livewire::test('pm::project.receipt-detail')
         ->dispatch('load-receipt-detail', id: $invoice->id)
         ->set('isPaid', true)
         ->set('paidAt', '2024-01-15 10:30')
@@ -272,11 +274,11 @@ test('validates paid at is required when marking as paid', function () {
     ]);
 
     // Generate receipt first
-    Livewire::test(ReceiptDetail::class)
+    Livewire::test('pm::project.receipt-detail')
         ->dispatch('load-receipt-detail', id: $invoice->id)
         ->call('generateReceipt');
 
-    Livewire::test(ReceiptDetail::class)
+    Livewire::test('pm::project.receipt-detail')
         ->dispatch('load-receipt-detail', id: $invoice->id)
         ->set('isPaid', true)
         ->set('paidAt', '')
@@ -297,13 +299,13 @@ test('validates payment proof file type', function () {
     ]);
 
     // Generate receipt first
-    Livewire::test(ReceiptDetail::class)
+    Livewire::test('pm::project.receipt-detail')
         ->dispatch('load-receipt-detail', id: $invoice->id)
         ->call('generateReceipt');
 
     $invalidFile = UploadedFile::fake()->create('document.txt', 100, 'text/plain');
 
-    Livewire::test(ReceiptDetail::class)
+    Livewire::test('pm::project.receipt-detail')
         ->dispatch('load-receipt-detail', id: $invoice->id)
         ->set('isPaid', true)
         ->set('paidAt', '2024-01-15 10:30')
@@ -320,7 +322,7 @@ test('resets detail on modal close', function () {
         'client_id' => $client->id,
     ]);
 
-    Livewire::test(ReceiptDetail::class)
+    Livewire::test('pm::project.receipt-detail')
         ->dispatch('load-receipt-detail', id: $invoice->id)
         ->assertSet('invoice.id', $invoice->id)
         ->dispatch('close-modal-receipt-detail')

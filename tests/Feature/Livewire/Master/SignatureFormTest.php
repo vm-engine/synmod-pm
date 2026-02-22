@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
-use VmEngine\Pm\Livewire\Master\SignatureForm;
 use VmEngine\Pm\Models\Signature;
+
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Storage::fake('public');
@@ -16,14 +18,14 @@ beforeEach(function () {
 });
 
 test('component can be rendered', function () {
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->assertStatus(200);
 });
 
 test('can create new signature', function () {
     $file = UploadedFile::fake()->image('signature.png');
 
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->set('form.name', 'John Doe')
         ->set('form.position', 'Director')
         ->set('form.file', $file)
@@ -44,7 +46,7 @@ test('can create new signature', function () {
 test('stores signature image file', function () {
     $file = UploadedFile::fake()->image('signature.png');
 
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->set('form.name', 'John Doe')
         ->set('form.position', 'Director')
         ->set('form.file', $file)
@@ -61,7 +63,7 @@ test('can update existing signature', function () {
         'position' => 'Old Position',
     ]);
 
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->dispatch('load-signature', id: $signature->id)
         ->set('form.name', 'Updated Name')
         ->set('form.position', 'Updated Position')
@@ -85,7 +87,7 @@ test('can update signature with new file', function () {
 
     $newFile = UploadedFile::fake()->image('new-signature.png');
 
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->dispatch('load-signature', id: $signature->id)
         ->set('form.name', 'John Doe')
         ->set('form.position', 'Director')
@@ -104,7 +106,7 @@ test('can update signature with new file', function () {
 test('validates required name', function () {
     $file = UploadedFile::fake()->image('signature.png');
 
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->set('form.name', '')
         ->set('form.position', 'Director')
         ->set('form.file', $file)
@@ -115,7 +117,7 @@ test('validates required name', function () {
 test('validates required position', function () {
     $file = UploadedFile::fake()->image('signature.png');
 
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->set('form.name', 'John Doe')
         ->set('form.position', '')
         ->set('form.file', $file)
@@ -124,7 +126,7 @@ test('validates required position', function () {
 });
 
 test('validates required file for new signature', function () {
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->set('form.name', 'John Doe')
         ->set('form.position', 'Director')
         ->set('form.file', null)
@@ -138,7 +140,7 @@ test('file is optional when updating signature', function () {
         'file' => 'signatures/existing.png',
     ]);
 
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->dispatch('load-signature', id: $signature->id)
         ->set('form.name', 'Updated Name')
         ->set('form.position', 'Updated Position')
@@ -153,7 +155,7 @@ test('file is optional when updating signature', function () {
 test('validates file mime types', function () {
     $file = UploadedFile::fake()->create('document.pdf', 100, 'application/pdf');
 
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->set('form.name', 'John Doe')
         ->set('form.position', 'Director')
         ->set('form.file', $file)
@@ -164,7 +166,7 @@ test('validates file mime types', function () {
 test('validates file max size', function () {
     $file = UploadedFile::fake()->create('large-image.png', 6000); // 6MB
 
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->set('form.name', 'John Doe')
         ->set('form.position', 'Director')
         ->set('form.file', $file)
@@ -175,7 +177,7 @@ test('validates file max size', function () {
 test('validates name max length', function () {
     $file = UploadedFile::fake()->image('signature.png');
 
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->set('form.name', str_repeat('a', 256))
         ->set('form.position', 'Director')
         ->set('form.file', $file)
@@ -186,7 +188,7 @@ test('validates name max length', function () {
 test('validates position max length', function () {
     $file = UploadedFile::fake()->image('signature.png');
 
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->set('form.name', 'John Doe')
         ->set('form.position', str_repeat('a', 256))
         ->set('form.file', $file)
@@ -201,7 +203,7 @@ test('loads signature data correctly', function () {
         'file' => 'signatures/test.png',
     ]);
 
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->dispatch('load-signature', id: $signature->id)
         ->assertSet('form.name', 'John Doe')
         ->assertSet('form.position', 'Director')
@@ -209,7 +211,7 @@ test('loads signature data correctly', function () {
 });
 
 test('handles loading non-existent signature', function () {
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->dispatch('load-signature', id: 99999)
         ->assertDispatched('notify')
         ->assertDispatched('close-modal-signature-form');
@@ -218,7 +220,7 @@ test('handles loading non-existent signature', function () {
 test('resets form on close modal event', function () {
     $signature = Signature::factory()->create();
 
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->dispatch('load-signature', id: $signature->id)
         ->assertSet('form.name', $signature->name)
         ->dispatch('close-modal-signature-form')
@@ -228,7 +230,7 @@ test('resets form on close modal event', function () {
 test('resets form on reset event', function () {
     $file = UploadedFile::fake()->image('signature.png');
 
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->set('form.name', 'John Doe')
         ->set('form.position', 'Director')
         ->set('form.file', $file)
@@ -241,7 +243,7 @@ test('resets form on reset event', function () {
 test('dispatches dragndrop clear event on save', function () {
     $file = UploadedFile::fake()->image('signature.png');
 
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->set('form.name', 'John Doe')
         ->set('form.position', 'Director')
         ->set('form.file', $file)
@@ -250,7 +252,7 @@ test('dispatches dragndrop clear event on save', function () {
 });
 
 test('dispatches dragndrop clear event on reset', function () {
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->dispatch('reset-signature-form')
         ->assertDispatched('dragndrop-clear-input');
 });
@@ -258,7 +260,7 @@ test('dispatches dragndrop clear event on reset', function () {
 test('accepts jpeg image format', function () {
     $file = UploadedFile::fake()->image('signature.jpg');
 
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->set('form.name', 'John Doe')
         ->set('form.position', 'Director')
         ->set('form.file', $file)
@@ -269,7 +271,7 @@ test('accepts jpeg image format', function () {
 test('accepts png image format', function () {
     $file = UploadedFile::fake()->image('signature.png');
 
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->set('form.name', 'John Doe')
         ->set('form.position', 'Director')
         ->set('form.file', $file)
@@ -280,7 +282,7 @@ test('accepts png image format', function () {
 test('accepts webp image format', function () {
     $file = UploadedFile::fake()->create('signature.webp', 100, 'image/webp');
 
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->set('form.name', 'John Doe')
         ->set('form.position', 'Director')
         ->set('form.file', $file)
@@ -291,7 +293,7 @@ test('accepts webp image format', function () {
 test('shows success message for create', function () {
     $file = UploadedFile::fake()->image('signature.png');
 
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->set('form.name', 'John Doe')
         ->set('form.position', 'Director')
         ->set('form.file', $file)
@@ -302,7 +304,7 @@ test('shows success message for create', function () {
 test('shows success message for update', function () {
     $signature = Signature::factory()->create();
 
-    Livewire::test(SignatureForm::class)
+    Livewire::test('pm::master.signature-form')
         ->dispatch('load-signature', id: $signature->id)
         ->set('form.name', 'Updated Name')
         ->set('form.position', 'Updated Position')

@@ -2,9 +2,12 @@
 
 declare(strict_types=1);
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\ClientCategory;
 use VmEngine\Pm\Models\Project;
+
+uses(RefreshDatabase::class);
 
 test('client has correct fillable fields', function () {
     $fillable = [

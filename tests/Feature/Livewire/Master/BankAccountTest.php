@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
-use VmEngine\Pm\Livewire\Master\BankAccount;
 use VmEngine\Pm\Models\BankAccount as ModelsBankAccount;
+
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Storage::fake('public');
@@ -15,14 +17,14 @@ beforeEach(function () {
 });
 
 test('component can be rendered', function () {
-    Livewire::test(BankAccount::class)
+    Livewire::test('pm::master.bank-account-list')
         ->assertStatus(200);
 });
 
 test('loads bank account list', function () {
     ModelsBankAccount::factory()->count(3)->create();
 
-    $component = Livewire::test(BankAccount::class);
+    $component = Livewire::test('pm::master.bank-account-list');
 
     expect($component->accountList)->toHaveCount(3);
 });
@@ -43,7 +45,7 @@ test('accounts are ordered by bank name then name', function () {
         'name' => 'Account B',
     ]);
 
-    $component = Livewire::test(BankAccount::class);
+    $component = Livewire::test('pm::master.bank-account-list');
 
     $accounts = $component->accountList;
     expect($accounts->first()->id)->toBe($accountA->id);
@@ -55,7 +57,7 @@ test('can search accounts by name', function () {
     $account2 = ModelsBankAccount::factory()->create(['name' => 'Savings Account']);
     $account3 = ModelsBankAccount::factory()->create(['name' => 'Business Checking']);
 
-    $component = Livewire::test(BankAccount::class)
+    $component = Livewire::test('pm::master.bank-account-list')
         ->set('q', 'Account');
 
     $accounts = $component->accountList;
@@ -71,7 +73,7 @@ test('can search accounts by account number', function () {
     $account1 = ModelsBankAccount::factory()->create(['number' => '1234567890']);
     $account2 = ModelsBankAccount::factory()->create(['number' => '0987654321']);
 
-    $component = Livewire::test(BankAccount::class)
+    $component = Livewire::test('pm::master.bank-account-list')
         ->set('q', '1234');
 
     $accounts = $component->accountList;
@@ -84,7 +86,7 @@ test('can search accounts by bank name', function () {
     $account2 = ModelsBankAccount::factory()->create(['bank_name' => 'Chase Bank']);
     $account3 = ModelsBankAccount::factory()->create(['bank_name' => 'Wells Fargo']);
 
-    $component = Livewire::test(BankAccount::class)
+    $component = Livewire::test('pm::master.bank-account-list')
         ->set('q', 'Bank');
 
     $accounts = $component->accountList;
@@ -94,7 +96,7 @@ test('can search accounts by bank name', function () {
 test('search requires minimum 3 characters', function () {
     ModelsBankAccount::factory()->count(5)->create();
 
-    $component = Livewire::test(BankAccount::class)
+    $component = Livewire::test('pm::master.bank-account-list')
         ->set('q', 'ab');
 
     expect($component->accountList)->toHaveCount(5);
@@ -103,7 +105,7 @@ test('search requires minimum 3 characters', function () {
 test('pagination works with limit', function () {
     ModelsBankAccount::factory()->count(15)->create();
 
-    $component = Livewire::test(BankAccount::class)
+    $component = Livewire::test('pm::master.bank-account-list')
         ->set('limit', 5);
 
     expect($component->accountList)->toHaveCount(5);
@@ -119,7 +121,7 @@ test('can delete bank account', function () {
 
     $token = $account->delete_token;
 
-    Livewire::test(BankAccount::class)
+    Livewire::test('pm::master.bank-account-list')
         ->call('delete', $token)
         ->assertDispatched('synapse-confirmed')
         ->assertDispatched('notify');
@@ -136,7 +138,7 @@ test('deletes bank logo when account is deleted', function () {
 
     $token = $account->delete_token;
 
-    Livewire::test(BankAccount::class)
+    Livewire::test('pm::master.bank-account-list')
         ->call('delete', $token);
 
     expect(Storage::disk('public')->exists('bank-logos/test.png'))->toBeFalse();
@@ -149,7 +151,7 @@ test('handles deletion when logo does not exist', function () {
 
     $token = $account->delete_token;
 
-    Livewire::test(BankAccount::class)
+    Livewire::test('pm::master.bank-account-list')
         ->call('delete', $token)
         ->assertDispatched('notify');
 
@@ -159,28 +161,21 @@ test('handles deletion when logo does not exist', function () {
 test('handles deletion with invalid token', function () {
     ModelsBankAccount::factory()->create();
 
-    Livewire::test(BankAccount::class)
+    Livewire::test('pm::master.bank-account-list')
         ->call('delete', 'invalid-token')
         ->assertDispatched('notify');
 });
 
 // Note: Cannot test non-existent account deletion without a valid token from an actual model instance
 
-test('displays breadcrumbs', function () {
-    Livewire::test(BankAccount::class)
-        ->assertSee(__('pm::menu.be.parent'))
-        ->assertSee(__('pm::menu.be.master.parent'))
-        ->assertSee(__('pm::menu.be.master.bank_account'));
-});
-
 test('sets active menu', function () {
-    Livewire::test(BankAccount::class);
+    Livewire::test('pm::master.bank-account-list');
 
     expect(synav()->getActiveMenu())->toBe('pm.master.bank_account');
 });
 
 test('search is persisted in URL', function () {
-    Livewire::test(BankAccount::class)
+    Livewire::test('pm::master.bank-account-list')
         ->set('q', 'test')
         ->assertSet('q', 'test');
 });

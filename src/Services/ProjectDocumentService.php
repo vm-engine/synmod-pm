@@ -29,6 +29,14 @@ class ProjectDocumentService
         ?string $notes = null,
         int $version = 1
     ): ProjectDocument {
+        // Collect file metadata BEFORE storing, because store() moves the temp file
+        // (same-disk optimization in Livewire v4), making it inaccessible afterwards.
+        $fileInfo = [
+            'original_name' => $file->getClientOriginalName(),
+            'size' => $file->getSize(),
+            'mime_type' => $file->getMimeType(),
+        ];
+
         $data = [
             'client_id' => $project->client_id,
             'user_id' => Auth::id(),
@@ -40,11 +48,7 @@ class ProjectDocumentService
                 'projects/'.$project->id.'/documents/'.($documentType->code() ?: $documentType->value),
                 'local'
             ),
-            'file_info' => [
-                'original_name' => $file->getClientOriginalName(),
-                'size' => $file->getSize(),
-                'mime_type' => $file->getMimeType(),
-            ],
+            'file_info' => $fileInfo,
         ];
 
         $document = $project->documents()->create($data);

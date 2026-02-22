@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
-use Livewire\Volt\Volt;
-use VmEngine\Pm\Livewire\ClientList;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\ClientCategory;
+
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $UserModel = config('auth.providers.users.model');
@@ -13,7 +15,7 @@ beforeEach(function () {
 });
 
 test('component can be rendered', function () {
-    Volt::test(ClientList::class)
+    Livewire::test('pm::client-list')
         ->assertStatus(200);
 });
 
@@ -24,7 +26,7 @@ test('displays clients list', function () {
         'client_category_id' => $category->id,
     ]);
 
-    Volt::test(ClientList::class)
+    Livewire::test('pm::client-list')
         ->assertSee('Acme Corp')
         ->assertStatus(200);
 });
@@ -34,7 +36,7 @@ test('can search clients by company name', function () {
     Client::factory()->create(['company' => 'Tech Solutions']);
     Client::factory()->create(['company' => 'Global Industries']);
 
-    Volt::test(ClientList::class)
+    Livewire::test('pm::client-list')
         ->set('q', 'Tech')
         ->assertSee('Tech Solutions')
         ->assertDontSee('Acme Corp')
@@ -45,7 +47,7 @@ test('can search clients by city', function () {
     Client::factory()->create(['company' => 'Company A', 'city' => 'New York']);
     Client::factory()->create(['company' => 'Company B', 'city' => 'Los Angeles']);
 
-    Volt::test(ClientList::class)
+    Livewire::test('pm::client-list')
         ->set('q', 'Angeles')
         ->assertSee('Company B')
         ->assertDontSee('Company A');
@@ -54,11 +56,11 @@ test('can search clients by city', function () {
 test('search requires at least 3 characters', function () {
     Client::factory()->create(['company' => 'Acme Corp']);
 
-    Volt::test(ClientList::class)
+    Livewire::test('pm::client-list')
         ->set('q', 'Ac')
         ->assertSee('Acme Corp'); // Should show all without filtering
 
-    Volt::test(ClientList::class)
+    Livewire::test('pm::client-list')
         ->set('q', 'Acm')
         ->assertSee('Acme Corp'); // Should filter now
 });
@@ -70,7 +72,7 @@ test('can filter by category', function () {
     Client::factory()->create(['company' => 'Company A', 'client_category_id' => $categoryA->id]);
     Client::factory()->create(['company' => 'Company B', 'client_category_id' => $categoryB->id]);
 
-    Volt::test(ClientList::class)
+    Livewire::test('pm::client-list')
         ->set('filterCategories', [$categoryA->id])
         ->assertSee('Company A')
         ->assertDontSee('Company B');
@@ -85,7 +87,7 @@ test('can filter by multiple categories', function () {
     Client::factory()->create(['company' => 'Company B', 'client_category_id' => $categoryB->id]);
     Client::factory()->create(['company' => 'Company C', 'client_category_id' => $categoryC->id]);
 
-    Volt::test(ClientList::class)
+    Livewire::test('pm::client-list')
         ->set('filterCategories', [$categoryA->id, $categoryB->id])
         ->assertSee('Company A')
         ->assertSee('Company B')
@@ -96,7 +98,7 @@ test('can filter by services', function () {
     Client::factory()->create(['company' => 'Web Dev Co', 'services' => [1, 2]]);
     Client::factory()->create(['company' => 'Mobile App Co', 'services' => [3, 4]]);
 
-    Volt::test(ClientList::class)
+    Livewire::test('pm::client-list')
         ->set('filterServices', [1])
         ->assertSee('Web Dev Co')
         ->assertDontSee('Mobile App Co');
@@ -106,7 +108,7 @@ test('can filter by status prospect', function () {
     Client::factory()->prospect()->create(['company' => 'Prospect Co']);
     Client::factory()->active()->create(['company' => 'Active Co']);
 
-    Volt::test(ClientList::class)
+    Livewire::test('pm::client-list')
         ->set('filterStatus', 'prospect')
         ->assertSee('Prospect Co')
         ->assertDontSee('Active Co');
@@ -116,7 +118,7 @@ test('can filter by status active', function () {
     Client::factory()->prospect()->create(['company' => 'Prospect Co']);
     Client::factory()->active()->create(['company' => 'Active Co']);
 
-    Volt::test(ClientList::class)
+    Livewire::test('pm::client-list')
         ->set('filterStatus', 'active')
         ->assertSee('Active Co')
         ->assertDontSee('Prospect Co');
@@ -126,7 +128,7 @@ test('can filter by active flag', function () {
     Client::factory()->active()->create(['company' => 'Enabled Company']);
     Client::factory()->inactive()->create(['company' => 'Disabled Company']);
 
-    Volt::test(ClientList::class)
+    Livewire::test('pm::client-list')
         ->set('filterActive', 'active')
         ->assertSee('Enabled Company')
         ->assertDontSee('Disabled Company');
@@ -136,7 +138,7 @@ test('can filter by inactive flag', function () {
     Client::factory()->active()->create(['company' => 'Enabled Company']);
     Client::factory()->inactive()->create(['company' => 'Disabled Company']);
 
-    Volt::test(ClientList::class)
+    Livewire::test('pm::client-list')
         ->set('filterActive', 'inactive')
         ->assertSee('Disabled Company')
         ->assertDontSee('Enabled Company');
@@ -163,7 +165,7 @@ test('can combine multiple filters', function () {
         'services' => [2],
     ]);
 
-    Volt::test(ClientList::class)
+    Livewire::test('pm::client-list')
         ->set('filterCategories', [$category->id])
         ->set('filterServices', [1])
         ->set('filterStatus', 'prospect')
@@ -176,14 +178,14 @@ test('can sort by column', function () {
     Client::factory()->create(['company' => 'Zebra Corp']);
     Client::factory()->create(['company' => 'Alpha Corp']);
 
-    Volt::test(ClientList::class)
+    Livewire::test('pm::client-list')
         ->call('sortData', 'company')
         ->assertSet('sort', 'company')
         ->assertSet('sortDirection', 'asc');
 });
 
 test('can toggle sort direction', function () {
-    Volt::test(ClientList::class)
+    Livewire::test('pm::client-list')
         ->call('sortData', 'company')
         ->assertSet('sortDirection', 'asc')
         ->call('sortData', 'company')
@@ -196,7 +198,7 @@ test('can toggle sort direction', function () {
 test('can toggle category filter', function () {
     $category = ClientCategory::factory()->create();
 
-    Volt::test(ClientList::class)
+    Livewire::test('pm::client-list')
         ->call('filterByCategory', $category->id)
         ->assertSet('filterCategories', [$category->id])
         ->call('filterByCategory', $category->id)
@@ -204,7 +206,7 @@ test('can toggle category filter', function () {
 });
 
 test('can toggle service filter', function () {
-    Volt::test(ClientList::class)
+    Livewire::test('pm::client-list')
         ->call('filterByService', 1)
         ->assertSet('filterServices', [1])
         ->call('filterByService', 1)
@@ -214,7 +216,7 @@ test('can toggle service filter', function () {
 test('can toggle client active status', function () {
     $client = Client::factory()->active()->create(['active' => true]);
 
-    Volt::test(ClientList::class)
+    Livewire::test('pm::client-list')
         ->call('toggleActive', $client->id)
         ->assertDispatched('notify');
 
@@ -227,7 +229,7 @@ test('toggleActive updates user status correctly for active client', function ()
 
     expect($user->status)->toBe(1);
 
-    Volt::test(ClientList::class)
+    Livewire::test('pm::client-list')
         ->call('toggleActive', $client->id);
 
     expect($client->fresh()->active)->toBeFalse();
@@ -240,7 +242,7 @@ test('toggleActive updates user status correctly for prospect client', function 
 
     expect($user->status)->toBe(0); // Prospect always has inactive user
 
-    Volt::test(ClientList::class)
+    Livewire::test('pm::client-list')
         ->call('toggleActive', $client->id);
 
     expect($client->fresh()->active)->toBeFalse();
@@ -260,7 +262,7 @@ test('can delete client', function () {
 test('pagination works correctly', function () {
     Client::factory()->count(25)->create();
 
-    $component = Volt::test(ClientList::class)
+    $component = Livewire::test('pm::client-list')
         ->set('limit', 10)
         ->assertSet('limit', 10);
 

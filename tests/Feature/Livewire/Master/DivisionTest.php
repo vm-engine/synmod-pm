@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
-use Livewire\Volt\Volt;
-use VmEngine\Pm\Livewire\Master\Division;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use VmEngine\Pm\Models\Division as ModelsDivision;
 use VmEngine\Pm\Models\SubDivision;
+
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $UserModel = config('auth.providers.users.model');
@@ -13,7 +15,7 @@ beforeEach(function () {
 });
 
 test('component can be rendered', function () {
-    Volt::test(Division::class)
+    Livewire::test('pm::master.division')
         ->assertStatus(200);
 });
 
@@ -21,13 +23,13 @@ test('displays division list', function () {
     ModelsDivision::factory()->create(['name' => 'Engineering']);
     ModelsDivision::factory()->create(['name' => 'Marketing']);
 
-    Volt::test(Division::class)
+    Livewire::test('pm::master.division')
         ->assertSee('Engineering')
         ->assertSee('Marketing');
 });
 
 test('can create new division', function () {
-    Volt::test(Division::class)
+    Livewire::test('pm::master.division')
         ->set('newDivision', 'New Division')
         ->set('newDivisionCode', 'ND')
         ->call('store')
@@ -37,7 +39,7 @@ test('can create new division', function () {
 });
 
 test('clears form after creating division', function () {
-    Volt::test(Division::class)
+    Livewire::test('pm::master.division')
         ->set('newDivision', 'Test Division')
         ->set('newDivisionCode', 'TD')
         ->call('store')
@@ -47,7 +49,7 @@ test('clears form after creating division', function () {
 test('can edit division', function () {
     $division = ModelsDivision::factory()->create(['name' => 'Old Name', 'code' => 'ON']);
 
-    Volt::test(Division::class)
+    Livewire::test('pm::master.division')
         ->call('edit', $division->id)
         ->assertSet('editId', $division->id)
         ->assertSet('editText', 'Old Name')
@@ -57,7 +59,7 @@ test('can edit division', function () {
 test('can update division', function () {
     $division = ModelsDivision::factory()->create(['name' => 'Old Name', 'code' => 'ON']);
 
-    Volt::test(Division::class)
+    Livewire::test('pm::master.division')
         ->call('edit', $division->id)
         ->set('editText', 'New Name')
         ->set('editCode', 'NN')
@@ -71,7 +73,7 @@ test('can update division', function () {
 test('clears edit form after updating division', function () {
     $division = ModelsDivision::factory()->create();
 
-    Volt::test(Division::class)
+    Livewire::test('pm::master.division')
         ->call('edit', $division->id)
         ->set('editText', 'Updated')
         ->set('editCode', 'UP')
@@ -103,7 +105,7 @@ test('deleting division also deletes sub divisions', function () {
 test('can create sub division', function () {
     $division = ModelsDivision::factory()->create();
 
-    Volt::test(Division::class)
+    Livewire::test('pm::master.division')
         ->set("newSubDivision.{$division->id}", 'New Sub Division')
         ->call('storeSub', $division->id)
         ->assertDispatched('notify');
@@ -114,7 +116,7 @@ test('can create sub division', function () {
 test('clears sub division form after creation', function () {
     $division = ModelsDivision::factory()->create();
 
-    Volt::test(Division::class)
+    Livewire::test('pm::master.division')
         ->set("newSubDivision.{$division->id}", 'Test Sub')
         ->call('storeSub', $division->id)
         ->assertSet("newSubDivision.{$division->id}", '');
@@ -123,7 +125,7 @@ test('clears sub division form after creation', function () {
 test('can edit sub division', function () {
     $subDivision = SubDivision::factory()->create(['name' => 'Old Sub Name']);
 
-    Volt::test(Division::class)
+    Livewire::test('pm::master.division')
         ->call('editSub', $subDivision->id)
         ->assertSet('editSubId', $subDivision->id)
         ->assertSet('editSubText', 'Old Sub Name');
@@ -132,7 +134,7 @@ test('can edit sub division', function () {
 test('can update sub division', function () {
     $subDivision = SubDivision::factory()->create(['name' => 'Old Sub Name']);
 
-    Volt::test(Division::class)
+    Livewire::test('pm::master.division')
         ->call('editSub', $subDivision->id)
         ->set('editSubText', 'New Sub Name')
         ->call('updateSub', $subDivision->id)
@@ -144,7 +146,7 @@ test('can update sub division', function () {
 test('clears edit form after updating sub division', function () {
     $subDivision = SubDivision::factory()->create();
 
-    Volt::test(Division::class)
+    Livewire::test('pm::master.division')
         ->call('editSub', $subDivision->id)
         ->set('editSubText', 'Updated')
         ->call('updateSub', $subDivision->id)
@@ -164,7 +166,7 @@ test('can cancel edit', function () {
     $division = ModelsDivision::factory()->create();
     $subDivision = SubDivision::factory()->create();
 
-    Volt::test(Division::class)
+    Livewire::test('pm::master.division')
         ->call('edit', $division->id)
         ->call('editSub', $subDivision->id)
         ->call('cancelEdit')
@@ -178,7 +180,7 @@ test('editing division cancels previous edit', function () {
     $division1 = ModelsDivision::factory()->create();
     $division2 = ModelsDivision::factory()->create();
 
-    Volt::test(Division::class)
+    Livewire::test('pm::master.division')
         ->call('edit', $division1->id)
         ->assertSet('editId', $division1->id)
         ->call('edit', $division2->id)
@@ -189,7 +191,7 @@ test('editing sub division cancels previous edit', function () {
     $sub1 = SubDivision::factory()->create();
     $sub2 = SubDivision::factory()->create();
 
-    Volt::test(Division::class)
+    Livewire::test('pm::master.division')
         ->call('editSub', $sub1->id)
         ->assertSet('editSubId', $sub1->id)
         ->call('editSub', $sub2->id)
@@ -200,20 +202,20 @@ test('division list includes sub divisions', function () {
     $division = ModelsDivision::factory()->create();
     SubDivision::factory()->create(['division_id' => $division->id]);
 
-    $component = Volt::test(Division::class);
+    $component = Livewire::test('pm::master.division');
 
     expect($component->divisionList->first()->subDivisions)->toHaveCount(1);
 });
 
 test('handles non existent division on update', function () {
-    Volt::test(Division::class)
+    Livewire::test('pm::master.division')
         ->set('editText', 'Test')
         ->call('update', 99999)
         ->assertDispatched('notify');
 });
 
 test('handles non existent sub division on update', function () {
-    Volt::test(Division::class)
+    Livewire::test('pm::master.division')
         ->set('editSubText', 'Test')
         ->call('updateSub', 99999)
         ->assertDispatched('notify');

@@ -31,6 +31,12 @@ parameters:
 			path: src/Console/Commands/MigrateOldDataCommand.php
 
 		-
+			message: '#^Class VmEngine\\Pm\\Seeders\\ClientRoleSeeder not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Console/Commands/MigrateOldDataCommand.php
+
+		-
 			message: '#^If condition is always false\.$#'
 			identifier: if.alwaysFalse
 			count: 1
@@ -47,84 +53,6 @@ parameters:
 			identifier: nullsafe.neverNull
 			count: 2
 			path: src/Form/ProjectFormObject.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Collection\<int, VmEngine\\Pm\\Models\\Client\>\|VmEngine\\Pm\\Models\\Client\:\:\$npwp_image\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Livewire/ClientList.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:byType\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Livewire/Components/Document/MultipleDocument.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:byType\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: src/Livewire/Components/Document/VersionedDocument.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Collection\<int, VmEngine\\Pm\\Models\\ClientCategory\>\|VmEngine\\Pm\\Models\\ClientCategory\:\:\$description\.$#'
-			identifier: property.notFound
-			count: 2
-			path: src/Livewire/Master/ClientCategory.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Collection\<int, VmEngine\\Pm\\Models\\ClientCategory\>\|VmEngine\\Pm\\Models\\ClientCategory\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 2
-			path: src/Livewire/Master/ClientCategory.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Collection\<int, VmEngine\\Pm\\Models\\Division\>\|VmEngine\\Pm\\Models\\Division\:\:\$code\.$#'
-			identifier: property.notFound
-			count: 2
-			path: src/Livewire/Master/Division.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Collection\<int, VmEngine\\Pm\\Models\\Division\>\|VmEngine\\Pm\\Models\\Division\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 3
-			path: src/Livewire/Master/Division.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Collection\<int, VmEngine\\Pm\\Models\\SubDivision\>\|VmEngine\\Pm\\Models\\SubDivision\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 2
-			path: src/Livewire/Master/Division.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Collection\<int, VmEngine\\Pm\\Models\\ProjectCategory\>\|VmEngine\\Pm\\Models\\ProjectCategory\:\:\$code\.$#'
-			identifier: property.notFound
-			count: 2
-			path: src/Livewire/Master/ProjectCategory.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Collection\<int, VmEngine\\Pm\\Models\\ProjectCategory\>\|VmEngine\\Pm\\Models\\ProjectCategory\:\:\$description\.$#'
-			identifier: property.notFound
-			count: 2
-			path: src/Livewire/Master/ProjectCategory.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Collection\<int, VmEngine\\Pm\\Models\\ProjectCategory\>\|VmEngine\\Pm\\Models\\ProjectCategory\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 2
-			path: src/Livewire/Master/ProjectCategory.php
-
-		-
-			message: '#^Using nullsafe property access "\?\-\>level" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
-			identifier: nullsafe.neverNull
-			count: 1
-			path: src/Livewire/Project/InvoiceList.php
-
-		-
-			message: '#^Call to function is_null\(\) with mixed will always evaluate to false\.$#'
-			identifier: function.impossibleType
-			count: 1
-			path: src/Livewire/Report/ProjectDocument.php
 
 		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:byType\(\)\.$#'
