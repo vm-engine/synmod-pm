@@ -29,6 +29,13 @@ All notable changes to this project will be documented in this file.
   - Root cause: `theme.css` global `button[type="button"]` rule (`justify-content: center`, `display: inline-flex`) had higher specificity than `.icon-dropdown-item`
   - Fix: added `.icon-dropdown .icon-dropdown-item` override rule with higher specificity and made `.icon-dropdown` a flex column container
 
+## [0.7.1] - 2026-02-24
+
+### Added
+- **Invoice List API search**: New `q` parameter on `GET /api/pm/invoice/list` for full-text search
+  - Searches across: invoice number, receipt number, client name (company), and creator name
+  - Case-insensitive partial matching (`LIKE %q%`)
+
 ## [0.7.0] - 2026-02-09
 
 ### Added
