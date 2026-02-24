@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.2] - 2026-02-24
+
+### Added
+- **Invoice List API search**: New `q` parameter on `GET /api/pm/invoice/list` for full-text search
+  - Searches across: invoice number, receipt number, client name (company), and creator name
+  - Case-insensitive partial matching (`LIKE %q%`)
+- **Account Information document type**: New `IA` document type (Informasi Akun)
+  - `Documents::IA` enum case with value `16`, code `IA`, label `Informasi Akun`
+  - `AccountInformation` service class — active when project has an SPK document
+  - Color: red, icon: `fa-user`
+
 ## [0.8.1] - 2026-02-24
 
 ### Fixed
