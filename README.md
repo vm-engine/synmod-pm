@@ -1,6 +1,6 @@
-# Pm
+# Project Management Module
 
-Pm module for Laravel Synapse
+A full-featured Project Management module for Laravel Synapse applications.
 
 ## Installation
 
@@ -14,6 +14,73 @@ php artisan migrate
 ```
 
 For internal modules, the module is auto-discovered.
+
+## Features
+
+### Master Data Management
+- **Divisions**: Organizational divisions with sub-divisions and hierarchy display
+- **Sub Divisions**: Subdivisions within divisions
+- **Client Categories**: Client categorization system
+- **Project Categories**: Project categorization with document index support
+
+### Client Management
+- **Client CRUD**: Complete client management with auto user account creation
+- **Client Categories**: Organize clients by categories
+- **Services Tracking**: Multi-select service assignments (Design, Development, SEO, etc.)
+- **Status Management**: Prospect vs Active client status with visual indicators
+- **Advanced Filtering**: Filter by category, services, status, and active state with session-based state persistence (navigating back restores filters)
+- **User Integration**: Auto-creates user accounts with role assignment on client creation
+- **Active Status Sync**: Client active status syncs with user account status
+- **Business Logic**:
+  - Prospect clients automatically have inactive user accounts
+  - Active clients with active flag enabled have active user accounts
+  - Email verification is automatic for all client users
+
+### Project Management
+- **Project CRUD**: Full project management linked to clients and divisions
+- **Document Management**: Upload and track project documents (PROPOSAL, SPH, SPK, INVOICE)
+  - File upload bug fixed for Livewire v4 (metadata collected before `store()`)
+- **Sub-Division Assignment**: JSON-based sub-division array for flexible assignment
+
+### Invoice Management
+- **Invoice CRUD**: Full invoice management with receipt tracking
+- **PDF Generation**: Generate invoice PDFs and receipts from modal without auto-close
+- **Invoice List with Refresh**: Invoice list updates automatically when invoice detail or receipt modal is closed
+- **Excel Export**: Background job Excel export with persistent reference tracking
+  - Three UI states: processing (with polling), completed (with download button), idle
+  - Automatically deletes previous export when regenerating
+- **Report Pages**: Invoice report and project document report with visual enhancements
+  - Color-coded document type badges
+  - Monthly/yearly breakdowns
+  - Improved empty states
+
+### Invoice REST API
+Five protected API endpoints for external integrations:
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/pm/invoice/statistics` | Invoice statistics summary (totals, paid/unpaid breakdown) |
+| `GET /api/pm/invoice/by-creator` | Invoices grouped by creator (optional creator ID filter) |
+| `GET /api/pm/invoice/by-project-category` | Invoices grouped by project category |
+| `GET /api/pm/invoice/by-month` | Monthly invoice breakdown with paid/unpaid metrics |
+| `GET /api/pm/invoice/list` | Paginated invoice list with filters and sorting |
+
+All endpoints require authentication via `auth:sanctum` and the `pm.report.invoice.read` permission. Supports two authentication methods:
+- **Permanent API tokens** (H2H): `Authorization: Bearer {permanent_token}`
+- **Login flow**: Standard session/token login then use access token
+
+A Postman collection (`postman/PM_Invoice_API.postman_collection.json`) and environment (`postman/PM_Invoice_API.postman_environment.json`) are included for easy testing.
+
+### API Request Logging
+- All API requests/responses are logged via the `pm.api.logger` terminable middleware
+- Logs stored in `api_logs` table: user, method, URL, route, headers, input, IP, user agent, status code, response body, duration
+- Authorization tokens masked in stored headers
+- Response body truncated at 64KB
+
+### Session-Based State Persistence
+List components remember their filter/sort/pagination state in the session via the `RemembersQueryParams` trait (Synapse v2.1+). Navigating back from a detail view restores the previous list state automatically. URL parameters always take precedence, so shared links still work correctly.
+
+Applies to: Client list, User list, and all other list/table components.
 
 ## Commands
 
@@ -48,33 +115,14 @@ php artisan mod-pm:migrate-old {source_connection} --skip-missing
 php artisan mod-pm:migrate-old mysql_old --skip-missing
 ```
 
-## Features
-
-### Master Data Management
-- **Divisions**: Organizational divisions management
-- **Sub Divisions**: Subdivisions within divisions
-- **Client Categories**: Client categorization system
-
-### Client Management
-- **Client CRUD**: Complete client management with user account creation
-- **Client Categories**: Organize clients by categories
-- **Services Tracking**: Multi-select service assignments (Design, Development, SEO, etc.)
-- **Status Management**: Prospect vs Active client status
-- **Advanced Filtering**: Filter by category, services, status, and active state
-- **User Integration**: Auto-create user accounts with role assignment
-- **Active Status Sync**: Client active status syncs with user account status
-
-### Business Logic
-- Prospect clients automatically have inactive user accounts
-- Active clients with active flag enabled have active user accounts
-- Email verification is automatic for all client users
-- Password requirements follow synapps-auth standards
+See [MIGRATION.md](MIGRATION.md) for detailed migration guide and troubleshooting.
 
 ## Requirements
 
-- Laravel 11+
-- Livewire v3
-- Laravel Synapse
+- Laravel 12+
+- Livewire v4
+- vm-engine/synapse ^2.0
+- vm-engine/synapps-auth ^2.0
 
 ## License
 
@@ -87,4 +135,4 @@ Email: theadods@gmail.com
 
 ## Version
 
-0.2.0
+0.8.1
