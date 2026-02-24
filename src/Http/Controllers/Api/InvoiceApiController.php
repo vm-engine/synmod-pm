@@ -111,6 +111,7 @@ class InvoiceApiController extends Controller
             'sort_desc' => 'nullable|boolean',
             'page' => 'nullable|integer|min:1',
             'limit' => 'nullable|integer|min:1|max:100',
+            'q' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -119,7 +120,7 @@ class InvoiceApiController extends Controller
 
         $filters = $request->only([
             'year', 'month', 'creator', 'project_category',
-            'is_paid', 'sort_by', 'sort_desc', 'limit',
+            'is_paid', 'sort_by', 'sort_desc', 'limit', 'q',
         ]);
 
         $paginated = $this->invoiceService->getInvoiceList($filters);
