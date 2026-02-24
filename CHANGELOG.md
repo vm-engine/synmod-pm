@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-02-24
+
+### Added
+- **Invoice List API search**: New `q` parameter on `GET /api/pm/invoice/list` for full-text search
+  - Searches across: invoice number, receipt number, client name (company), and creator name
+  - Case-insensitive partial matching (`LIKE %q%`)
+
+## [0.7.0] - 2026-02-09
+
 ### Added
 - **Invoice API Endpoints**: 5 new REST API endpoints at `/api/pm/invoice/`
   - `GET /statistics` - Invoice statistics summary (total invoices, amounts, VAT, paid/unpaid breakdowns)

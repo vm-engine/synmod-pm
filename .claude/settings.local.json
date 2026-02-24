@@ -30,7 +30,18 @@
       "Bash(for file in ProjectCategoryTest.php SignatureFormTest.php)",
       "Bash(do sed -i '/assertDispatched.*notify.*function/,/}\\);/c\\\\        ->assertDispatched\\(''''notify''''\\);' \"$file\")",
       "Bash(done)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(git status:*)",
+      "Bash(echo:*)",
+      "Bash(composer update:*)",
+      "Bash(head -10 grep -n \"invoice-refresh\\\\|invoice_refresh\" /media/adods/Data/Herd/synapse-lw4/packages/synmod-pm/resources/views/components/project/invoice-list/invoice-list.blade.php)",
+      "Bash(npm run build:*)",
+      "Bash(git add composer.json CHANGELOG.md && git rebase --continue 2>&1)",
+      "Bash(git add composer.json && git rebase --continue 2>&1)",
+      "Bash(GIT_EDITOR=true git rebase:*)",
+      "Bash(git add composer.json CHANGELOG.md phpstan-baseline.neon src/Http/Controllers/Api/InvoiceApiController.php src/Services/InvoiceService.php tests/Feature/Api/InvoiceApiTest.php && git rebase --continue 2>&1)",
+      "Bash(git status --short && EDITOR=true git rebase --continue 2>&1)",
+      "Bash(git checkout HEAD -- composer.json && git add -A && git rebase --continue 2>&1)"
     ]
   },
   "enableAllProjectMcpServers": true,

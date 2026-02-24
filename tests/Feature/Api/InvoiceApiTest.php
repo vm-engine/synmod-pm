@@ -253,6 +253,103 @@ test('list validates sort_by parameter', function () {
     $response->assertStatus(422);
 });
 
+test('list searches by invoice number', function () {
+    $client = Client::factory()->create();
+    $project = Project::factory()->create(['client_id' => $client->id]);
+    $category = ProjectCategory::factory()->create();
+
+    ProjectInvoice::factory()->create([
+        'project_id' => $project->id,
+        'project_category_id' => $category->id,
+        'client_id' => $client->id,
+        'created_by' => test()->user->id,
+        'archived' => false,
+        'invoice_number' => 'INV-FINDME-001',
+    ]);
+    createInvoices(3);
+
+    $response = apiGet('/list?q=FINDME');
+
+    $response->assertSuccessful();
+    expect($response->json('meta.total'))->toBe(1);
+    expect($response->json('data.0.invoice_number'))->toBe('INV-FINDME-001');
+});
+
+test('list searches by receipt number', function () {
+    $client = Client::factory()->create();
+    $project = Project::factory()->create(['client_id' => $client->id]);
+    $category = ProjectCategory::factory()->create();
+
+    ProjectInvoice::factory()->create([
+        'project_id' => $project->id,
+        'project_category_id' => $category->id,
+        'client_id' => $client->id,
+        'created_by' => test()->user->id,
+        'archived' => false,
+        'is_paid' => true,
+        'receipt_number' => 'RCP-FINDME-999',
+    ]);
+    createInvoices(3);
+
+    $response = apiGet('/list?q=RCP-FINDME');
+
+    $response->assertSuccessful();
+    expect($response->json('meta.total'))->toBe(1);
+    expect($response->json('data.0.receipt_number'))->toBe('RCP-FINDME-999');
+});
+
+test('list searches by client name', function () {
+    $client = Client::factory()->create(['company' => 'PT Searchable Company']);
+    $project = Project::factory()->create(['client_id' => $client->id]);
+    $category = ProjectCategory::factory()->create();
+
+    ProjectInvoice::factory()->create([
+        'project_id' => $project->id,
+        'project_category_id' => $category->id,
+        'client_id' => $client->id,
+        'created_by' => test()->user->id,
+        'archived' => false,
+    ]);
+    createInvoices(3);
+
+    $response = apiGet('/list?q=Searchable');
+
+    $response->assertSuccessful();
+    expect($response->json('meta.total'))->toBe(1);
+    expect($response->json('data.0.client.company'))->toBe('PT Searchable Company');
+});
+
+test('list searches by creator name', function () {
+    $creator = User::factory()->create(['name' => 'Unique Creator Name']);
+    $client = Client::factory()->create();
+    $project = Project::factory()->create(['client_id' => $client->id]);
+    $category = ProjectCategory::factory()->create();
+
+    ProjectInvoice::factory()->create([
+        'project_id' => $project->id,
+        'project_category_id' => $category->id,
+        'client_id' => $client->id,
+        'created_by' => $creator->id,
+        'archived' => false,
+    ]);
+    createInvoices(3);
+
+    $response = apiGet('/list?q=Unique+Creator');
+
+    $response->assertSuccessful();
+    expect($response->json('meta.total'))->toBe(1);
+    expect($response->json('data.0.creator.name'))->toBe('Unique Creator Name');
+});
+
+test('list q with no match returns empty results', function () {
+    createInvoices(3);
+
+    $response = apiGet('/list?q=ZZZNOMATCHZZZ');
+
+    $response->assertSuccessful();
+    expect($response->json('meta.total'))->toBe(0);
+});
+
 // =====================================================
 // Authentication Tests
 // =====================================================

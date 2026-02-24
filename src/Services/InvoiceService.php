@@ -295,6 +295,7 @@ class InvoiceService
         $creator = $filters['creator'] ?? null;
         $projectCategory = $filters['project_category'] ?? null;
         $isPaid = $filters['is_paid'] ?? null;
+        $q = isset($filters['q']) ? trim((string) $filters['q']) : null;
         $sortBy = $filters['sort_by'] ?? 'issue_date';
         $sortDesc = $filters['sort_desc'] ?? true;
         $limit = min((int) ($filters['limit'] ?? 20), 100);
@@ -319,6 +320,15 @@ class InvoiceService
 
         if ($isPaid !== null) {
             $query->where('is_paid', (bool) $isPaid);
+        }
+
+        if ($q !== null && $q !== '') {
+            $query->where(function ($sub) use ($q): void {
+                $sub->where('invoice_number', 'like', "%{$q}%")
+                    ->orWhere('receipt_number', 'like', "%{$q}%")
+                    ->orWhereHas('client', fn ($c) => $c->where('company', 'like', "%{$q}%"))
+                    ->orWhereHas('creator', fn ($c) => $c->where('name', 'like', "%{$q}%"));
+            });
         }
 
         $query->with(['project:id,name', 'projectCategory:id,name', 'creator:id,name', 'client:id,company'])

@@ -7,6 +7,12 @@ parameters:
 			path: src/Console/Commands/ImportProjectsCommand.php
 
 		-
+			message: '#^Class VmEngine\\Pm\\Seeders\\ClientRoleSeeder not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Console/Commands/MigrateOldDataCommand.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Collection\<int, VmEngine\\Pm\\Models\\Client\>\|VmEngine\\Pm\\Models\\Client\:\:\$user_id\.$#'
 			identifier: property.notFound
 			count: 1
