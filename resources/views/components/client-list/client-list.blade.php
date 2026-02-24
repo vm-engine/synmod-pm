@@ -1,5 +1,5 @@
 <div x-data="{ pageName: '{{ __('pm::client.list_title') }}', isHome: false, drawerOpen: false }">
-    @include('synapps::components.layouts.partials.breadcrumbs')
+    @include('synapps::components.layouts.partials.breadcrumbs', ['breadcrumbs' => $this->breadcrumbs])
 
     <!-- Confirmation Dialog -->
     <x-synapse-confirm-dialog />

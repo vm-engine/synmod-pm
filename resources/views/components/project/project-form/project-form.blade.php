@@ -2,7 +2,7 @@
     class="relative overflow-y-auto"
     x-data="{ pageName: '{{ __('pm::project.create_title') }}', isHome: false }"
 >
-    @include('synapps::components.layouts.partials.breadcrumbs')
+    @include('synapps::components.layouts.partials.breadcrumbs', ['breadcrumbs' => $this->breadcrumbs])
 
     <div class="mb-16 grid grid-cols-1 gap-6 sm:grid-cols-2">
         <!-- LEFT COLUMN -->

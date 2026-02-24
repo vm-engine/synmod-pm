@@ -32,7 +32,7 @@ new class extends Component
 
     public function title(): string
     {
-        return page_title(__('pm::menu.be.config.index'));
+        return __('pm::menu.be.config.index');
     }
 
     public function save(): void
@@ -89,5 +89,10 @@ new class extends Component
             label: __('pm::menu.be.config.index'),
             icon: 'fa-solid fa-gear',
         );
+    }
+
+    public function render()
+    {
+        return $this->view()->title(page_title($this->title()));
     }
 };

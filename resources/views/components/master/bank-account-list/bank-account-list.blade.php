@@ -2,7 +2,7 @@
     x-data="{ pageName: '{{ __('pm::bank_account.list_title') }}', isHome: false }"
     x-on:bank-account-refresh="$wire.$refresh()"
 >
-    @include('synapps::components.layouts.partials.breadcrumbs')
+    @include('synapps::components.layouts.partials.breadcrumbs', ['breadcrumbs' => $this->breadcrumbs])
 
     <!-- Confirmation Dialog -->
     <x-synapse-confirm-dialog />

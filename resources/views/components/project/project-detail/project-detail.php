@@ -38,7 +38,7 @@ new class extends Component
 
     public function title(): string
     {
-        return page_title(__('pm::project.detail_title').': '.$this->project->name);
+        return __('pm::project.detail_title').': '.$this->project->name;
     }
 
     #[On('document-uploaded')]
@@ -107,5 +107,10 @@ new class extends Component
             label: $this->project->name,
             icon: 'fa-solid fa-eye',
         );
+    }
+
+    public function render()
+    {
+        return $this->view()->title(page_title($this->title()));
     }
 };

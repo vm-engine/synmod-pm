@@ -29,7 +29,7 @@ new class extends Component
 
     public function title(): string
     {
-        return page_title(__('pm::client_category.title'));
+        return __('pm::client_category.title');
     }
 
     public function cancelEdit(): void
@@ -200,5 +200,10 @@ new class extends Component
             label: __('pm::menu.be.master.client_category'),
             icon: 'fa-solid fa-tags',
         );
+    }
+
+    public function render()
+    {
+        return $this->view()->title(page_title($this->title()));
     }
 };

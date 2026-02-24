@@ -42,7 +42,7 @@ new class extends Component
 
     public function title(): string
     {
-        return page_title(__('pm::bank_account.title'));
+        return __('pm::bank_account.title');
     }
 
     public function updated(): void
@@ -130,5 +130,10 @@ new class extends Component
             label: __('pm::menu.be.master.bank_account'),
             icon: 'fa-solid fa-building-columns',
         );
+    }
+
+    public function render()
+    {
+        return $this->view()->title(page_title($this->title()));
     }
 };

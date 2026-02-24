@@ -3,7 +3,7 @@
     isHome: false,
     filtersExpanded: true
 }">
-    @include('synapps::components.layouts.partials.breadcrumbs')
+    @include('synapps::components.layouts.partials.breadcrumbs', ['breadcrumbs' => $this->breadcrumbs])
 
     <!-- Filters Section -->
     <div class="card mb-6">

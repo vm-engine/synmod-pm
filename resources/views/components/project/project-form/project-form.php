@@ -46,7 +46,7 @@ new class extends Component
 
     public function title(): string
     {
-        return page_title($this->form->project ? __('pm::project.edit_title') : __('pm::project.create_title'));
+        return $this->form->project ? __('pm::project.edit_title') : __('pm::project.create_title');
     }
 
     /**
@@ -260,5 +260,10 @@ new class extends Component
             label: $this->form->project ? __('pm::project.edit_title') : __('pm::project.create_title'),
             icon: 'fa-solid fa-pen',
         );
+    }
+
+    public function render()
+    {
+        return $this->view()->title(page_title($this->title()));
     }
 };

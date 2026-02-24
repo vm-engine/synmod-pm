@@ -2,7 +2,7 @@
     x-data="{ pageName: '{{ $project->name }}', isHome: false, activeTab: $wire.entangle('activeTab') }"
     x-on:project-refresh.window="$wire.$refresh()"
 >
-    @include('synapps::components.layouts.partials.breadcrumbs')
+    @include('synapps::components.layouts.partials.breadcrumbs', ['breadcrumbs' => $this->breadcrumbs])
 
     <!-- Project Header -->
     <div class="card mb-6">

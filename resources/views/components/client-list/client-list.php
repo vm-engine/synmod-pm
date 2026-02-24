@@ -63,7 +63,7 @@ new class extends Component
 
     public function title(): string
     {
-        return page_title(__('pm::client.list_title'));
+        return __('pm::client.list_title');
     }
 
     public function updated($property): void
@@ -254,5 +254,10 @@ new class extends Component
             label: __('pm::client.list_title'),
             icon: 'fa-solid fa-users',
         );
+    }
+
+    public function render()
+    {
+        return $this->view()->title(page_title($this->title()));
     }
 };

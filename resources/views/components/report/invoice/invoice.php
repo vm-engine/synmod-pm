@@ -31,7 +31,7 @@ new class extends Component
 
     public function title(): string
     {
-        return page_title(__('pm::menu.be.report.invoice'));
+        return __('pm::menu.be.report.invoice');
     }
 
     #[Computed()]
@@ -144,5 +144,10 @@ new class extends Component
             label: __('pm::menu.be.report.invoice'),
             icon: 'fa-solid fa-file-invoice-dollar',
         );
+    }
+
+    public function render()
+    {
+        return $this->view()->title(page_title($this->title()));
     }
 };

@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.1] - 2026-02-24
+
+### Fixed
+- **Page titles**: Fixed all full-page Livewire SFC components not setting the browser `<title>` tag
+  - Added `render()` method to all 14 full-page components calling `$this->view()->title(page_title($this->title()))`
+  - Removed incorrect `page_title()` wrapping from inside `title()` methods (was causing double-formatted titles)
+- **Breadcrumbs scope**: Fixed `$breadcrumbs` variable not in scope when `@include`-ing breadcrumbs partial
+  - All full-page blade views now pass `['breadcrumbs' => $this->breadcrumbs]` explicitly to the `@include`
+
 ## [0.8.0] - 2026-02-22
 
 ### Changed

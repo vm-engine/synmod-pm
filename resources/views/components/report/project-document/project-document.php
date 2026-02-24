@@ -32,7 +32,7 @@ new class extends Component
 
     public function title(): string
     {
-        return page_title(__('pm::report.documents.title'));
+        return __('pm::report.documents.title');
     }
 
     public function clearFilters(): void
@@ -117,5 +117,10 @@ new class extends Component
             label: __('pm::menu.be.report.project_document'),
             icon: 'fa-solid fa-diagram-project',
         );
+    }
+
+    public function render()
+    {
+        return $this->view()->title(page_title($this->title()));
     }
 };

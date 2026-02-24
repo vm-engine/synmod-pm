@@ -1,5 +1,5 @@
 <div x-data="{ pageName: '{{ __('pm::menu.be.config.index') }}', isHome: false }">
-    @include('synapps::components.layouts.partials.breadcrumbs')
+    @include('synapps::components.layouts.partials.breadcrumbs', ['breadcrumbs' => $this->breadcrumbs])
 
     <div class="space-y-5 sm:space-y-6">
         {{-- Tab Navigation --}}

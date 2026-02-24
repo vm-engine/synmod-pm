@@ -42,7 +42,7 @@ new class extends Component
 
     public function title(): string
     {
-        return page_title(__('pm::issuer.title'));
+        return __('pm::issuer.title');
     }
 
     public function updated(): void
@@ -129,5 +129,10 @@ new class extends Component
             label: __('pm::menu.be.master.issuer'),
             icon: 'fa-solid fa-building',
         );
+    }
+
+    public function render()
+    {
+        return $this->view()->title(page_title($this->title()));
     }
 };
