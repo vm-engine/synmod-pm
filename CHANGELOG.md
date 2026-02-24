@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.2] - 2026-02-24
+
+### Added
+- **Account Information document type**: New `IA` document type (Informasi Akun)
+  - `Documents::IA` enum case with value `16`, code `IA`, label `Informasi Akun`
+  - `AccountInformation` service class — active when project has an SPK document
+  - Color: red, icon: `fa-user`
+
 ## [0.7.1] - 2026-02-24
 
 ### Added
