@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.7.1] - 2026-02-22
+## [0.8.0] - 2026-02-22
 
 ### Changed
 - **Livewire v4 MFC Migration**: Migrated all Livewire components to Multi-File Component (MFC) format under `resources/views/components/`
