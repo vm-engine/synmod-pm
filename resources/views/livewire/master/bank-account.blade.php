@@ -160,6 +160,6 @@
         name="bank-account-form"
         maxWidth="2xl"
     >
-        <livewire:pm.master.bank-account-form />
+        <livewire:pm::master.bank-account-form />
     </x-synapse-modal>
 </div>

@@ -6,6 +6,7 @@ namespace VmEngine\Pm\Services;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\Project;
 use VmEngine\SynAuth\Facades\SynAuth;
@@ -70,6 +71,19 @@ class ProjectService
         $projectData = $project->toArray();
 
         return DB::transaction(function () use ($project, $projectData) {
+            // Delete all document files from storage before cascade delete bypasses Eloquent events
+            $project->documents()->each(function ($document) {
+                if ($document->file_path && Storage::exists($document->file_path)) {
+                    Storage::delete($document->file_path);
+                }
+            });
+
+            // Delete the project folder if it exists
+            $projectFolder = 'projects/'.$project->id;
+            if (Storage::exists($projectFolder)) {
+                Storage::deleteDirectory($projectFolder);
+            }
+
             $deleted = $project->delete();
 
             // Log activity

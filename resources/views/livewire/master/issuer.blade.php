@@ -165,6 +165,6 @@
         name="issuer-form"
         maxWidth="2xl"
     >
-        <livewire:pm.master.issuer-form />
+        <livewire:pm::master.issuer-form />
     </x-synapse-modal>
 </div>

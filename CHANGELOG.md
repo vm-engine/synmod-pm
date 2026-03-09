@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.6.9] - 2026-03-09
+
+### Added
+- **Invoice API Endpoints**: 5 new REST API endpoints at `/api/pm/invoice/`
+  - `GET /statistics` - Invoice statistics summary (total invoices, amounts, VAT, paid/unpaid breakdowns)
+  - `GET /by-creator` - Invoices grouped by creator with optional creator ID filter
+  - `GET /by-project-category` - Invoices grouped by project category
+  - `GET /by-month` - Monthly invoice breakdown with paid/unpaid metrics
+  - `GET /list` - Paginated invoice list with filters (year, month, creator, project_category, is_paid) and sorting
+  - All endpoints protected with `auth:sanctum`, `api.auth`, `api.token.expiry`, `api.permission:pm.report.invoice.read`, `throttle:api`
+  - Custom status code format: `"<http_code><service_code><response_code>"` per endpoint
+- **Invoice List API search**: New `q` parameter on `GET /api/pm/invoice/list` for full-text search
+  - Searches across: invoice number, receipt number, client name (company), and creator name
+  - Case-insensitive partial matching (`LIKE %q%`)
+- **API Request Logging**: Terminable middleware that logs all API requests/responses
+  - `ApiLogger` middleware registered as `pm.api.logger`
+  - `api_logs` table with migration tracking
+
+### Fixed
+- **Project deletion**: Files uploaded to storage were not deleted when a project was deleted due to DB-level cascade bypassing Eloquent model events. Now explicitly deletes all document files and the project folder before cascading the delete.
+- **Livewire component references**: Updated blade views to use namespace notation (`pm::`) instead of dot notation (`pm.`) for embedded sub-components (`bank-account-form`, `issuer-form`, `signature-form`, `invoice-form`, `invoice-detail`, `receipt-detail`).
+
 ## [0.7.1] - 2026-02-24
 
 ### Added

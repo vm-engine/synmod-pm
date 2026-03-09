@@ -468,7 +468,7 @@
         name="invoice-form"
         maxWidth="2xl"
     >
-        <livewire:pm.project.invoice-form />
+        <livewire:pm::project.invoice-form />
     </x-synapse-modal>
 
     <!-- Invoice Detail Modal -->
@@ -476,7 +476,7 @@
         name="invoice-detail"
         maxWidth="7xl"
     >
-        <livewire:pm.project.invoice-detail />
+        <livewire:pm::project.invoice-detail />
     </x-synapse-modal>
 
     <!-- Receipt Detail Modal -->
@@ -484,6 +484,6 @@
         name="receipt-detail"
         maxWidth="4xl"
     >
-        <livewire:pm.project.receipt-detail />
+        <livewire:pm::project.receipt-detail />
     </x-synapse-modal>
 </div>

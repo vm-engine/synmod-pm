@@ -153,6 +153,6 @@
         name="signature-form"
         maxWidth="2xl"
     >
-        <livewire:pm.master.signature-form />
+        <livewire:pm::master.signature-form />
     </x-synapse-modal>
 </div>
