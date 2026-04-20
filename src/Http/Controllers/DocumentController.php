@@ -75,6 +75,7 @@ class DocumentController extends Controller
      */
     protected function canAccessDocument(ProjectDocument $document): bool
     {
+        /** @var VmEngine\SynAuth\Models\User $user */
         $user = Auth::user();
 
         if (! $user) {

@@ -74,7 +74,7 @@ new class extends Component
 
             $this->newDivision = '';
             $this->newDivisionCode = '';
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify',
                 variant: 'danger',
                 title: 'Error',
@@ -131,7 +131,7 @@ new class extends Component
             );
 
             return;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify',
                 variant: 'danger',
                 title: 'Error',
@@ -153,7 +153,7 @@ new class extends Component
         try {
             $id = ModelsDivision::validateDeleteToken($token);
             if (! $id) {
-                throw new \Exception(__('pm::messages.invalid_delete_token'));
+                throw new Exception(__('pm::messages.invalid_delete_token'));
             }
             $division = ModelsDivision::findOrFail($id);
             $divisionArray = $division->toArray();
@@ -176,7 +176,7 @@ new class extends Component
             );
 
             return;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify',
                 variant: 'danger',
                 title: 'Error',
@@ -211,7 +211,7 @@ new class extends Component
             );
 
             $this->newSubDivision[$divisionId] = '';
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify',
                 variant: 'danger',
                 title: 'Error',
@@ -261,7 +261,7 @@ new class extends Component
             );
 
             return;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify',
                 variant: 'danger',
                 title: 'Error',
@@ -283,7 +283,7 @@ new class extends Component
         try {
             $id = SubDivision::validateDeleteToken($token);
             if (! $id) {
-                throw new \Exception(__('pm::messages.invalid_delete_token'));
+                throw new Exception(__('pm::messages.invalid_delete_token'));
             }
             $subDivision = SubDivision::findOrFail($id);
             $subDivisionArray = $subDivision->toArray();
@@ -304,7 +304,7 @@ new class extends Component
             );
 
             return;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify',
                 variant: 'danger',
                 title: 'Error',

@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.3] - 2026-04-20
+
+### Added
+- **Invoice service extensions** for standalone invoices module consumption:
+  - `InvoiceService::findInvoice(int $id)` — fetch a single invoice by id.
+  - `InvoiceService::getAvailableYears()` — distinct invoice issue years for filters.
+  - `InvoiceService::getCreators()` — distinct invoice creators (id + name) for filters.
+- **Project service extensions**:
+  - `ProjectService::findProject(int $id)` — non-throwing project lookup.
+  - `ProjectService::getSpkReadyProjects()` — projects that already have an SPK document, for the invoice-creation picker.
+- **Dropdown option helpers** on master-data services — each returns `[{value, label}]` for form dropdowns:
+  - `BankAccountService::getOptions()`
+  - `IssuerService::getOptions()`
+  - `SignatureService::getOptions()`
+
+### Changed
+- **Invoice list query** now supports:
+  - `include_archived` filter (default `false`) — baseline behavior unchanged; archived invoices are still hidden by default.
+  - `status` filter — `paid` / `outstanding` / `overdue` (paid=false AND past due date).
+  - `recipient` field added to the `q` full-text search.
+- **`Documents` enum**: imported document service classes at the top of the file and replaced inline FQNs in `Documents::service()` with short names (no behavioral change; readability only).
+
+### Fixed
+- **DocumentController**: added `@var User` PHPDoc on `Auth::user()` to satisfy static analysis.
+
 ## [0.8.2] - 2026-02-24
 
 ### Added

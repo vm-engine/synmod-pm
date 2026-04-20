@@ -65,7 +65,7 @@ new class extends Component
                 'client',
             ])->findOrFail($id);
             if ($this->invoice->archived) {
-                throw new \Exception(__('pm::invoice.archived_detail'));
+                throw new Exception(__('pm::invoice.archived_detail'));
             }
             $this->invoiceId = $id;
 
@@ -168,7 +168,7 @@ new class extends Component
                 title: __('pm::messages.success'),
                 message: __('pm::invoice.item_updated'),
             );
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify',
                 variant: 'danger',
                 title: __('pm::messages.error'),
@@ -214,7 +214,7 @@ new class extends Component
                 title: __('pm::messages.success'),
                 message: __('pm::invoice.item_added'),
             );
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify',
                 variant: 'danger',
                 title: __('pm::messages.error'),
@@ -228,7 +228,7 @@ new class extends Component
         try {
             $id = ProjectInvoiceItem::validateDeleteToken($token);
             if (! $id) {
-                throw new \Exception(__('pm::messages.invalid_delete_token'));
+                throw new Exception(__('pm::messages.invalid_delete_token'));
             }
 
             $item = ProjectInvoiceItem::findOrFail($id);
@@ -243,7 +243,7 @@ new class extends Component
                 title: __('pm::messages.success'),
                 message: __('pm::invoice.item_deleted'),
             );
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify',
                 variant: 'danger',
                 title: __('pm::messages.error'),
@@ -346,7 +346,7 @@ new class extends Component
                 'project.'.$this->invoice->project_id.'.invoice',
                 'pm'
             );
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify',
                 variant: 'danger',
                 title: __('pm::messages.error'),

@@ -189,7 +189,7 @@ new class extends Component
         try {
             $id = Project::validateDeleteToken($token);
             if (! $id) {
-                throw new \Exception(__('pm::messages.invalid_delete_token'));
+                throw new Exception(__('pm::messages.invalid_delete_token'));
             }
 
             $project = Project::findOrFail($id);
@@ -203,7 +203,7 @@ new class extends Component
                 title: __('pm::messages.success'),
                 message: __('pm::messages.project_deleted_successfully'),
             );
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('synapse-confirmed');
             $this->dispatch('notify',
                 variant: 'danger',

@@ -62,7 +62,7 @@ new class extends Component
 
             $this->newName = '';
             $this->newDescription = '';
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify',
                 variant: 'danger',
                 title: 'Error',
@@ -120,7 +120,7 @@ new class extends Component
             );
 
             return;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify',
                 variant: 'danger',
                 title: 'Error',
@@ -142,7 +142,7 @@ new class extends Component
         try {
             $id = ModelsClientCategory::validateDeleteToken($token);
             if (! $id) {
-                throw new \Exception(__('pm::messages.invalid_delete_token'));
+                throw new Exception(__('pm::messages.invalid_delete_token'));
             }
             $category = ModelsClientCategory::findOrFail($id);
             $categoryArray = $category->toArray();
@@ -163,7 +163,7 @@ new class extends Component
             );
 
             return;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify',
                 variant: 'danger',
                 title: 'Error',

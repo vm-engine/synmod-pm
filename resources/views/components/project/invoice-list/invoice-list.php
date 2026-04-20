@@ -12,6 +12,7 @@ use VmEngine\Pm\Models\DocumentIssuer;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Pm\Models\ProjectInvoice;
 use VmEngine\SynAuth\Facades\SynAuth;
+use VmEngine\SynAuth\Models\Role;
 
 new class extends Component
 {
@@ -84,7 +85,7 @@ new class extends Component
         try {
             $id = ProjectInvoice::validateDeleteToken($token);
             if (! $id) {
-                throw new \Exception(__('pm::messages.invalid_delete_token'));
+                throw new Exception(__('pm::messages.invalid_delete_token'));
             }
 
             $invoice = ProjectInvoice::findOrFail($id);
@@ -110,7 +111,7 @@ new class extends Component
                     message: __('pm::invoice.'.($unarchive ? 'un' : '').'archive_successfully'),
                 );
             });
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify',
                 variant: 'danger',
                 title: __('pm::messages.error'),
@@ -124,7 +125,7 @@ new class extends Component
         try {
             $id = ProjectInvoice::validateDeleteToken($token);
             if (! $id) {
-                throw new \Exception(__('pm::messages.invalid_delete_token'));
+                throw new Exception(__('pm::messages.invalid_delete_token'));
             }
 
             $invoice = ProjectInvoice::findOrFail($id);
@@ -155,7 +156,7 @@ new class extends Component
                 title: __('pm::messages.success'),
                 message: __('pm::invoice.deleted_successfully'),
             );
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify',
                 variant: 'danger',
                 title: __('pm::messages.error'),
@@ -243,7 +244,7 @@ new class extends Component
     {
         $userModel = config('auth.providers.users.model');
 
-        $adminRole = \VmEngine\SynAuth\Models\Role::where('slug', 'admin')->first();
+        $adminRole = Role::where('slug', 'admin')->first();
         $adminLevel = $adminRole?->level ?? 1;
 
         return $userModel::select('users.id as value', 'users.name as label')

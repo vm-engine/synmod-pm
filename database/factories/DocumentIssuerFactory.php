@@ -6,6 +6,7 @@ namespace VmEngine\Pm\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use VmEngine\Pm\Models\DocumentIssuer;
+use VmEngine\SynAuth\Models\User;
 
 /**
  * @extends Factory<DocumentIssuer>
@@ -22,7 +23,7 @@ class DocumentIssuerFactory extends Factory
             'tax_id_name' => fake()->company(),
             'tax_id_address' => fake()->address(),
             'tax_id_number' => fake()->numerify('##.###.###.#-###.###'),
-            'created_by' => \VmEngine\SynAuth\Models\User::factory(),
+            'created_by' => User::factory(),
             'updated_by' => null,
         ];
     }
@@ -30,7 +31,7 @@ class DocumentIssuerFactory extends Factory
     public function withUpdater(): static
     {
         return $this->state(fn (array $attributes) => [
-            'updated_by' => \VmEngine\SynAuth\Models\User::factory(),
+            'updated_by' => User::factory(),
         ]);
     }
 }

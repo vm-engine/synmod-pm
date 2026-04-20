@@ -8,6 +8,7 @@ use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Pm\Models\ProjectDocument;
 use VmEngine\Pm\Models\ProjectInvoice;
+use VmEngine\SynAuth\Models\Role;
 
 uses(RefreshDatabase::class);
 
@@ -19,7 +20,7 @@ beforeEach(function () {
     $this->user = $UserModel::factory()->create();
 
     // Create dev role with full access (use firstOrCreate to avoid duplicates)
-    $devRole = \VmEngine\SynAuth\Models\Role::firstOrCreate(
+    $devRole = Role::firstOrCreate(
         ['slug' => 'dev'],
         ['name' => 'Developer', 'level' => 0]
     );

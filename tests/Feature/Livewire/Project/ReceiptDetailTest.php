@@ -10,6 +10,7 @@ use VmEngine\Pm\Enums\Documents;
 use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\DocumentIssuer;
 use VmEngine\Pm\Models\Project;
+use VmEngine\Pm\Models\ProjectCategory;
 use VmEngine\Pm\Models\ProjectInvoice;
 use VmEngine\Pm\Models\Signature;
 
@@ -29,7 +30,7 @@ beforeEach(function () {
 function setupDocumentConfig(): void
 {
     // Create a project category for testing
-    $category = \VmEngine\Pm\Models\ProjectCategory::firstOrCreate(
+    $category = ProjectCategory::firstOrCreate(
         ['code' => 'TEST'],
         ['name' => 'Test Category', 'description' => 'Test category for unit tests']
     );
@@ -45,7 +46,7 @@ function setupDocumentConfig(): void
 
 function createTestProject(array $attributes = []): Project
 {
-    $category = \VmEngine\Pm\Models\ProjectCategory::where('code', 'TEST')->first();
+    $category = ProjectCategory::where('code', 'TEST')->first();
 
     return Project::factory()->create(array_merge([
         'project_category_id' => $category->id,

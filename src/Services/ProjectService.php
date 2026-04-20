@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Services;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use VmEngine\Pm\Enums\Documents;
 use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\Project;
 use VmEngine\SynAuth\Facades\SynAuth;
@@ -83,6 +85,30 @@ class ProjectService
 
             return $deleted;
         });
+    }
+
+    /**
+     * Find a project by id without failing.
+     */
+    public function findProject(int $id): ?Project
+    {
+        return Project::find($id);
+    }
+
+    /**
+     * Get projects that already have at least one SPK document.
+     *
+     * Used by the standalone invoices module so that its picker only
+     * surfaces projects that are ready for invoice creation.
+     *
+     * @return Collection<int, Project>
+     */
+    public function getSpkReadyProjects(): Collection
+    {
+        return Project::query()
+            ->whereHas('documents', fn ($q) => $q->where('type', Documents::SPK->value))
+            ->orderBy('name')
+            ->get(['id', 'name']);
     }
 
     /**

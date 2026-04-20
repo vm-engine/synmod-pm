@@ -2,7 +2,24 @@
 
 namespace VmEngine\Pm\Enums;
 
+use VmEngine\Pm\Services\Documents\AccountInformation;
+use VmEngine\Pm\Services\Documents\BackupRequest;
 use VmEngine\Pm\Services\Documents\Base;
+use VmEngine\Pm\Services\Documents\Bast;
+use VmEngine\Pm\Services\Documents\BeritaAcara;
+use VmEngine\Pm\Services\Documents\Blueprint;
+use VmEngine\Pm\Services\Documents\ChangeRequest;
+use VmEngine\Pm\Services\Documents\Invoice;
+use VmEngine\Pm\Services\Documents\Panduan;
+use VmEngine\Pm\Services\Documents\Proposal;
+use VmEngine\Pm\Services\Documents\Receipt;
+use VmEngine\Pm\Services\Documents\Sow;
+use VmEngine\Pm\Services\Documents\Sph;
+use VmEngine\Pm\Services\Documents\Spk;
+use VmEngine\Pm\Services\Documents\TaxInvoice;
+use VmEngine\Pm\Services\Documents\Tor;
+use VmEngine\Pm\Services\Documents\Uat;
+use VmEngine\Pm\Services\Documents\UseCase;
 
 enum Documents: int
 {
@@ -112,23 +129,23 @@ enum Documents: int
     public function handler(): Base
     {
         return match ($this) {
-            Documents::PROPOSAL => app(\VmEngine\Pm\Services\Documents\Proposal::class),
-            Documents::SPH => app(\VmEngine\Pm\Services\Documents\Sph::class),
-            Documents::SPK => app(\VmEngine\Pm\Services\Documents\Spk::class),
-            Documents::SOW => app(\VmEngine\Pm\Services\Documents\Sow::class),
-            Documents::TOR => app(\VmEngine\Pm\Services\Documents\Tor::class),
-            Documents::USE_CASE => app(\VmEngine\Pm\Services\Documents\UseCase::class),
-            Documents::BLUEPRINT => app(\VmEngine\Pm\Services\Documents\Blueprint::class),
-            Documents::INVOICE => app(\VmEngine\Pm\Services\Documents\Invoice::class),
-            Documents::RECEIPT => app(\VmEngine\Pm\Services\Documents\Receipt::class),
-            Documents::TAX_INVOICE => app(\VmEngine\Pm\Services\Documents\TaxInvoice::class),
-            Documents::IA => app(\VmEngine\Pm\Services\Documents\AccountInformation::class),
-            Documents::BAST => app(\VmEngine\Pm\Services\Documents\Bast::class),
-            Documents::PANDUAN => app(\VmEngine\Pm\Services\Documents\Panduan::class),
-            Documents::CHANGE_REQUEST => app(\VmEngine\Pm\Services\Documents\ChangeRequest::class),
-            Documents::BACKUP => app(\VmEngine\Pm\Services\Documents\BackupRequest::class),
-            Documents::UAT => app(\VmEngine\Pm\Services\Documents\Uat::class),
-            Documents::BA => app(\VmEngine\Pm\Services\Documents\BeritaAcara::class),
+            Documents::PROPOSAL => app(Proposal::class),
+            Documents::SPH => app(Sph::class),
+            Documents::SPK => app(Spk::class),
+            Documents::SOW => app(Sow::class),
+            Documents::TOR => app(Tor::class),
+            Documents::USE_CASE => app(UseCase::class),
+            Documents::BLUEPRINT => app(Blueprint::class),
+            Documents::INVOICE => app(Invoice::class),
+            Documents::RECEIPT => app(Receipt::class),
+            Documents::TAX_INVOICE => app(TaxInvoice::class),
+            Documents::IA => app(AccountInformation::class),
+            Documents::BAST => app(Bast::class),
+            Documents::PANDUAN => app(Panduan::class),
+            Documents::CHANGE_REQUEST => app(ChangeRequest::class),
+            Documents::BACKUP => app(BackupRequest::class),
+            Documents::UAT => app(Uat::class),
+            Documents::BA => app(BeritaAcara::class),
         };
     }
 

@@ -129,7 +129,7 @@ new class extends Component
             $document = $documentService->validateDocumentAccess($this->project, $documentId);
 
             $this->redirect(route('backend.pm.document.download', $document->id));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify',
                 variant: 'danger',
                 title: 'Error',
@@ -143,13 +143,13 @@ new class extends Component
         try {
             $id = ProjectDocument::validateDeleteToken($deleteToken);
             if (! $id) {
-                throw new \Exception('Invalid delete token');
+                throw new Exception('Invalid delete token');
             }
 
             $document = ProjectDocument::findOrFail($id);
 
             if ($document->project_id !== $this->project->id) {
-                throw new \Exception('Unauthorized to delete this document');
+                throw new Exception('Unauthorized to delete this document');
             }
 
             $documentService = app(ProjectDocumentService::class);
@@ -164,7 +164,7 @@ new class extends Component
 
             $this->dispatch('document-uploaded');
             $this->dispatch('activity-refresh');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify',
                 variant: 'danger',
                 title: 'Error',
@@ -180,7 +180,7 @@ new class extends Component
             $document = $documentService->validateDocumentAccess($this->project, $documentId);
 
             $this->redirect(route('backend.pm.document.print', $document->id));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify',
                 variant: 'danger',
                 title: 'Error',

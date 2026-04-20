@@ -9,6 +9,7 @@ use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Pm\Models\ProjectInvoice;
 use VmEngine\Pm\Models\ProjectInvoiceItem;
+use VmEngine\SynAuth\Models\User;
 
 /**
  * @extends Factory<ProjectInvoiceItem>
@@ -49,7 +50,7 @@ class ProjectInvoiceItemFactory extends Factory
             'discount_percentage' => $discountPercentage,
             'discount_amount' => $discountAmount,
             'is_paid' => fake()->boolean(60),
-            'created_by' => \VmEngine\SynAuth\Models\User::factory(),
+            'created_by' => User::factory(),
             'updated_by' => null,
         ];
     }
@@ -57,7 +58,7 @@ class ProjectInvoiceItemFactory extends Factory
     public function withUpdater(): static
     {
         return $this->state(fn (array $attributes) => [
-            'updated_by' => \VmEngine\SynAuth\Models\User::factory(),
+            'updated_by' => User::factory(),
         ]);
     }
 

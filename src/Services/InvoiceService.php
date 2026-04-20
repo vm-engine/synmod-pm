@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace VmEngine\Pm\Services;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use VmEngine\Pm\Enums\Documents;
@@ -89,6 +91,52 @@ class InvoiceService
     }
 
     /**
+     * Find a non-archived invoice by id.
+     */
+    public function findInvoice(int $id): ProjectInvoice
+    {
+        return ProjectInvoice::query()->findOrFail($id);
+    }
+
+    /**
+     * Distinct years found on issued invoices (non-archived), sorted desc.
+     *
+     * @return array<int, int>
+     */
+    public function getAvailableYears(): array
+    {
+        return ProjectInvoice::query()
+            ->where('archived', 0)
+            ->selectRaw($this->dateExtract('YEAR', 'issue_date').' as yr')
+            ->groupBy('yr')
+            ->orderByDesc('yr')
+            ->pluck('yr')
+            ->map(fn ($y) => (int) $y)
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Distinct invoice creators (id + name) for filter dropdowns.
+     *
+     * @return Collection<int, object{id:int,name:string}>
+     */
+    public function getCreators(): Collection
+    {
+        return ProjectInvoice::query()
+            ->where('archived', 0)
+            ->whereNotNull('created_by')
+            ->with('creator:id,name')
+            ->select('created_by')
+            ->distinct()
+            ->get()
+            ->map(fn ($invoice) => $invoice->creator)
+            ->filter()
+            ->unique('id')
+            ->values();
+    }
+
+    /**
      * Generate invoice number for a project.
      */
     public function generateInvoiceNumber(Project $project): string
@@ -157,9 +205,13 @@ class InvoiceService
         return "{$part}({$column})";
     }
 
-    private function baseInvoiceQuery(?int $year = null): \Illuminate\Database\Eloquent\Builder
+    private function baseInvoiceQuery(?int $year = null, bool $includeArchived = false): Builder
     {
-        $query = ProjectInvoice::query()->where('archived', 0);
+        $query = ProjectInvoice::query();
+
+        if (! $includeArchived) {
+            $query->where('archived', 0);
+        }
 
         if ($year !== null) {
             $query->where(DB::raw($this->dateExtract('YEAR', 'issue_date')), $year);
@@ -295,16 +347,18 @@ class InvoiceService
         $creator = $filters['creator'] ?? null;
         $projectCategory = $filters['project_category'] ?? null;
         $isPaid = $filters['is_paid'] ?? null;
+        $status = isset($filters['status']) ? (string) $filters['status'] : null;
         $q = isset($filters['q']) ? trim((string) $filters['q']) : null;
         $sortBy = $filters['sort_by'] ?? 'issue_date';
         $sortDesc = $filters['sort_desc'] ?? true;
         $limit = min((int) ($filters['limit'] ?? 20), 100);
+        $includeArchived = (bool) ($filters['include_archived'] ?? false);
 
         if (! in_array($sortBy, $allowedSortColumns, true)) {
             $sortBy = 'issue_date';
         }
 
-        $query = $this->baseInvoiceQuery($year ? (int) $year : null);
+        $query = $this->baseInvoiceQuery($year ? (int) $year : null, $includeArchived);
 
         if ($month !== null) {
             $query->where(DB::raw($this->dateExtract('MONTH', 'issue_date')), (int) $month);
@@ -322,9 +376,19 @@ class InvoiceService
             $query->where('is_paid', (bool) $isPaid);
         }
 
+        if ($status !== null && $status !== '') {
+            match ($status) {
+                'paid' => $query->where('is_paid', true),
+                'outstanding' => $query->where('is_paid', false),
+                'overdue' => $query->where('is_paid', false)->whereDate('due_date', '<', now()->toDateString()),
+                default => null,
+            };
+        }
+
         if ($q !== null && $q !== '') {
             $query->where(function ($sub) use ($q): void {
                 $sub->where('invoice_number', 'like', "%{$q}%")
+                    ->orWhere('recipient', 'like', "%{$q}%")
                     ->orWhere('receipt_number', 'like', "%{$q}%")
                     ->orWhereHas('client', fn ($c) => $c->where('company', 'like', "%{$q}%"))
                     ->orWhereHas('creator', fn ($c) => $c->where('name', 'like', "%{$q}%"));

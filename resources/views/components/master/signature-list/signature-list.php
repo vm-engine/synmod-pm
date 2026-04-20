@@ -79,7 +79,7 @@ new class extends Component
             );
 
             return;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify',
                 variant: 'danger',
                 title: 'Error',

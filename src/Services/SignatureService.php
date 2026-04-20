@@ -68,6 +68,24 @@ class SignatureService
     }
 
     /**
+     * Dropdown options for signatures, ordered by name.
+     *
+     * @return array<int, array{value: int, label: string}>
+     */
+    public function getOptions(): array
+    {
+        return Signature::query()
+            ->select('id', 'name', 'position')
+            ->orderBy('name')
+            ->get()
+            ->map(fn (Signature $signature) => [
+                'value' => (int) $signature->id,
+                'label' => $signature->name.' - '.$signature->position,
+            ])
+            ->all();
+    }
+
+    /**
      * Delete a signature.
      */
     public function delete(Signature $signature): bool

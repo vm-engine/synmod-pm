@@ -92,6 +92,24 @@ class IssuerService
     }
 
     /**
+     * Dropdown options for document issuers, ordered by name.
+     *
+     * @return array<int, array{value: int, label: string}>
+     */
+    public function getOptions(): array
+    {
+        return DocumentIssuer::query()
+            ->select('id', 'name', 'tax_id_number')
+            ->orderBy('name')
+            ->get()
+            ->map(fn (DocumentIssuer $issuer) => [
+                'value' => (int) $issuer->id,
+                'label' => $issuer->name.' ('.$issuer->tax_id_number.')',
+            ])
+            ->all();
+    }
+
+    /**
      * Log issuer activity.
      */
     private function logActivity(string $action, DocumentIssuer $issuer, ?array $newData = null, ?array $oldData = null): void

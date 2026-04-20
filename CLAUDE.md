@@ -1,5 +1,13 @@
 # CLAUDE.md
 
+# Import personal global standards
+@~/.claude/CLAUDE.md
+
+# Import project standards
+@../../CLAUDE.md
+
+---
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview

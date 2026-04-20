@@ -147,7 +147,7 @@ new class extends Component
                 message: __('pm::receipt.pdf_generated'),
             );
             $this->refreshInvoice();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify',
                 variant: 'danger',
                 title: __('pm::messages.error'),
@@ -238,7 +238,7 @@ new class extends Component
                 message: __('pm::receipt.payment_status_updated'),
             );
             $this->refreshInvoice();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify',
                 variant: 'danger',
                 title: __('pm::messages.error'),

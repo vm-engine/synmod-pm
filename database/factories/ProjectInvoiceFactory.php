@@ -13,6 +13,7 @@ use VmEngine\Pm\Models\ProjectCategory;
 use VmEngine\Pm\Models\ProjectDocument;
 use VmEngine\Pm\Models\ProjectInvoice;
 use VmEngine\Pm\Models\Signature;
+use VmEngine\SynAuth\Models\User;
 
 /**
  * @extends Factory<ProjectInvoice>
@@ -53,7 +54,7 @@ class ProjectInvoiceFactory extends Factory
             'project_id' => Project::factory(),
             'project_category_id' => ProjectCategory::factory(),
             'client_id' => Client::factory(),
-            'user_id' => \VmEngine\SynAuth\Models\User::factory(),
+            'user_id' => User::factory(),
             'invoice_number' => 'INV-'.fake()->unique()->numerify('######'),
             'spk_document_id' => ProjectDocument::factory(),
             'issue_date' => $issueDate,
@@ -84,7 +85,7 @@ class ProjectInvoiceFactory extends Factory
             'receipt_number' => $isPaid ? 'RCP-'.fake()->unique()->numerify('######') : null,
             'receipt_amount_text' => $isPaid ? fake()->randomElement($numberWords).' Juta Rupiah' : null,
             'receipt_document_id' => $isPaid && fake()->boolean(40) ? ProjectDocument::factory() : null,
-            'created_by' => \VmEngine\SynAuth\Models\User::factory(),
+            'created_by' => User::factory(),
             'updated_by' => null,
         ];
     }
@@ -92,7 +93,7 @@ class ProjectInvoiceFactory extends Factory
     public function withUpdater(): static
     {
         return $this->state(fn (array $attributes) => [
-            'updated_by' => \VmEngine\SynAuth\Models\User::factory(),
+            'updated_by' => User::factory(),
         ]);
     }
 

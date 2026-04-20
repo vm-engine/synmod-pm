@@ -84,7 +84,7 @@ new class extends Component
             $npwpImage = Storage::disk('local')->get($client->npwp_image);
             $this->npwpImage = 'data:image/png;base64,'.base64_encode($npwpImage);
             $this->dispatch('open-modal-npwp-image');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify',
                 variant: 'error',
                 title: __('pm::messages.error'),
@@ -156,7 +156,7 @@ new class extends Component
                 title: __('pm::messages.success'),
                 message: __('pm::messages.client_status_updated'),
             );
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('notify',
                 variant: 'danger',
                 title: __('pm::messages.error'),
@@ -170,7 +170,7 @@ new class extends Component
         try {
             $id = Client::validateDeleteToken($token);
             if (! $id) {
-                throw new \Exception(__('pm::messages.invalid_delete_token'));
+                throw new Exception(__('pm::messages.invalid_delete_token'));
             }
 
             $client = Client::findOrFail($id);
@@ -184,7 +184,7 @@ new class extends Component
                 title: __('pm::messages.success'),
                 message: __('pm::messages.client_deleted_successfully'),
             );
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('synapse-confirmed');
             $this->dispatch('notify',
                 variant: 'danger',

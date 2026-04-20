@@ -68,6 +68,24 @@ class BankAccountService
     }
 
     /**
+     * Dropdown options for bank accounts, ordered by name.
+     *
+     * @return array<int, array{value: int, label: string}>
+     */
+    public function getOptions(): array
+    {
+        return BankAccount::query()
+            ->select('id', 'name', 'number', 'bank_name')
+            ->orderBy('name')
+            ->get()
+            ->map(fn (BankAccount $account) => [
+                'value' => (int) $account->id,
+                'label' => $account->name.' - '.$account->number.' ('.$account->bank_name.')',
+            ])
+            ->all();
+    }
+
+    /**
      * Delete a bank account.
      */
     public function delete(BankAccount $bankAccount): bool

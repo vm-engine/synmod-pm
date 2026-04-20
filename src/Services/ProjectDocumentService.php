@@ -138,6 +138,7 @@ class ProjectDocumentService
      */
     public function canAccessDocument(Project $project): bool
     {
+        /** @var VmEngine\SynAuth\Models\User $user */
         $user = Auth::user();
 
         if (! $user) {

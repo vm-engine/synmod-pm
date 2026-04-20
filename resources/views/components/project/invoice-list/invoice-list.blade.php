@@ -224,11 +224,11 @@
                                                         const menuWidth = 192; // w-48 = 12rem = 192px
                                                         const viewportHeight = window.innerHeight;
                                                         const viewportWidth = window.innerWidth;
-
+                                                
                                                         // Check if there's enough space below
                                                         const spaceBelow = viewportHeight - rect.bottom;
                                                         const spaceAbove = rect.top;
-
+                                                
                                                         // Position vertically (prefer below, use above if not enough space)
                                                         let top;
                                                         if (spaceBelow >= menuHeight || spaceBelow > spaceAbove) {
@@ -236,20 +236,20 @@
                                                         } else {
                                                             top = rect.top + window.scrollY - menuHeight - 8;
                                                         }
-
+                                                
                                                         // Position horizontally (align to right of button)
                                                         let left = rect.right + window.scrollX - menuWidth;
-
+                                                
                                                         // Ensure dropdown doesn't go off the left edge
                                                         if (left < 0) {
                                                             left = 8;
                                                         }
-
+                                                
                                                         // Ensure dropdown doesn't go off the right edge
                                                         if (left + menuWidth > viewportWidth) {
                                                             left = viewportWidth - menuWidth - 8;
                                                         }
-
+                                                
                                                         this.dropdownPosition = { top, left };
                                                     }
                                                 }"

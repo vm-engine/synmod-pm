@@ -6,6 +6,7 @@ namespace VmEngine\Pm\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use VmEngine\Pm\Models\BankAccount;
+use VmEngine\SynAuth\Models\User;
 
 /**
  * @extends Factory<BankAccount>
@@ -23,7 +24,7 @@ class BankAccountFactory extends Factory
             'number' => fake()->numerify('##########'),
             'bank_name' => fake()->randomElement($banks),
             'bank_logo' => fake()->imageUrl(200, 100, 'business', true),
-            'created_by' => \VmEngine\SynAuth\Models\User::factory(),
+            'created_by' => User::factory(),
             'updated_by' => null,
         ];
     }
@@ -31,7 +32,7 @@ class BankAccountFactory extends Factory
     public function withUpdater(): static
     {
         return $this->state(fn (array $attributes) => [
-            'updated_by' => \VmEngine\SynAuth\Models\User::factory(),
+            'updated_by' => User::factory(),
         ]);
     }
 }
