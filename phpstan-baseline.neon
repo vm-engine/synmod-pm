@@ -7,12 +7,6 @@ parameters:
 			path: src/Console/Commands/ImportProjectsCommand.php
 
 		-
-			message: '#^Class VmEngine\\Pm\\Seeders\\ClientRoleSeeder not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Console/Commands/MigrateOldDataCommand.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Collection\<int, VmEngine\\Pm\\Models\\Client\>\|VmEngine\\Pm\\Models\\Client\:\:\$user_id\.$#'
 			identifier: property.notFound
 			count: 1
@@ -37,12 +31,6 @@ parameters:
 			path: src/Console/Commands/MigrateOldDataCommand.php
 
 		-
-			message: '#^Class VmEngine\\Pm\\Seeders\\ClientRoleSeeder not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Console/Commands/MigrateOldDataCommand.php
-
-		-
 			message: '#^If condition is always false\.$#'
 			identifier: if.alwaysFalse
 			count: 1
@@ -59,6 +47,36 @@ parameters:
 			identifier: nullsafe.neverNull
 			count: 2
 			path: src/Form/ProjectFormObject.php
+
+		-
+			message: '#^Access to property \$id on an unknown class VmEngine\\Pm\\Http\\Controllers\\VmEngine\\SynAuth\\Models\\User\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Http/Controllers/DocumentController.php
+
+		-
+			message: '#^Call to method hasRole\(\) on an unknown class VmEngine\\Pm\\Http\\Controllers\\VmEngine\\SynAuth\\Models\\User\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Http/Controllers/DocumentController.php
+
+		-
+			message: '#^Call to method isDev\(\) on an unknown class VmEngine\\Pm\\Http\\Controllers\\VmEngine\\SynAuth\\Models\\User\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Http/Controllers/DocumentController.php
+
+		-
+			message: '#^Call to method roles\(\) on an unknown class VmEngine\\Pm\\Http\\Controllers\\VmEngine\\SynAuth\\Models\\User\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Http/Controllers/DocumentController.php
+
+		-
+			message: '#^PHPDoc tag @var for variable \$user contains unknown class VmEngine\\Pm\\Http\\Controllers\\VmEngine\\SynAuth\\Models\\User\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Http/Controllers/DocumentController.php
 
 		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:byType\(\)\.$#'
@@ -85,8 +103,38 @@ parameters:
 			path: src/Services/InvoicePdfService.php
 
 		-
+			message: '#^Access to property \$id on an unknown class VmEngine\\Pm\\Services\\VmEngine\\SynAuth\\Models\\User\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Services/ProjectDocumentService.php
+
+		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:byType\(\)\.$#'
 			identifier: method.notFound
+			count: 1
+			path: src/Services/ProjectDocumentService.php
+
+		-
+			message: '#^Call to method hasRole\(\) on an unknown class VmEngine\\Pm\\Services\\VmEngine\\SynAuth\\Models\\User\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Services/ProjectDocumentService.php
+
+		-
+			message: '#^Call to method isDev\(\) on an unknown class VmEngine\\Pm\\Services\\VmEngine\\SynAuth\\Models\\User\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Services/ProjectDocumentService.php
+
+		-
+			message: '#^Call to method roles\(\) on an unknown class VmEngine\\Pm\\Services\\VmEngine\\SynAuth\\Models\\User\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Services/ProjectDocumentService.php
+
+		-
+			message: '#^PHPDoc tag @var for variable \$user contains unknown class VmEngine\\Pm\\Services\\VmEngine\\SynAuth\\Models\\User\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Services/ProjectDocumentService.php
 

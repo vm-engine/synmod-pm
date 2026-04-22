@@ -78,9 +78,19 @@ class InvoiceFormObject extends Form
         $invoiceService = app(InvoiceService::class);
         $this->invoice_number = $invoiceService->generateInvoiceNumber($project);
 
-        // Set default dates
+        // Set defaults from DbConfig (fall back to literals if rows missing).
+        // dbconf returns string values when read from the DB (ints only survive
+        // in-process via its cache), so nullable ID fields must be cast explicitly.
+        $dueDays = (int) dbconf('pm.invoice.payment_due_days', 14);
+        $issuerId = dbconf('pm.invoice.default_issuer_id', null);
+        $bankAccountId = dbconf('pm.invoice.default_bank_account_id', null);
+        $signatureId = dbconf('pm.invoice.default_signature_id', null);
+
         $this->issue_date = now()->format('Y-m-d');
-        $this->due_date = now()->addDays(14)->format('Y-m-d');
+        $this->due_date = now()->addDays($dueDays)->format('Y-m-d');
+        $this->issuer_id = $issuerId !== null && $issuerId !== '' ? (int) $issuerId : null;
+        $this->bank_account_id = $bankAccountId !== null && $bankAccountId !== '' ? (int) $bankAccountId : null;
+        $this->signature_id = $signatureId !== null && $signatureId !== '' ? (int) $signatureId : null;
     }
 
     public function setInvoice(ProjectInvoice $invoice): void

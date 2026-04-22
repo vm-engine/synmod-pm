@@ -26,7 +26,7 @@ class ProjectInvoiceFactory extends Factory
     {
         $amount = fake()->numberBetween(5000000, 50000000);
         $includeVat = fake()->boolean(80);
-        $vatPercentage = 11.00;
+        $vatPercentage = (float) dbconf('pm.invoice.vat_percentage', 11.00);
         $vatAmount = $includeVat ? round($amount * $vatPercentage / 100, 2) : 0;
 
         $includeDiscount = fake()->boolean(30);

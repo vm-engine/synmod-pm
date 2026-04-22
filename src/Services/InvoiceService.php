@@ -28,6 +28,11 @@ class InvoiceService
     public function create(Project $project, array $invoiceData): ProjectInvoice
     {
         $data = [
+            // DbConfig defaults for VAT — caller may still override via $invoiceData.
+            // These drive the initial stored row; the invoice-detail editor will
+            // respect the persisted value on subsequent opens.
+            'vat_percentage' => (float) dbconf('pm.invoice.vat_percentage', 11.0),
+            'include_vat' => (bool) dbconf('pm.invoice.include_vat_default', true),
             ...$invoiceData,
             'user_id' => Auth::id(),
             'signature_id' => ($invoiceData['has_signature'] ?? false) ? $invoiceData['signature_id'] : null,

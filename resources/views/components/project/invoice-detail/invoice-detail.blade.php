@@ -372,7 +372,7 @@
                                 <label
                                     class="text-gray-600 dark:text-gray-400"
                                     for="includeDpp"
-                                >{{ __('pm::invoice.include_dpp') }} (11/12)</label>
+                                >{{ __('pm::invoice.include_dpp') }} {{ $this->dppLabel }}</label>
                             </div>
                             @if ($includeDpp)
                                 <span class="font-mono font-medium text-gray-900 dark:text-white">Rp

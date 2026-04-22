@@ -52,6 +52,26 @@ new class extends Component
 
     public string $invoiceNotes = '';
 
+    public function mount(): void
+    {
+        // New-invoice defaults from DbConfig (overridden by loadInvoice() when
+        // an existing invoice is loaded via the load-invoice-detail event).
+        $this->vatPercentage = (float) dbconf('pm.invoice.vat_percentage', 11.0);
+        $this->includeVat = (bool) dbconf('pm.invoice.include_vat_default', true);
+    }
+
+    private function dppRatio(): float
+    {
+        $num = (int) dbconf('pm.invoice.dpp_numerator', 11);
+        $den = (int) dbconf('pm.invoice.dpp_denominator', 12);
+
+        if ($den === 0) {
+            $den = 12;
+        }
+
+        return $num / $den;
+    }
+
     #[On('load-invoice-detail')]
     public function loadInvoice(int $id): void
     {
@@ -295,8 +315,8 @@ new class extends Component
             $baseAmount += $itemTotal;
         }
 
-        // Calculate DPP (if include_dpp is true, DPP = 11/12 of base amount)
-        $dppAmount = $this->includeDpp ? ($baseAmount * 11 / 12) : $baseAmount;
+        // Calculate DPP (if include_dpp is true, DPP = numerator/denominator of base amount)
+        $dppAmount = $this->includeDpp ? ($baseAmount * $this->dppRatio()) : $baseAmount;
 
         // Calculate invoice discount
         $discountAmount = $this->includeDiscount
@@ -418,7 +438,20 @@ new class extends Component
     #[Computed]
     public function dppAmount(): float
     {
-        return $this->includeDpp ? ($this->subTotal * 11 / 12) : $this->subTotal;
+        return $this->includeDpp ? ($this->subTotal * $this->dppRatio()) : $this->subTotal;
+    }
+
+    #[Computed]
+    public function dppLabel(): string
+    {
+        $num = (int) dbconf('pm.invoice.dpp_numerator', 11);
+        $den = (int) dbconf('pm.invoice.dpp_denominator', 12);
+
+        if ($den === 0) {
+            $den = 12;
+        }
+
+        return "({$num}/{$den})";
     }
 
     #[Computed]

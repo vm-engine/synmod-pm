@@ -14,6 +14,7 @@ return [
     'receipts' => 'Receipts',
     'archive' => 'Archive',
     'unarchive' => 'Unarchive',
+    'delete' => 'Delete',
     'save_and_generate_pdf' => 'Save & Generate PDF',
     'add_item' => 'Add Item',
 

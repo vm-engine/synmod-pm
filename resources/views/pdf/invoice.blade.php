@@ -400,7 +400,9 @@
 
             {{-- Totals Section --}}
             @php
-                $dppAmount = $invoice->include_dpp ? ($subTotal * 11) / 12 : $subTotal;
+                $dppNumerator = (int) dbconf('pm.invoice.dpp_numerator', 11);
+                $dppDenominator = (int) dbconf('pm.invoice.dpp_denominator', 12) ?: 12;
+                $dppAmount = $invoice->include_dpp ? ($subTotal * $dppNumerator / $dppDenominator) : $subTotal;
                 $discountAmount = $invoice->include_discount ? ($dppAmount * $invoice->discount_percentage) / 100 : 0;
                 $afterDiscount = $dppAmount - $discountAmount;
                 $vatAmount = $invoice->include_vat ? ($afterDiscount * $invoice->vat_percentage) / 100 : 0;

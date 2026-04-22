@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.4] - 2026-04-22
+
+### Added
+- **Invoice DbConfig** — eight runtime-configurable keys under `pm.invoice.*` surfaced in a new "General" tab on the PM config page:
+  - `vat_percentage`, `include_vat_default` — defaults for new invoices.
+  - `dpp_numerator`, `dpp_denominator` — drives the DPP Nilai Lain ratio (default 11/12) in `invoice-detail` calculations, the PDF template, and the dynamic form label.
+  - `payment_due_days`, `default_issuer_id`, `default_bank_account_id`, `default_signature_id` — pre-fill `InvoiceFormObject::setProject()` when opening the new-invoice form.
+- **Dynamic DPP label** — `invoice-detail` exposes a `dppLabel` computed property; the blade now renders `({numerator}/{denominator})` from DbConfig instead of the hardcoded `(11/12)`.
+- **Delete translation key** `pm::invoice.delete` for dropdown labels.
+
+### Changed
+- **`InvoiceService::create()`** now applies `pm.invoice.vat_percentage` / `pm.invoice.include_vat_default` as defaults when the caller does not supply VAT fields, so invoices created via either the PM project flow or the standalone invoices module pick up the configured rate. Explicit values in the caller data still win.
+- **`InvoiceFormObject::setProject()`** populates issuer, bank account, signature, and due date from DbConfig for new invoices; casts nullable ID values explicitly to `int` to survive the DbConfig DB-roundtrip (which returns strings outside the in-process cache).
+- **`ProjectInvoiceFactory`** seeds `vat_percentage` from DbConfig with a literal `11.00` fallback so tests in a bare DB behave deterministically.
+- **Invoice-detail `mount()`** reads `vat_percentage` and `include_vat_default` from DbConfig on new-invoice instantiation; existing invoices keep their persisted row values via `loadInvoice`.
+
+### Tests
+- New feature test file `tests/Feature/InvoiceConfigTest.php` covering: general-tab preload, save, permission denial, validation rules, zero-denominator DPP guard, `InvoiceFormObject::setProject` DbConfig defaults (including a DB-roundtrip regression test that bypasses the DbConfig cache), invoice-detail VAT defaults (new vs. existing), DPP ratio reflection, dynamic label, factory VAT behavior, and `InvoiceService::create` default-vs-caller-override semantics.
+
 ## [0.8.3] - 2026-04-20
 
 ### Added
