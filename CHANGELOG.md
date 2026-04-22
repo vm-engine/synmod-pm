@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.5] - 2026-04-22
+
+### Fixed
+- `composer.json` `version` field was stuck at `0.8.3` during the 0.8.4 release, which caused Composer to report the package as `0.8.3` even at the `v0.8.4` tag (the explicit version field overrides Git tags). Bumped to `0.8.5` in sync with `module.json` so production `composer update vm-engine/synmod-pm` picks up the latest.
+
 ## [0.8.4] - 2026-04-22
 
 ### Added
