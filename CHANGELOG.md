@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.6] - 2026-05-04
+
+### Fixed
+- **Project document download/print redirected non-dev admins to the dashboard.** The routes were gated by `pm.document.read`, but that permission was never declared in `module.json`'s ACL, so it was never seeded into `role_permissions` for any role. `User::can('pm.document.read')` returned `false` for everyone except dev (which bypasses via `isDev()`), and the `Permission` middleware redirects to the dashboard on failure. Swapped both `/pm/document/{id}/download` and `/pm/document/{id}/print` middleware to `can-access:pm.project.read`. The controller's `canAccessDocument()` continues to enforce per-role isolation (admin vs. client) after the middleware passes.
+
+### Added
+- **`pm.document.read` registered as a first-class ACL permission** in `module.json` so it appears in the role permissions admin UI for granular configuration.
+- **Translation entries** for `__pm::acl.document.label` and `__pm::acl.document.read`.
+- **Backfill migration** `2026_05_04_000000_seed_pm_document_acl_permissions.php` — idempotently inserts `pm.document.read` rows for every role that already has `pm.project.read = 1`, using `insertOrIgnore` against the existing unique index.
+
+### Removed
+- **`version` field from `composer.json`.** Composer treats an explicit `version` field as authoritative and will override Git tags, which previously caused stale-version reports in production. Versioning now relies solely on Git tags + `module.json`.
+
 ## [0.8.5] - 2026-04-22
 
 ### Fixed

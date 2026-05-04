@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use VmEngine\Pm\Enums\Documents;
+use VmEngine\Pm\Models\BankAccount;
+use VmEngine\Pm\Models\DocumentIssuer;
+use VmEngine\Pm\Models\Signature;
 use VmEngine\Synapse\Services\Helper\Breadcrumbs;
 use VmEngine\SynAuth\Facades\SynAuth;
 
@@ -20,14 +23,14 @@ new class extends Component
     ];
 
     public array $generalConfigs = [
-        'vat_percentage'          => 11.0,
-        'include_vat_default'     => true,
-        'dpp_numerator'           => 11,
-        'dpp_denominator'         => 12,
-        'payment_due_days'        => 14,
-        'default_issuer_id'       => null,
+        'vat_percentage' => 11.0,
+        'include_vat_default' => true,
+        'dpp_numerator' => 11,
+        'dpp_denominator' => 12,
+        'payment_due_days' => 14,
+        'default_issuer_id' => null,
         'default_bank_account_id' => null,
-        'default_signature_id'    => null,
+        'default_signature_id' => null,
     ];
 
     public function mount(): void
@@ -39,14 +42,14 @@ new class extends Component
         }
 
         $this->generalConfigs = [
-            'vat_percentage'          => (float) dbconf('pm.invoice.vat_percentage', 11.0),
-            'include_vat_default'     => (bool)  dbconf('pm.invoice.include_vat_default', true),
-            'dpp_numerator'           => (int)   dbconf('pm.invoice.dpp_numerator', 11),
-            'dpp_denominator'         => (int)   dbconf('pm.invoice.dpp_denominator', 12),
-            'payment_due_days'        => (int)   dbconf('pm.invoice.payment_due_days', 14),
-            'default_issuer_id'       => dbconf('pm.invoice.default_issuer_id', null),
+            'vat_percentage' => (float) dbconf('pm.invoice.vat_percentage', 11.0),
+            'include_vat_default' => (bool) dbconf('pm.invoice.include_vat_default', true),
+            'dpp_numerator' => (int) dbconf('pm.invoice.dpp_numerator', 11),
+            'dpp_denominator' => (int) dbconf('pm.invoice.dpp_denominator', 12),
+            'payment_due_days' => (int) dbconf('pm.invoice.payment_due_days', 14),
+            'default_issuer_id' => dbconf('pm.invoice.default_issuer_id', null),
             'default_bank_account_id' => dbconf('pm.invoice.default_bank_account_id', null),
-            'default_signature_id'    => dbconf('pm.invoice.default_signature_id', null),
+            'default_signature_id' => dbconf('pm.invoice.default_signature_id', null),
         ];
 
         synav()->setActiveMenu('pm.config');
@@ -94,14 +97,14 @@ new class extends Component
         }
 
         $this->validate([
-            'generalConfigs.vat_percentage'          => ['required', 'numeric', 'min:0', 'max:100'],
-            'generalConfigs.include_vat_default'     => ['boolean'],
-            'generalConfigs.dpp_numerator'           => ['required', 'integer', 'min:1'],
-            'generalConfigs.dpp_denominator'         => ['required', 'integer', 'min:1'],
-            'generalConfigs.payment_due_days'        => ['required', 'integer', 'min:0'],
-            'generalConfigs.default_issuer_id'       => ['nullable', 'integer', 'exists:document_issuers,id'],
+            'generalConfigs.vat_percentage' => ['required', 'numeric', 'min:0', 'max:100'],
+            'generalConfigs.include_vat_default' => ['boolean'],
+            'generalConfigs.dpp_numerator' => ['required', 'integer', 'min:1'],
+            'generalConfigs.dpp_denominator' => ['required', 'integer', 'min:1'],
+            'generalConfigs.payment_due_days' => ['required', 'integer', 'min:0'],
+            'generalConfigs.default_issuer_id' => ['nullable', 'integer', 'exists:document_issuers,id'],
             'generalConfigs.default_bank_account_id' => ['nullable', 'integer', 'exists:bank_accounts,id'],
-            'generalConfigs.default_signature_id'    => ['nullable', 'integer', 'exists:signatures,id'],
+            'generalConfigs.default_signature_id' => ['nullable', 'integer', 'exists:signatures,id'],
         ]);
 
         foreach ($this->generalConfigs as $key => $value) {
@@ -142,7 +145,7 @@ new class extends Component
     #[Computed()]
     public function issuerOptions(): array
     {
-        return \VmEngine\Pm\Models\DocumentIssuer::query()
+        return DocumentIssuer::query()
             ->select('id', 'name')
             ->orderBy('name')
             ->get()
@@ -153,7 +156,7 @@ new class extends Component
     #[Computed()]
     public function bankAccountOptions(): array
     {
-        return \VmEngine\Pm\Models\BankAccount::query()
+        return BankAccount::query()
             ->select('id', 'name', 'bank_name')
             ->orderBy('name')
             ->get()
@@ -164,7 +167,7 @@ new class extends Component
     #[Computed()]
     public function signatureOptions(): array
     {
-        return \VmEngine\Pm\Models\Signature::query()
+        return Signature::query()
             ->select('id', 'name', 'position')
             ->orderBy('name')
             ->get()

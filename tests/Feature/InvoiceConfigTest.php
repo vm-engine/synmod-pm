@@ -9,7 +9,10 @@ use VmEngine\Pm\Form\InvoiceFormObject;
 use VmEngine\Pm\Models\BankAccount;
 use VmEngine\Pm\Models\DocumentIssuer;
 use VmEngine\Pm\Models\Project;
+use VmEngine\Pm\Models\ProjectInvoice;
 use VmEngine\Pm\Models\Signature;
+use VmEngine\Pm\Services\InvoiceService;
+use VmEngine\Synapse\Models\Config;
 use VmEngine\SynAuth\Models\Role;
 use VmEngine\SynAuth\Models\RolePermission;
 use VmEngine\SynAuth\Models\User;
@@ -203,17 +206,17 @@ it('casts string-valued dbconfig IDs to int in setProject (DB-roundtrip path)', 
 
     // dbconf splits on the first '.' — 'pm.invoice.default_issuer_id' becomes
     // group='pm', key='invoice.default_issuer_id'.
-    \VmEngine\Synapse\Models\Config::create([
+    Config::create([
         'group' => 'pm',
         'key' => 'invoice.default_issuer_id',
         'value' => (string) $issuer->id,
     ]);
-    \VmEngine\Synapse\Models\Config::create([
+    Config::create([
         'group' => 'pm',
         'key' => 'invoice.default_bank_account_id',
         'value' => (string) $bank->id,
     ]);
-    \VmEngine\Synapse\Models\Config::create([
+    Config::create([
         'group' => 'pm',
         'key' => 'invoice.default_signature_id',
         'value' => (string) $signature->id,
@@ -242,7 +245,7 @@ it('uses dbconfig vat_percentage and include_vat_default on new invoice mount', 
 it('keeps persisted invoice vat_percentage after loadInvoice', function () {
     dbconf(['pm.invoice.vat_percentage' => 12.0]);
 
-    $invoice = \VmEngine\Pm\Models\ProjectInvoice::factory()->create([
+    $invoice = ProjectInvoice::factory()->create([
         'vat_percentage' => 11.00,
         'include_vat' => true,
         'archived' => false,
@@ -294,7 +297,7 @@ it('exposes a dynamic dppLabel computed property', function () {
 it('factory uses dbconfig vat_percentage when set', function () {
     dbconf(['pm.invoice.vat_percentage' => 12.5]);
 
-    $invoice = \VmEngine\Pm\Models\ProjectInvoice::factory()->create([
+    $invoice = ProjectInvoice::factory()->create([
         'include_vat' => true,
     ]);
 
@@ -302,7 +305,7 @@ it('factory uses dbconfig vat_percentage when set', function () {
 });
 
 it('factory falls back to 11 when dbconfig is missing', function () {
-    $invoice = \VmEngine\Pm\Models\ProjectInvoice::factory()->create([
+    $invoice = ProjectInvoice::factory()->create([
         'include_vat' => true,
     ]);
 
@@ -315,17 +318,17 @@ it('InvoiceService::create applies dbconfig VAT defaults when caller omits them'
         'pm.invoice.include_vat_default' => false,
     ]);
 
-    $this->actingAs(\VmEngine\SynAuth\Models\User::factory()->create());
+    $this->actingAs(User::factory()->create());
 
     // Build a valid invoice payload via the factory, then strip VAT fields so
     // create() must consult dbconfig for them.
-    $payload = \VmEngine\Pm\Models\ProjectInvoice::factory()->make()->toArray();
+    $payload = ProjectInvoice::factory()->make()->toArray();
     unset($payload['vat_percentage'], $payload['include_vat'], $payload['vat_amount']);
 
     $project = Project::find($payload['project_id']) ?? Project::factory()->create();
     $payload['project_id'] = $project->id;
 
-    $invoice = app(\VmEngine\Pm\Services\InvoiceService::class)->create($project, $payload);
+    $invoice = app(InvoiceService::class)->create($project, $payload);
 
     expect((float) $invoice->vat_percentage)->toBe(12.0)
         ->and((bool) $invoice->include_vat)->toBeFalse();
@@ -334,16 +337,16 @@ it('InvoiceService::create applies dbconfig VAT defaults when caller omits them'
 it('InvoiceService::create respects explicit VAT in caller data over dbconfig', function () {
     dbconf(['pm.invoice.vat_percentage' => 12.0]);
 
-    $this->actingAs(\VmEngine\SynAuth\Models\User::factory()->create());
+    $this->actingAs(User::factory()->create());
 
-    $payload = \VmEngine\Pm\Models\ProjectInvoice::factory()->make()->toArray();
+    $payload = ProjectInvoice::factory()->make()->toArray();
     $payload['vat_percentage'] = 15.0;
     $payload['include_vat'] = true;
 
     $project = Project::find($payload['project_id']) ?? Project::factory()->create();
     $payload['project_id'] = $project->id;
 
-    $invoice = app(\VmEngine\Pm\Services\InvoiceService::class)->create($project, $payload);
+    $invoice = app(InvoiceService::class)->create($project, $payload);
 
     expect((float) $invoice->vat_percentage)->toBe(15.0)
         ->and((bool) $invoice->include_vat)->toBeTrue();

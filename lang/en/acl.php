@@ -56,4 +56,8 @@ return [
         'update' => 'Edit Receipt',
         'delete' => 'Delete Receipt',
     ],
+    'document' => [
+        'label' => 'Project Documents',
+        'read' => 'Download Project Documents',
+    ],
 ];

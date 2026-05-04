@@ -22,9 +22,9 @@ Route::group([], function () {
 
     // Document Download routes
     Route::get('/document/{id}/download', [DocumentController::class, 'download'])
-        ->name('document.download')->middleware('can-access:pm.document.read');
+        ->name('document.download')->middleware('can-access:pm.project.read');
     Route::get('/document/{id}/print', [DocumentController::class, 'print'])
-        ->name('document.print')->middleware('can-access:pm.document.read');
+        ->name('document.print')->middleware('can-access:pm.project.read');
 
     // Invoice routes
     Route::get('/invoice/{id}/download', [InvoiceController::class, 'download'])
