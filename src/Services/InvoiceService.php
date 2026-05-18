@@ -352,6 +352,8 @@ class InvoiceService
         $creator = $filters['creator'] ?? null;
         $projectCategory = $filters['project_category'] ?? null;
         $isPaid = $filters['is_paid'] ?? null;
+        $hasReceipt = isset($filters['has_receipt']) && $filters['has_receipt'] !== '' ? (string) $filters['has_receipt'] : null;
+        $hasVat = isset($filters['has_vat']) && $filters['has_vat'] !== '' ? (string) $filters['has_vat'] : null;
         $status = isset($filters['status']) ? (string) $filters['status'] : null;
         $q = isset($filters['q']) ? trim((string) $filters['q']) : null;
         $sortBy = $filters['sort_by'] ?? 'issue_date';
@@ -379,6 +381,18 @@ class InvoiceService
 
         if ($isPaid !== null) {
             $query->where('is_paid', (bool) $isPaid);
+        }
+
+        if ($hasReceipt === 'yes') {
+            $query->whereNotNull('receipt_number');
+        } elseif ($hasReceipt === 'no') {
+            $query->whereNull('receipt_number');
+        }
+
+        if ($hasVat === 'yes') {
+            $query->where('include_vat', true);
+        } elseif ($hasVat === 'no') {
+            $query->where('include_vat', false);
         }
 
         if ($status !== null && $status !== '') {

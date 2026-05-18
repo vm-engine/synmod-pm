@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.7] - 2026-05-18
+
+### Added
+- **`has_receipt` filter** in `InvoiceService::getInvoiceList()` — pass `has_receipt: 'yes'` to scope to invoices with a receipt number, or `'no'` for those without.
+- **`has_vat` filter** in `InvoiceService::getInvoiceList()` — pass `has_vat: 'yes'` to scope to invoices with VAT enabled, or `'no'` for those without.
+
+### Changed
+- **Invoice detail percentage inputs** — discount % and VAT % fields now auto-select their content on focus when the value is `0`, so typing immediately replaces the zero.
+
 ## [0.8.6] - 2026-05-04
 
 ### Fixed

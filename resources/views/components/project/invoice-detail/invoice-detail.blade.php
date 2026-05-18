@@ -187,6 +187,7 @@
                                                         wire:model="editItemDiscountPercentage"
                                                         min="0"
                                                         max="100"
+                                                        x-on:focus="if (parseFloat($event.target.value) === 0) $event.target.select()"
                                                     >
                                                     <span>%</span>
                                                 @endif
@@ -313,6 +314,7 @@
                                                 wire:model="newItemDiscountPercentage"
                                                 min="0"
                                                 max="100"
+                                                x-on:focus="if (parseFloat($event.target.value) === 0) $event.target.select()"
                                             >
                                             <span>%</span>
                                         @endif
@@ -402,6 +404,7 @@
                                         wire:model.live.debounce.500ms="discountPercentage"
                                         min="0"
                                         max="100"
+                                        x-on:focus="if (parseFloat($event.target.value) === 0) $event.target.select()"
                                     >
                                     <span>%</span>
                                 @endif
@@ -444,6 +447,7 @@
                                         wire:model.live.debounce.500ms="vatPercentage"
                                         min="0"
                                         max="100"
+                                        x-on:focus="if (parseFloat($event.target.value) === 0) $event.target.select()"
                                     >
                                     <span>%</span>
                                 @endif
