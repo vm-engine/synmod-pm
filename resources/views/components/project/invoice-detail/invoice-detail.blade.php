@@ -361,27 +361,6 @@
                                 {{ number_format($this->subTotal, 0, ',', '.') }}</span>
                         </div>
 
-                        <!-- DPP Option -->
-                        <div
-                            class="flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-700">
-                            <div class="flex items-center gap-3">
-                                <input
-                                    class="h-4 w-4 rounded border-gray-300"
-                                    id="includeDpp"
-                                    type="checkbox"
-                                    wire:model.live.debounce.500ms="includeDpp"
-                                >
-                                <label
-                                    class="text-gray-600 dark:text-gray-400"
-                                    for="includeDpp"
-                                >{{ __('pm::invoice.include_dpp') }} {{ $this->dppLabel }}</label>
-                            </div>
-                            @if ($includeDpp)
-                                <span class="font-mono font-medium text-gray-900 dark:text-white">Rp
-                                    {{ number_format($this->dppAmount, 0, ',', '.') }}</span>
-                            @endif
-                        </div>
-
                         <!-- Invoice Discount -->
                         <div
                             class="flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-700">
@@ -424,6 +403,27 @@
                                     {{ number_format($this->afterDiscountAmount, 0, ',', '.') }}</span>
                             </div>
                         @endif
+
+                        <!-- DPP Option (VAT base — calculated from after-discount sub total) -->
+                        <div
+                            class="flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-700">
+                            <div class="flex items-center gap-3">
+                                <input
+                                    class="h-4 w-4 rounded border-gray-300"
+                                    id="includeDpp"
+                                    type="checkbox"
+                                    wire:model.live.debounce.500ms="includeDpp"
+                                >
+                                <label
+                                    class="text-gray-600 dark:text-gray-400"
+                                    for="includeDpp"
+                                >{{ __('pm::invoice.include_dpp') }} {{ $this->dppLabel }}</label>
+                            </div>
+                            @if ($includeDpp)
+                                <span class="font-mono font-medium text-gray-900 dark:text-white">Rp
+                                    {{ number_format($this->dppAmount, 0, ',', '.') }}</span>
+                            @endif
+                        </div>
 
                         <!-- VAT -->
                         <div

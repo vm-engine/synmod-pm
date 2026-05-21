@@ -305,7 +305,7 @@ new class extends Component
 
         $items = ProjectInvoiceItem::where('project_invoice_id', $this->invoice->id)->get();
 
-        // Calculate base amount (sum of all items after item discounts)
+        // Calculate base amount (sum of all items after item-level discounts)
         $baseAmount = 0;
         foreach ($items as $item) {
             $itemTotal = $item->amount;
@@ -315,24 +315,25 @@ new class extends Component
             $baseAmount += $itemTotal;
         }
 
-        // Calculate DPP (if include_dpp is true, DPP = numerator/denominator of base amount)
-        $dppAmount = $this->includeDpp ? ($baseAmount * $this->dppRatio()) : $baseAmount;
-
-        // Calculate invoice discount
+        // Apply invoice-level discount on the actual item sub total (not on DPP)
         $discountAmount = $this->includeDiscount
-            ? ($dppAmount * $this->discountPercentage / 100)
+            ? ($baseAmount * $this->discountPercentage / 100)
             : 0;
 
-        // Calculate sub total after discount
-        $subTotal = $dppAmount - $discountAmount;
+        // After-discount amount — what the client actually pays for services
+        $afterDiscount = $baseAmount - $discountAmount;
 
-        // Calculate VAT
+        // DPP is only the VAT base: calculated from after-discount amount.
+        // It does NOT replace the sub total in the grand total.
+        $dppAmount = $this->includeDpp ? ($afterDiscount * $this->dppRatio()) : $afterDiscount;
+
+        // VAT is calculated from DPP (or from after-discount when DPP is off)
         $vatAmount = $this->includeVat
-            ? ($subTotal * $this->vatPercentage / 100)
+            ? ($dppAmount * $this->vatPercentage / 100)
             : 0;
 
-        // Calculate grand total
-        $grandTotal = $subTotal + $vatAmount;
+        // Grand total = sub total of items (after discount) + VAT — NOT dppAmount + VAT
+        $grandTotal = $afterDiscount + $vatAmount;
 
         // Update invoice
         $this->invoice->update([
@@ -436,12 +437,6 @@ new class extends Component
     }
 
     #[Computed]
-    public function dppAmount(): float
-    {
-        return $this->includeDpp ? ($this->subTotal * $this->dppRatio()) : $this->subTotal;
-    }
-
-    #[Computed]
     public function dppLabel(): string
     {
         $num = (int) dbconf('pm.invoice.dpp_numerator', 11);
@@ -457,24 +452,34 @@ new class extends Component
     #[Computed]
     public function invoiceDiscountAmount(): float
     {
-        return $this->includeDiscount ? ($this->dppAmount * $this->discountPercentage / 100) : 0;
+        // Discount applies on the actual item sub total, not on DPP
+        return $this->includeDiscount ? ($this->subTotal * $this->discountPercentage / 100) : 0;
     }
 
     #[Computed]
     public function afterDiscountAmount(): float
     {
-        return $this->dppAmount - $this->invoiceDiscountAmount;
+        return $this->subTotal - $this->invoiceDiscountAmount;
+    }
+
+    #[Computed]
+    public function dppAmount(): float
+    {
+        // DPP is purely the VAT base, calculated from after-discount sub total.
+        // It is NOT used as the service total for the grand total.
+        return $this->includeDpp ? ($this->afterDiscountAmount * $this->dppRatio()) : $this->afterDiscountAmount;
     }
 
     #[Computed]
     public function vatAmount(): float
     {
-        return $this->includeVat ? ($this->afterDiscountAmount * $this->vatPercentage / 100) : 0;
+        return $this->includeVat ? ($this->dppAmount * $this->vatPercentage / 100) : 0;
     }
 
     #[Computed]
     public function grandTotal(): float
     {
+        // Grand total = sub total of items (after discount) + VAT — NOT dppAmount + VAT
         return $this->afterDiscountAmount + $this->vatAmount;
     }
 };

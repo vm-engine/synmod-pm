@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.8] - 2026-05-21
+
+### Fixed
+- **Invoice total calculation with DPP enabled** — grand total now correctly equals *sub total of items (after discount) + VAT* instead of *DPP + VAT*. DPP (Dasar Pengenaan Pajak) is used solely as the VAT base and no longer replaces the service sub total in the grand total.
+  - `recalculateTotals()` in `invoice-detail.php`: invoice-level discount now applies to the item sub total (not to DPP); DPP is derived from the after-discount sub total; grand total is `afterDiscount + vatAmount`.
+  - Computed properties reordered to reflect the correct dependency chain: `subTotal → invoiceDiscountAmount → afterDiscountAmount → dppAmount → vatAmount → grandTotal`.
+  - `pdf/invoice.blade.php`: same calculation logic fixed; DPP row now appears after the discount row (matching the computation order); DPP label shows the configured ratio (e.g., `11/12`); discount value prefixed with `Rp`.
+  - `invoice-detail.blade.php`: discount section now displayed before DPP section in the totals panel.
+
 ## [0.8.7] - 2026-05-18
 
 ### Added

@@ -402,10 +402,15 @@
             @php
                 $dppNumerator = (int) dbconf('pm.invoice.dpp_numerator', 11);
                 $dppDenominator = (int) dbconf('pm.invoice.dpp_denominator', 12) ?: 12;
-                $dppAmount = $invoice->include_dpp ? ($subTotal * $dppNumerator / $dppDenominator) : $subTotal;
-                $discountAmount = $invoice->include_discount ? ($dppAmount * $invoice->discount_percentage) / 100 : 0;
-                $afterDiscount = $dppAmount - $discountAmount;
-                $vatAmount = $invoice->include_vat ? ($afterDiscount * $invoice->vat_percentage) / 100 : 0;
+                // Discount applies on the item sub total, not on DPP
+                $discountAmount = $invoice->include_discount ? ($subTotal * $invoice->discount_percentage) / 100 : 0;
+                $afterDiscount = $subTotal - $discountAmount;
+                // DPP is only the VAT base — calculated from after-discount sub total
+                $dppAmount = $invoice->include_dpp
+                    ? ($afterDiscount * $dppNumerator) / $dppDenominator
+                    : $afterDiscount;
+                $vatAmount = $invoice->include_vat ? ($dppAmount * $invoice->vat_percentage) / 100 : 0;
+                // Grand total = sub total of items (after discount) + VAT — NOT dppAmount + VAT
                 $grandTotal = $afterDiscount + $vatAmount;
             @endphp
 
@@ -414,27 +419,27 @@
                     <td class="label-col">Sub Total</td>
                     <td class="value-col">Rp {{ number_format($subTotal, 2, ',', '.') }}</td>
                 </tr>
-                @if ($invoice->include_dpp)
-                    <tr>
-                        <td class="label-col">DPP</td>
-                        <td class="value-col">Rp {{ number_format($dppAmount, 2, ',', '.') }}</td>
-                    </tr>
-                @endif
                 @if ($invoice->include_discount && $invoice->discount_percentage > 0)
                     <tr>
                         <td class="label-col">Discount ({{ $invoice->discount_percentage }}%)</td>
-                        <td class="value-col">- {{ number_format($discountAmount, 2, ',', '.') }}</td>
+                        <td class="value-col">- Rp {{ number_format($discountAmount, 2, ',', '.') }}</td>
+                    </tr>
+                @endif
+                @if ($invoice->include_dpp)
+                    <tr>
+                        <td class="label-col">DPP ({{ $dppNumerator }}/{{ $dppDenominator }})</td>
+                        <td class="value-col">Rp {{ number_format($dppAmount, 2, ',', '.') }}</td>
                     </tr>
                 @endif
                 @if ($invoice->include_vat)
                     <tr>
                         <td class="label-col">PPN</td>
-                        <td class="value-col">{{ number_format($vatAmount, 2, ',', '.') }}</td>
+                        <td class="value-col">Rp {{ number_format($vatAmount, 2, ',', '.') }}</td>
                     </tr>
                 @endif
                 <tr class="total-row">
                     <td class="label-col">TOTAL</td>
-                    <td class="value-col">RP {{ number_format($grandTotal, 2, ',', '.') }}</td>
+                    <td class="value-col">Rp {{ number_format($grandTotal, 2, ',', '.') }}</td>
                 </tr>
             </table>
         </div>
