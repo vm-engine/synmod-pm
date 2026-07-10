@@ -87,8 +87,11 @@
                 <div class="flex items-end justify-between">
                     <!-- Amount Box -->
                     <div class="rounded border-2 border-gray-900 px-6 py-3 dark:border-gray-300">
+                        @php
+                            $cf = app(\VmEngine\Pm\Services\CurrencyFormatter::class);
+                        @endphp
                         <p class="text-xl font-bold text-gray-900 dark:text-white">
-                            Rp. {{ number_format($invoice->total_amount, 0, ',', '.') }}, -
+                            {{ $cf->format((float) $invoice->total_amount, $invoice->currency ?? 'IDR') }}
                         </p>
                     </div>
 
@@ -224,22 +227,68 @@
         <div class="flex shrink-0 items-center justify-between gap-3 border-t border-gray-200 p-5 dark:border-gray-700">
             <div class="flex items-center gap-2">
                 @if ($this->hasReceipt)
-                    <a
-                        class="btn info"
-                        href="{{ route('backend.pm.receipt.download', $invoice->id) }}"
-                        target="_blank"
+                    <div
+                        class="relative"
+                        x-data="{ open: false }"
+                        @click.away.capture="open = false"
                     >
-                        <span class="fa-solid fa-download mr-1"></span>
-                        {{ __('pm::receipt.download') }}
-                    </a>
-                    <a
-                        class="btn secondary"
-                        href="{{ route('backend.pm.receipt.print', $invoice->id) }}"
-                        target="_blank"
+                        <button
+                            class="btn info"
+                            type="button"
+                            @click="open = !open"
+                        >
+                            <span class="fa-solid fa-download mr-1"></span>
+                            {{ __('pm::receipt.download') }}
+                            <span class="fa-solid fa-caret-down ml-1"></span>
+                        </button>
+                        <div
+                            class="absolute bottom-full z-20 mb-1 w-48 rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+                            x-show="open"
+                            x-cloak
+                        >
+                            <a
+                                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                                href="{{ route('backend.pm.receipt.download', ['id' => $invoice->id, 'lang' => 'id']) }}"
+                                target="_blank"
+                            >{{ __('pm::invoice.lang_indonesian') }}</a>
+                            <a
+                                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                                href="{{ route('backend.pm.receipt.download', ['id' => $invoice->id, 'lang' => 'en']) }}"
+                                target="_blank"
+                            >{{ __('pm::invoice.lang_english') }}</a>
+                        </div>
+                    </div>
+                    <div
+                        class="relative"
+                        x-data="{ open: false }"
+                        @click.away.capture="open = false"
                     >
-                        <span class="fa-solid fa-print mr-1"></span>
-                        {{ __('pm::receipt.print') }}
-                    </a>
+                        <button
+                            class="btn secondary"
+                            type="button"
+                            @click="open = !open"
+                        >
+                            <span class="fa-solid fa-print mr-1"></span>
+                            {{ __('pm::receipt.print') }}
+                            <span class="fa-solid fa-caret-down ml-1"></span>
+                        </button>
+                        <div
+                            class="absolute bottom-full z-20 mb-1 w-48 rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+                            x-show="open"
+                            x-cloak
+                        >
+                            <a
+                                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                                href="{{ route('backend.pm.receipt.print', ['id' => $invoice->id, 'lang' => 'id']) }}"
+                                target="_blank"
+                            >{{ __('pm::invoice.lang_indonesian') }}</a>
+                            <a
+                                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                                href="{{ route('backend.pm.receipt.print', ['id' => $invoice->id, 'lang' => 'en']) }}"
+                                target="_blank"
+                            >{{ __('pm::invoice.lang_english') }}</a>
+                        </div>
+                    </div>
                 @endif
             </div>
             <div class="flex items-center gap-3">

@@ -23,6 +23,7 @@ class BankAccount extends Model
         'name',
         'number',
         'bank_name',
+        'swift_code',
         'bank_logo',
     ];
 

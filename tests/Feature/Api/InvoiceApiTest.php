@@ -9,6 +9,8 @@ use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Pm\Models\ProjectCategory;
 use VmEngine\Pm\Models\ProjectInvoice;
+use VmEngine\SynAuth\Http\Middleware\Api\ValidateClientToken;
+use VmEngine\SynAuth\Models\ApiToken;
 use VmEngine\SynAuth\Models\Role;
 use VmEngine\SynAuth\Models\RolePermission;
 use VmEngine\SynAuth\Models\User;
@@ -40,11 +42,15 @@ beforeEach(function () {
             'can_delete' => false,
         ]);
 
+    $this->clientToken = makePmApiClientToken();
+
     // Login and get token
     $loginResponse = $this->postJson('/api/auth/login', [
         'credential' => 'api-test@example.com',
         'password' => 'password123',
         'device_name' => 'Test Device',
+    ], [
+        ValidateClientToken::HEADER_NAME => $this->clientToken,
     ]);
 
     $this->accessToken = $loginResponse->json('data.access_token');
@@ -53,6 +59,24 @@ beforeEach(function () {
 // =====================================================
 // Helper
 // =====================================================
+
+function makePmApiClientToken(): string
+{
+    $apiUser = User::factory()->create([
+        'is_api_user' => true,
+        'email_verified_at' => now(),
+        'two_factor_enabled' => false,
+    ]);
+    $newToken = $apiUser->createToken('test-client-token');
+    $plain = $newToken->plainTextToken;
+    $newToken->accessToken->update([
+        'type' => ApiToken::TYPE_CLIENT,
+        'expires_at' => null,
+        'allowed_ips' => null,
+    ]);
+
+    return $plain;
+}
 
 function apiGet(string $uri, array $headers = [])
 {
@@ -381,6 +405,8 @@ test('user without permission gets 403', function () {
         'credential' => 'noperm@example.com',
         'password' => 'password123',
         'device_name' => 'Test Device',
+    ], [
+        ValidateClientToken::HEADER_NAME => test()->clientToken,
     ]);
 
     $token = $loginResponse->json('data.access_token');

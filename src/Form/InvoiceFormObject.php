@@ -28,6 +28,10 @@ class InvoiceFormObject extends Form
 
     public string $invoice_number = '';
 
+    public string $currency = 'IDR';
+
+    public bool $is_external_spk = false;
+
     public string $recipient = '';
 
     public string $address = '';
@@ -91,6 +95,9 @@ class InvoiceFormObject extends Form
         $this->issuer_id = $issuerId !== null && $issuerId !== '' ? (int) $issuerId : null;
         $this->bank_account_id = $bankAccountId !== null && $bankAccountId !== '' ? (int) $bankAccountId : null;
         $this->signature_id = $signatureId !== null && $signatureId !== '' ? (int) $signatureId : null;
+
+        $this->currency = (string) dbconf('pm.invoice.default_currency', 'IDR');
+        $this->is_external_spk = false;
     }
 
     public function setInvoice(ProjectInvoice $invoice): void
@@ -101,9 +108,13 @@ class InvoiceFormObject extends Form
         $this->project_category_id = $invoice->project_category_id;
         $this->client_id = $invoice->client_id;
         $this->spk_document_id = $invoice->spk_document_id;
+        $this->currency = $invoice->currency ?? 'IDR';
+        $this->is_external_spk = (bool) $invoice->is_external_spk;
 
-        // Get SPK number
-        if ($invoice->spkDocument) {
+        // Get SPK number (free text when external, otherwise from the SPK document)
+        if ($invoice->is_external_spk) {
+            $this->spk_number = $invoice->spk_number ?? '';
+        } elseif ($invoice->spkDocument) {
             $this->spk_number = $invoice->spkDocument->number;
         }
 
@@ -124,6 +135,15 @@ class InvoiceFormObject extends Form
     {
         return [
             'invoice_number' => 'required|string|max:255',
+            'currency' => ['required', 'string', 'max:3', function ($attribute, $value, $fail) {
+                if ($this->invoice && $this->invoice->exists && $this->invoice->items()->exists()
+                    && $value !== $this->invoice->currency) {
+                    $fail(__('pm::invoice.validation.currency_locked'));
+                }
+            }],
+            'is_external_spk' => 'boolean',
+            'spk_document_id' => 'required_if:is_external_spk,false|nullable|exists:project_documents,id',
+            'spk_number' => 'required_if:is_external_spk,true|nullable|string|max:255',
             'recipient' => 'required|string|max:255',
             'address' => 'required|string',
             'issue_date' => 'required|date',
@@ -141,6 +161,9 @@ class InvoiceFormObject extends Form
     {
         return [
             'invoice_number.required' => __('pm::invoice.validation.invoice_number_required'),
+            'currency.required' => __('pm::invoice.validation.currency_required'),
+            'spk_document_id.required_if' => __('pm::invoice.validation.spk_document_required'),
+            'spk_number.required_if' => __('pm::invoice.validation.spk_number_required'),
             'recipient.required' => __('pm::invoice.validation.recipient_required'),
             'address.required' => __('pm::invoice.validation.address_required'),
             'issue_date.required' => __('pm::invoice.validation.issue_date_required'),
@@ -167,8 +190,11 @@ class InvoiceFormObject extends Form
             'project_id' => $this->project_id,
             'project_category_id' => $this->project_category_id,
             'client_id' => $this->client_id,
-            'spk_document_id' => $this->spk_document_id,
+            'spk_document_id' => $this->is_external_spk ? null : $this->spk_document_id,
+            'is_external_spk' => $this->is_external_spk,
+            'spk_number' => $this->is_external_spk ? $this->spk_number : null,
             'invoice_number' => $this->invoice_number,
+            'currency' => $this->currency,
             'recipient' => $this->recipient,
             'address' => $this->address,
             'issue_date' => $this->issue_date,
@@ -196,6 +222,10 @@ class InvoiceFormObject extends Form
 
         $data = [
             'invoice_number' => $this->invoice_number,
+            'currency' => $this->currency,
+            'spk_document_id' => $this->is_external_spk ? null : $this->spk_document_id,
+            'is_external_spk' => $this->is_external_spk,
+            'spk_number' => $this->is_external_spk ? $this->spk_number : null,
             'recipient' => $this->recipient,
             'address' => $this->address,
             'issue_date' => $this->issue_date,

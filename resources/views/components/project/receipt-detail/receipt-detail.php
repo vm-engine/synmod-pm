@@ -14,6 +14,7 @@ use Livewire\WithFileUploads;
 use VmEngine\Pm\Enums\Documents;
 use VmEngine\Pm\Helpers\Terbilang;
 use VmEngine\Pm\Models\ProjectInvoice;
+use VmEngine\Pm\Services\CurrencyFormatter;
 use VmEngine\Pm\Services\ReceiptPdfService;
 use VmEngine\SynAuth\Facades\SynAuth;
 
@@ -92,6 +93,11 @@ new class extends Component
         );
     }
 
+    private function currencyFormatter(): CurrencyFormatter
+    {
+        return app(CurrencyFormatter::class);
+    }
+
     #[Computed]
     public function amountText(): string
     {
@@ -99,13 +105,23 @@ new class extends Component
             return '-';
         }
 
-        // If receipt already generated, return stored text
-        if ($this->invoice->receipt_amount_text) {
+        // If receipt already generated, the stored text is Indonesian-only,
+        // so it can only be reused while the current locale is Indonesian.
+        if ($this->invoice->receipt_amount_text && app()->getLocale() !== 'en') {
             return $this->invoice->receipt_amount_text;
         }
 
-        // Generate text from total_amount
-        return Terbilang::rupiah((float) $this->invoice->total_amount);
+        // Amount-in-words reflects the invoice's native currency (e.g. "One
+        // Hundred Dollars" for a USD invoice), not a forced IDR conversion.
+        $currency = $this->invoice->currency ?? 'IDR';
+        $cf = $this->currencyFormatter();
+
+        return Terbilang::amountInWords(
+            (float) $this->invoice->total_amount,
+            $cf->currencyName($currency),
+            $cf->currencyNamePlural($currency),
+            app()->getLocale()
+        );
     }
 
     #[Computed]

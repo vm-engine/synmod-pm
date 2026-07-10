@@ -86,6 +86,26 @@ class BankAccountService
     }
 
     /**
+     * Distinct bank names with a representative swift code (latest non-empty).
+     *
+     * @return array<int, array{bank_name: string, swift_code: string|null}>
+     */
+    public function bankNameSuggestions(): array
+    {
+        return BankAccount::query()
+            ->selectRaw('bank_name, MAX(swift_code) as swift_code')
+            ->whereNotNull('bank_name')
+            ->groupBy('bank_name')
+            ->orderBy('bank_name')
+            ->get()
+            ->map(fn ($row) => [
+                'bank_name' => (string) $row->bank_name,
+                'swift_code' => $row->swift_code !== null ? (string) $row->swift_code : null,
+            ])
+            ->all();
+    }
+
+    /**
      * Delete a bank account.
      */
     public function delete(BankAccount $bankAccount): bool

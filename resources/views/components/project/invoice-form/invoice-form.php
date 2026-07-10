@@ -19,6 +19,8 @@ new class extends Component
 
     public ?int $projectId = null;
 
+    public int $formNonce = 0;
+
     #[On('create-invoice')]
     public function createInvoice(int $projectId): void
     {
@@ -59,6 +61,9 @@ new class extends Component
     #[On('reset-invoice-form')]
     public function resetForm(): void
     {
+        // Bump the nonce so the issuer/bank/signature/currency adv-selects are
+        // re-keyed and re-initialised, clearing any stale Alpine display state.
+        $this->formNonce++;
         $this->form->reset();
         $this->projectId = null;
     }
@@ -82,6 +87,12 @@ new class extends Component
         $this->dispatch('close-modal-invoice-form');
         $this->dispatch('invoice-refresh');
         $this->dispatch('activity-refresh');
+    }
+
+    #[Computed]
+    public function currencyOptions(): array
+    {
+        return app(\VmEngine\Pm\Services\CurrencyFormatter::class)->options();
     }
 
     #[Computed]

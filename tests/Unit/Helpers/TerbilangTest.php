@@ -86,3 +86,25 @@ test('typical invoice amounts', function () {
     expect(Terbilang::rupiah(5500000))->toBe('Lima Juta Lima Ratus Ribu Rupiah');
     expect(Terbilang::rupiah(10000000))->toBe('Sepuluh Juta Rupiah');
 });
+
+test('converts zero to Zero Rupiah in English', function () {
+    expect(Terbilang::rupiah(0, 'en'))->toBe('Zero Rupiah');
+    expect(Terbilang::rupiahEnglish(0))->toBe('Zero Rupiah');
+});
+
+test('converts English number words correctly', function () {
+    expect(Terbilang::convertEnglish(1))->toBe('One');
+    expect(Terbilang::convertEnglish(15))->toBe('Fifteen');
+    expect(Terbilang::convertEnglish(99))->toBe('Ninety Nine');
+    expect(Terbilang::convertEnglish(100))->toBe('One Hundred');
+    expect(Terbilang::convertEnglish(555))->toBe('Five Hundred Fifty Five');
+    expect(Terbilang::convertEnglish(1000))->toBe('One Thousand');
+    expect(Terbilang::convertEnglish(1234567))->toBe('One Million Two Hundred Thirty Four Thousand Five Hundred Sixty Seven');
+    expect(Terbilang::convertEnglish(1000000000))->toBe('One Billion');
+    expect(Terbilang::convertEnglish(1000000000000))->toBe('One Trillion');
+});
+
+test('rupiah method switches to English words when lang is en', function () {
+    expect(Terbilang::rupiah(1600000, 'en'))->toBe('One Million Six Hundred Thousand Rupiah');
+    expect(Terbilang::rupiah(1600000))->toBe('Satu Juta Enam Ratus Ribu Rupiah');
+});

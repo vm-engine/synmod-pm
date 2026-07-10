@@ -36,6 +36,7 @@ class ProjectInvoiceItem extends Model
     protected function casts(): array
     {
         return [
+            'amount' => 'decimal:2',
             'include_discount' => 'boolean',
             'discount_percentage' => 'decimal:2',
             'discount_amount' => 'decimal:2',

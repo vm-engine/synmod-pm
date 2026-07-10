@@ -18,6 +18,8 @@ class BankAccountFormObject extends Form
 
     public $bank_name = '';
 
+    public $swift_code = '';
+
     public $bank_logo = null;
 
     public $existing_bank_logo = null;
@@ -28,6 +30,7 @@ class BankAccountFormObject extends Form
             'name' => 'required|string|max:255',
             'number' => 'required|string|max:255',
             'bank_name' => 'required|string|max:255',
+            'swift_code' => 'nullable|string|max:50',
             'bank_logo' => [
                 $this->bankAccount ? 'nullable' : 'required',
                 'file',
@@ -58,6 +61,7 @@ class BankAccountFormObject extends Form
         $this->name = $bankAccount->name;
         $this->number = $bankAccount->number;
         $this->bank_name = $bankAccount->bank_name;
+        $this->swift_code = $bankAccount->swift_code;
         $this->existing_bank_logo = $bankAccount->bank_logo;
     }
 
@@ -71,6 +75,7 @@ class BankAccountFormObject extends Form
             'name' => $this->name,
             'number' => $this->number,
             'bank_name' => $this->bank_name,
+            'swift_code' => $this->swift_code ?: null,
         ];
 
         $bankAccountService->create($data, $this->bank_logo);
@@ -88,6 +93,7 @@ class BankAccountFormObject extends Form
             'name' => $this->name,
             'number' => $this->number,
             'bank_name' => $this->bank_name,
+            'swift_code' => $this->swift_code ?: null,
         ];
 
         $this->bankAccount = $bankAccountService->update($this->bankAccount, $data, $this->bank_logo);

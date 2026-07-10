@@ -52,7 +52,7 @@
             <div class="border-t border-gray-100 dark:border-gray-800">
                 <div class="max-w-full overflow-x-auto">
                     <table
-                        class="datatable min-w-full"
+                        class="datatable datatable-sm min-w-full"
                         id="dataTable"
                         width="100%"
                         cellspacing="0"
@@ -69,13 +69,7 @@
                                     <p>{{ __('pm::invoice.col_total') }}</p>
                                 </th>
                                 <th>
-                                    <p>{{ __('pm::invoice.col_vat') }}</p>
-                                </th>
-                                <th>
-                                    <p>{{ __('pm::invoice.col_issue_date') }}</p>
-                                </th>
-                                <th>
-                                    <p>{{ __('pm::invoice.col_due_date') }}</p>
+                                    <p>{{ __('pm::invoice.col_dates') }}</p>
                                 </th>
                                 <th>
                                     <p>{{ __('pm::invoice.col_status') }}</p>
@@ -114,46 +108,112 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="flex items-center">
-                                            <p class="font-mono">
-                                                {{ number_format($invoice->total_amount, 0, ',', '.') }}</p>
+                                        @php
+                                            $cf = app(\VmEngine\Pm\Services\CurrencyFormatter::class);
+                                            $cur = $invoice->currency ?? 'IDR';
+                                            $hasBreakdown =
+                                                $invoice->include_vat ||
+                                                $invoice->include_dpp ||
+                                                $invoice->include_discount;
+                                        @endphp
+                                        <div class="flex flex-col gap-1.5 font-mono">
+                                            @if ($hasBreakdown)
+                                                <p class="leading-tight">
+                                                    <span
+                                                        class="block text-[10px] font-sans font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500"
+                                                    >{{ __('pm::invoice.sub_total') }}</span>
+                                                    <span
+                                                        class="block text-gray-600 dark:text-gray-400">{{ $cf->format((float) $invoice->amount, $cur) }}</span>
+                                                </p>
+                                            @endif
+                                            @if ($invoice->include_vat)
+                                                <p class="leading-tight">
+                                                    <span
+                                                        class="block text-[10px] font-sans font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500"
+                                                    >{{ __('pm::invoice.vat') }}
+                                                        ({{ rtrim(rtrim(number_format((float) $invoice->vat_percentage, 2), '0'), '.') }}%)
+                                                    </span>
+                                                    <span
+                                                        class="block text-gray-600 dark:text-gray-400">{{ $cf->format((float) $invoice->vat_amount, $cur) }}</span>
+                                                </p>
+                                            @endif
+                                            @if ($invoice->include_dpp)
+                                                <p class="leading-tight">
+                                                    <span
+                                                        class="block text-[10px] font-sans font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500"
+                                                    >{{ __('pm::invoice.dpp') }}</span>
+                                                    <span
+                                                        class="block text-gray-600 dark:text-gray-400">{{ $cf->format((float) $invoice->dpp_amount, $cur) }}</span>
+                                                </p>
+                                            @endif
+                                            @if ($invoice->include_discount)
+                                                <p class="leading-tight">
+                                                    <span
+                                                        class="block text-[10px] font-sans font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500"
+                                                    >{{ __('pm::invoice.discount') }}</span>
+                                                    <span class="block text-gray-600 dark:text-gray-400">-
+                                                        {{ $cf->format((float) $invoice->discount_amount, $cur) }}</span>
+                                                </p>
+                                            @endif
+                                            <p class="leading-tight">
+                                                <span
+                                                    class="block text-[10px] font-sans font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500"
+                                                >{{ __('pm::invoice.grand_total') }}</span>
+                                                <span
+                                                    class="block text-sm font-semibold text-gray-800 dark:text-white/90"
+                                                >{{ $cf->format((float) $invoice->total_amount, $cur) }}</span>
+                                            </p>
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="flex items-center">
-                                            @if ($invoice->include_vat)
-                                                <p class="font-mono">
-                                                    {{ number_format($invoice->vat_amount, 0, ',', '.') }}
-                                                    ({{ $invoice->vat_percentage }}%)
+                                        <div class="flex flex-col gap-1.5">
+                                            <p class="leading-tight">
+                                                <span
+                                                    class="block text-[10px] font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500"
+                                                >{{ __('pm::invoice.issue_date') }}</span>
+                                                <span
+                                                    class="block text-gray-600 dark:text-gray-400">{{ $invoice->issue_date?->format('d M Y') ?? '-' }}</span>
+                                            </p>
+                                            <p class="leading-tight">
+                                                <span
+                                                    class="block text-[10px] font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500"
+                                                >{{ __('pm::invoice.due_date') }}</span>
+                                                <span
+                                                    class="block text-gray-600 dark:text-gray-400">{{ $invoice->due_date?->format('d M Y') ?? '-' }}</span>
+                                            </p>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="flex flex-col items-start gap-1">
+                                            <span
+                                                class="{{ $status['class'] }} inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium"
+                                            >
+                                                <span class="fa-solid {{ $status['icon'] }} text-[10px]"></span>
+                                                {{ $status['label'] }}
+                                            </span>
+                                            @if ($invoice->is_paid && $invoice->paid_at)
+                                                <p class="leading-tight">
+                                                    <span
+                                                        class="block text-[10px] font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500"
+                                                    >{{ __('pm::invoice.paid_on') }}</span>
+                                                    <span
+                                                        class="block text-[11px] text-gray-500 dark:text-gray-400">{{ $invoice->paid_at->format('d M Y') }}</span>
                                                 </p>
-                                            @else
-                                                <p>No VAT</p>
                                             @endif
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="flex items-center">
-                                            <p>{{ $invoice->issue_date?->format('d M Y') ?? '-' }}</p>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="flex items-center">
-                                            <p>{{ $invoice->due_date?->format('d M Y') ?? '-' }}</p>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="flex items-center">
-                                            <span
-                                                class="{{ $status['class'] }} inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-sm font-medium"
-                                            >
-                                                <span class="fa-solid {{ $status['icon'] }} text-xs"></span>
-                                                {{ $status['label'] }}
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="flex items-center">
-                                            <p>{{ $invoice->issuer?->name ?? '-' }}</p>
+                                        <div class="flex flex-col gap-1.5">
+                                            <p class="leading-tight">{{ $invoice->issuer?->name ?? '-' }}</p>
+                                            @if ($invoice->bankAccount)
+                                                <p class="leading-tight">
+                                                    <span
+                                                        class="block text-[10px] font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500"
+                                                    >{{ $invoice->bankAccount->bank_name }}</span>
+                                                    <span
+                                                        class="block font-mono text-gray-600 dark:text-gray-400">{{ $invoice->bankAccount->number }}</span>
+                                                </p>
+                                            @endif
                                         </div>
                                     </td>
                                     <td>
@@ -220,7 +280,12 @@
                                                         const btn = this.$refs.dropdownBtn;
                                                         const menu = this.$refs.dropdownMenu;
                                                         const rect = btn.getBoundingClientRect();
-                                                        const menuHeight = 300; // Approximate dropdown height
+                                                        // Measure the real menu height instead of guessing — item count
+                                                        // varies per invoice (receipts/download are conditional), so a
+                                                        // fixed approximation picks the wrong above/below branch and
+                                                        // overshoots the offset for shorter menus. Call this only after
+                                                        // $nextTick so x-show has already applied to the DOM.
+                                                        const menuHeight = menu.offsetHeight || 300;
                                                         const menuWidth = 192; // w-48 = 12rem = 192px
                                                         const viewportHeight = window.innerHeight;
                                                         const viewportWidth = window.innerWidth;
@@ -230,15 +295,20 @@
                                                         const spaceAbove = rect.top;
                                                 
                                                         // Position vertically (prefer below, use above if not enough space)
+                                                        // .icon-dropdown is position:fixed, so these are viewport-relative —
+                                                        // do NOT add window.scrollY/scrollX (that's only correct for
+                                                        // position:absolute, document-relative elements). Adding it here
+                                                        // offset the dropdown by the scroll distance, which grew with
+                                                        // page zoom and made the menu appear far from the trigger button.
                                                         let top;
                                                         if (spaceBelow >= menuHeight || spaceBelow > spaceAbove) {
-                                                            top = rect.bottom + window.scrollY + 8;
+                                                            top = rect.bottom + 8;
                                                         } else {
-                                                            top = rect.top + window.scrollY - menuHeight - 8;
+                                                            top = rect.top - menuHeight - 8;
                                                         }
                                                 
                                                         // Position horizontally (align to right of button)
-                                                        let left = rect.right + window.scrollX - menuWidth;
+                                                        let left = rect.right - menuWidth;
                                                 
                                                         // Ensure dropdown doesn't go off the left edge
                                                         if (left < 0) {
@@ -259,7 +329,7 @@
                                                     class="btn-icon secondary has-tooltip group"
                                                     type="button"
                                                     x-ref="dropdownBtn"
-                                                    @click="dropdownOpen = !dropdownOpen; if(dropdownOpen) updatePosition()"
+                                                    @click="dropdownOpen = !dropdownOpen; if (dropdownOpen) { $nextTick(() => updatePosition()) }"
                                                 >
                                                     <span class="fa-solid fa-ellipsis-v"></span>
                                                     <span class="tooltip">{{ __('pm::invoice.tooltip_more') }}</span>

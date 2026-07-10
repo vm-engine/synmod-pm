@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased] - 2026-07-10
+
+### Added
+- **Multi-currency invoices**: `currency` field on invoices (IDR/USD, configurable), currency-locked once items exist, external SPK entry with free-text SPK number.
+- **IDR exchange-rate conversion for reporting**: `exchange_rate` field plus `amount_idr`/`vat_amount_idr`/`dpp_amount_idr`/`discount_amount_idr`/`total_amount_idr` on invoices, recalculated whenever the rate or amounts change. Reports (`statistics`, `getByCreator`, `getByProject`, `apiStatistics`, `getByMonth`, Excel export) now sum the IDR-converted columns instead of raw ones. Exchange-rate input on Invoice Detail only appears for non-IDR currencies, formatted as a masked Rupiah currency field, and locks once the invoice is marked Paid.
+- `mod-pm:recalculate-invoice-conversions` Artisan command to backfill/resync `exchange_rate` and `_idr` fields on existing invoices (`--rate`, `--use-saved-rate`, `--missing-only`, `--year`, `--dry-run`).
+- Bilingual (Indonesian/English) invoice and receipt PDFs, each generated and stored separately; `?lang=en` query param on download/print routes selects the language.
+- Bank account SWIFT code field, with bank-name autocomplete suggestions on the form.
+- `CurrencyFormatter` service (symbol/decimal formatting, currency name lookup) and `InvoiceConversionService` (exchange-rate normalization and conversion).
+
+### Fixed
+- Receipt amount-in-words ("Terbilang") now reflects the invoice's actual currency (e.g. "One Hundred Dollars" for a USD invoice) and the active language, instead of always saying "...Rupiah" in Indonesian regardless of currency or locale.
+- Receipt preview and print no longer hardcode `Rp.` formatting — both use the invoice's native currency symbol/format.
+- Invoice list dropdown menu positioning: removed incorrect scroll-offset math for the `position:fixed` menu and replaced a hardcoded height guess with the actual measured element height.
+- Click-outside handling on `adv-select` and several hand-rolled dropdowns (exchange-rate lock, receipt/invoice-detail menus) now closes reliably even from inside a modal.
+- Invoice item `amount` now casts to `decimal:2` consistently.
+
 ## [0.8.8] - 2026-05-21
 
 ### Fixed

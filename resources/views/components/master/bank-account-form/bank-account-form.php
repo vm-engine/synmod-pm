@@ -3,17 +3,25 @@
 declare(strict_types=1);
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use VmEngine\Pm\Form\BankAccountFormObject;
 use VmEngine\Pm\Models\BankAccount;
+use VmEngine\Pm\Services\BankAccountService;
 
 new class extends Component
 {
     use WithFileUploads;
 
     public BankAccountFormObject $form;
+
+    #[Computed]
+    public function bankNameSuggestions(): array
+    {
+        return app(BankAccountService::class)->bankNameSuggestions();
+    }
 
     #[On('load-bank-account')]
     public function loadAccount($id): void

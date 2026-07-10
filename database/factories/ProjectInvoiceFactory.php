@@ -56,7 +56,10 @@ class ProjectInvoiceFactory extends Factory
             'client_id' => Client::factory(),
             'user_id' => User::factory(),
             'invoice_number' => 'INV-'.fake()->unique()->numerify('######'),
+            'currency' => 'IDR',
             'spk_document_id' => ProjectDocument::factory(),
+            'is_external_spk' => false,
+            'spk_number' => null,
             'issue_date' => $issueDate,
             'due_date' => $dueDate,
             'recipient' => fake()->company(),
@@ -73,6 +76,14 @@ class ProjectInvoiceFactory extends Factory
             'include_dpp' => $includeDpp,
             'dpp_amount' => $dppAmount,
             'total_amount' => $totalAmount,
+            // IDR is the only currency this factory defaults to, so the
+            // converted fields are always a 1:1 passthrough of the raw ones.
+            'exchange_rate' => 1,
+            'amount_idr' => $amount,
+            'vat_amount_idr' => $vatAmount,
+            'dpp_amount_idr' => $dppAmount ?? 0,
+            'discount_amount_idr' => $discountAmount ?? 0,
+            'total_amount_idr' => $totalAmount,
             'is_paid' => $isPaid,
             'paid_at' => $paidAt,
             'payment_notes' => $isPaid && fake()->boolean(60) ? fake()->sentence() : null,
@@ -128,5 +139,30 @@ class ProjectInvoiceFactory extends Factory
             'receipt_amount_text' => null,
             'receipt_document_id' => null,
         ]);
+    }
+
+    /**
+     * USD invoice with a given exchange rate, its _idr fields pre-computed
+     * to match (amount/vat/dpp/discount/total * rate).
+     */
+    public function usdConverted(float $rate = 16000): static
+    {
+        return $this->state(function (array $attributes) use ($rate) {
+            $amount = (float) ($attributes['amount'] ?? 0);
+            $vatAmount = (float) ($attributes['vat_amount'] ?? 0);
+            $dppAmount = (float) ($attributes['dpp_amount'] ?? 0);
+            $discountAmount = (float) ($attributes['discount_amount'] ?? 0);
+            $totalAmount = (float) ($attributes['total_amount'] ?? 0);
+
+            return [
+                'currency' => 'USD',
+                'exchange_rate' => $rate,
+                'amount_idr' => round($amount * $rate, 2),
+                'vat_amount_idr' => round($vatAmount * $rate, 2),
+                'dpp_amount_idr' => round($dppAmount * $rate, 2),
+                'discount_amount_idr' => round($discountAmount * $rate, 2),
+                'total_amount_idr' => round($totalAmount * $rate, 2),
+            ];
+        });
     }
 }

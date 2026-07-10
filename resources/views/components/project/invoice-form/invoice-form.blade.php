@@ -19,20 +19,51 @@
 
     <!-- Modal Body (Scrollable) -->
     <div class="max-h-[700px] flex-1 space-y-4 overflow-y-auto p-6">
+        <!-- From External SPK -->
+        <div class="form-box">
+            <label
+                class="flex cursor-pointer select-none items-center gap-3 text-sm font-medium text-gray-700 dark:text-gray-400"
+            >
+                <input
+                    class="h-5 w-5 rounded border-gray-300 text-brand-500 focus:ring-brand-500"
+                    type="checkbox"
+                    wire:model.live="form.is_external_spk"
+                >
+                <span>{{ __('pm::invoice.external_spk') }}</span>
+            </label>
+        </div>
+
         <!-- SPK Number -->
         <div class="form-box">
             <label for="spk_number">{{ __('pm::invoice.spk_number') }}</label>
             <div class="input-group">
-                <input
-                    class="form-input bg-gray-100 dark:bg-gray-700"
-                    id="spk_number"
-                    type="text"
-                    value="{{ $form->spk_number }}"
-                    readonly
-                    disabled
-                >
+                @if ($form->is_external_spk)
+                    <input
+                        class="form-input @error('form.spk_number') has-error @enderror font-mono"
+                        id="spk_number"
+                        type="text"
+                        wire:model="form.spk_number"
+                        placeholder="{{ __('pm::invoice.spk_number_placeholder') }}"
+                    >
+                @else
+                    <input
+                        class="form-input bg-gray-100 dark:bg-gray-700"
+                        id="spk_number"
+                        type="text"
+                        value="{{ $form->spk_number }}"
+                        readonly
+                        disabled
+                    >
+                @endif
             </div>
-            <p class="mt-1 text-xs text-gray-500">{{ __('pm::invoice.spk_number_hint') }}</p>
+            @if ($form->is_external_spk)
+                <p class="mt-1 text-xs text-gray-500">{{ __('pm::invoice.spk_number_manual_hint') }}</p>
+                @error('form.spk_number')
+                    <p class="form-error-message">{{ $message }}</p>
+                @enderror
+            @else
+                <p class="mt-1 text-xs text-gray-500">{{ __('pm::invoice.spk_number_hint') }}</p>
+            @endif
         </div>
 
         <!-- Invoice Number -->
@@ -48,6 +79,38 @@
                 >
             </div>
             @error('form.invoice_number')
+                <p class="form-error-message">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <!-- Currency -->
+        <div
+            class="form-box required"
+            wire:key="currency-select-{{ $formNonce }}"
+        >
+            <label for="currency">{{ __('pm::invoice.currency') }}</label>
+            @php
+                $currencyLocked = $form->invoice && $form->invoice->exists && $form->invoice->items()->exists();
+            @endphp
+            @if ($currencyLocked)
+                <input
+                    class="form-input bg-gray-100 dark:bg-gray-700"
+                    type="text"
+                    value="{{ $form->currency }}"
+                    readonly
+                    disabled
+                >
+                <p class="mt-1 text-xs text-gray-500">{{ __('pm::invoice.validation.currency_locked') }}</p>
+            @else
+                <x-synapse-adv-select
+                    wire-model="form.currency"
+                    :live="true"
+                    :options="$this->currencyOptions"
+                    placeholder="{{ __('pm::invoice.select_currency') }}"
+                    :error="$errors->first('form.currency')"
+                />
+            @endif
+            @error('form.currency')
                 <p class="form-error-message">{{ $message }}</p>
             @enderror
         </div>
@@ -152,7 +215,10 @@
         </div>
 
         <!-- Issuer -->
-        <div class="form-box required" wire:key="issuer-select-{{ $form->invoice?->id ?? 'new' }}">
+        <div
+            class="form-box required"
+            wire:key="issuer-select-{{ $formNonce }}"
+        >
             <label for="issuer_id">{{ __('pm::invoice.issuer') }}</label>
             <x-synapse-adv-select
                 wire-model="form.issuer_id"
@@ -167,7 +233,10 @@
         </div>
 
         <!-- Bank Account -->
-        <div class="form-box required" wire:key="bank-select-{{ $form->invoice?->id ?? 'new' }}">
+        <div
+            class="form-box required"
+            wire:key="bank-select-{{ $formNonce }}"
+        >
             <label for="bank_account_id">{{ __('pm::invoice.bank_account') }}</label>
             <x-synapse-adv-select
                 wire-model="form.bank_account_id"
@@ -183,7 +252,9 @@
 
         <!-- Signature Toggle -->
         <div class="form-box">
-            <label class="flex cursor-pointer select-none items-center gap-3 text-sm font-medium text-gray-700 dark:text-gray-400">
+            <label
+                class="flex cursor-pointer select-none items-center gap-3 text-sm font-medium text-gray-700 dark:text-gray-400"
+            >
                 <input
                     class="h-5 w-5 rounded border-gray-300 text-brand-500 focus:ring-brand-500"
                     id="has_signature"
@@ -197,7 +268,10 @@
 
         <!-- Signature Dropdown (shown when has_signature is true) -->
         @if ($form->has_signature)
-            <div class="form-box required" wire:key="signature-select-{{ $form->invoice?->id ?? 'new' }}">
+            <div
+                class="form-box required"
+                wire:key="signature-select-{{ $formNonce }}"
+            >
                 <label for="signature_id">{{ __('pm::invoice.signature') }}</label>
                 <x-synapse-adv-select
                     wire-model="form.signature_id"

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace VmEngine\Pm\Http\Controllers;
 
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Storage;
@@ -13,22 +14,34 @@ use VmEngine\Pm\Models\ProjectInvoice;
 
 class InvoiceController extends Controller
 {
-    public function download(int $id): BinaryFileResponse|Response
+    /**
+     * Resolve the requested language, defaulting to Indonesian.
+     */
+    private function resolveLang(Request $request): string
     {
-        $invoice = ProjectInvoice::with(['invoiceDocument'])->findOrFail($id);
+        return $request->query('lang') === 'en' ? 'en' : 'id';
+    }
 
-        if (! $invoice->invoice_document_id || ! $invoice->invoiceDocument) {
+    public function download(Request $request, int $id): BinaryFileResponse|Response
+    {
+        $lang = $this->resolveLang($request);
+        $invoice = ProjectInvoice::with(['invoiceDocument', 'invoiceDocumentEn'])->findOrFail($id);
+
+        $document = $lang === 'en'
+            ? ($invoice->invoiceDocumentEn ?? $invoice->invoiceDocument)
+            : ($invoice->invoiceDocument ?? $invoice->invoiceDocumentEn);
+
+        if (! $document) {
             abort(404, __('pm::invoice.pdf_not_found'));
         }
 
-        $filePath = Storage::path($invoice->invoiceDocument->file_path);
+        $filePath = Storage::path($document->file_path);
 
         if (! file_exists($filePath)) {
             abort(404, __('pm::invoice.pdf_not_found'));
         }
 
-        $fileName = $invoice->invoiceDocument->file_info['name']
-            ?? basename($invoice->invoiceDocument->file_path);
+        $fileName = $document->file_info['name'] ?? basename($document->file_path);
 
         return response()->download(
             $filePath,
@@ -37,8 +50,10 @@ class InvoiceController extends Controller
         );
     }
 
-    public function print(int $id)
+    public function print(Request $request, int $id)
     {
+        app()->setLocale($this->resolveLang($request));
+
         $invoice = ProjectInvoice::with([
             'project',
             'issuer',

@@ -59,20 +59,101 @@
             @enderror
         </div>
 
-        {{-- Bank Name --}}
-        <div class="form-box required">
+        {{-- Bank Name (with autocomplete) --}}
+        {{--
+            Filtering is done fully client-side against a local `query` variable, so
+            typing never triggers a Livewire commit/morph. The dropdown carries
+            `wire:ignore` so Livewire never morphs Alpine's x-for generated <li>
+            nodes (mirrors the adv-select component); without it, morph-vs-Alpine
+            reconciliation floods the console with expression errors.
+        --}}
+        <div
+            class="form-box required"
+            x-data="{
+                open: false,
+                query: '',
+                suggestions: @js($this->bankNameSuggestions),
+                init() {
+                    this.query = (this.$wire?.get('form.bank_name')) || '';
+                },
+                get filtered() {
+                    const q = (this.query || '').toLowerCase();
+                    if (!q) return this.suggestions;
+                    return this.suggestions.filter(s => s.bank_name.toLowerCase().includes(q));
+                },
+                pick(s) {
+                    this.query = s.bank_name;
+                    this.$wire.set('form.bank_name', s.bank_name);
+                    if (s.swift_code) { this.$wire.set('form.swift_code', s.swift_code); }
+                    this.open = false;
+                }
+            }"
+            {{-- .capture: this form renders inside <x-synapse-modal>, whose content
+                 box calls stopPropagation() on click; without .capture this
+                 bubble-phase document listener would never fire. --}}
+            @click.away.capture="open = false"
+        >
             <label for="bank_name">{{ __('pm::bank_account.bank_name') }}</label>
-            <div class="input-group">
+            <div class="input-group relative">
                 <input
                     class="form-input @error('form.bank_name') has-error @enderror"
                     id="bank_name"
                     name="bank_name"
                     type="text"
+                    autocomplete="off"
                     wire:model="form.bank_name"
+                    @input="query = $event.target.value; open = true"
+                    @focus="open = true"
                     placeholder="{{ __('pm::bank_account.bank_name_placeholder') }}"
                 >
+                <ul
+                    wire:ignore
+                    x-show="open && filtered.length > 0"
+                    x-cloak
+                    class="absolute z-20 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+                >
+                    <template
+                        x-for="s in filtered"
+                        :key="s.bank_name"
+                    >
+                        <li
+                            class="cursor-pointer px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                            @click="pick(s)"
+                        >
+                            <span
+                                class="font-medium"
+                                x-text="s.bank_name"
+                            ></span>
+                            <span
+                                class="ml-2 font-mono text-xs text-gray-500"
+                                x-show="s.swift_code"
+                                x-text="s.swift_code"
+                            ></span>
+                        </li>
+                    </template>
+                </ul>
             </div>
             @error('form.bank_name')
+                <p class="form-error-message">
+                    {{ $message }}
+                </p>
+            @enderror
+        </div>
+
+        {{-- SWIFT Code --}}
+        <div class="form-box">
+            <label for="swift_code">{{ __('pm::bank_account.swift_code') }}</label>
+            <div class="input-group">
+                <input
+                    class="form-input @error('form.swift_code') has-error @enderror font-mono uppercase"
+                    id="swift_code"
+                    name="swift_code"
+                    type="text"
+                    wire:model="form.swift_code"
+                    placeholder="{{ __('pm::bank_account.swift_code_placeholder') }}"
+                >
+            </div>
+            @error('form.swift_code')
                 <p class="form-error-message">
                     {{ $message }}
                 </p>

@@ -3,6 +3,11 @@
     <x-synapse-confirm-dialog />
 
     @if ($invoice)
+        @php
+            $cf = app(\VmEngine\Pm\Services\CurrencyFormatter::class);
+            $cur = $currency;
+            $curDef = $cf->definition($cur);
+        @endphp
         <!-- Modal Header with Issuer Header Image -->
         <div class="shrink-0 border-b border-gray-200 dark:border-gray-700">
             @if ($invoice->issuer?->header_image_url)
@@ -160,13 +165,18 @@
                                     <td>
                                         <div class="flex items-center">
                                             @if ($editItemId == $item->id)
-                                                <x-synapse-currency
-                                                    class="w-full"
-                                                    wire:model="editItemAmount"
-                                                    currency="Rp"
-                                                />
+                                                <div class="input-group w-full">
+                                                    <span class="input-group-item left">{{ $curDef['symbol'] }}</span>
+                                                    <input
+                                                        class="form-input pl-[62px]! w-full"
+                                                        type="text"
+                                                        wire:model="editItemAmount"
+                                                        x-mask:dynamic="$money($input, '{{ $curDef['decimal'] }}', '{{ $curDef['thousands'] }}', {{ (int) $curDef['decimals'] }})"
+                                                        x-on:focus="if ($event.target.value == '0') $event.target.select()"
+                                                    >
+                                                </div>
                                             @else
-                                                <p class="font-mono">Rp {{ number_format($item->amount, 0, ',', '.') }}
+                                                <p class="font-mono">{{ $cf->format((float) $item->amount, $cur) }}
                                                 </p>
                                             @endif
                                         </div>
@@ -202,7 +212,7 @@
                                     </td>
                                     <td>
                                         <div class="flex items-center">
-                                            <p class="font-mono">Rp {{ number_format($itemTotal, 0, ',', '.') }}</p>
+                                            <p class="font-mono">{{ $cf->format((float) $itemTotal, $cur) }}</p>
                                         </div>
                                     </td>
                                     <td>
@@ -289,11 +299,16 @@
                                 </td>
                                 <td>
                                     <div>
-                                        <x-synapse-currency
-                                            class="@error('newItemAmount') border-red-500 @enderror w-full"
-                                            wire:model="newItemAmount"
-                                            currency="Rp"
-                                        />
+                                        <div class="input-group w-full">
+                                            <span class="input-group-item left">{{ $curDef['symbol'] }}</span>
+                                            <input
+                                                class="form-input pl-[62px]! @error('newItemAmount') border-red-500 @enderror w-full"
+                                                type="text"
+                                                wire:model="newItemAmount"
+                                                x-mask:dynamic="$money($input, '{{ $curDef['decimal'] }}', '{{ $curDef['thousands'] }}', {{ (int) $curDef['decimals'] }})"
+                                                x-on:focus="if ($event.target.value == '0') $event.target.select()"
+                                            >
+                                        </div>
                                         @error('newItemAmount')
                                             <span class="text-xs text-red-500">{{ $message }}</span>
                                         @enderror
@@ -352,13 +367,64 @@
                     <h4 class="font-medium text-gray-900 dark:text-white">{{ __('pm::invoice.totals_title') }}</h4>
                 </div>
                 <div class="p-4">
+                    @php
+                        $cf = app(\VmEngine\Pm\Services\CurrencyFormatter::class);
+                        $cur = $currency;
+                        $taxable = $cf->isTaxable($cur);
+                    @endphp
                     <div class="space-y-3">
-                        <!-- Sub Total (Items) -->
+                        <!-- Currency (fixed on the invoice form; not editable here) -->
                         <div class="flex items-center justify-between">
+                            <span class="text-gray-600 dark:text-gray-400">{{ __('pm::invoice.currency') }}</span>
+                            <span
+                                class="font-mono font-medium text-gray-900 dark:text-white">{{ $cur }}</span>
+                        </div>
+
+                        @php
+                            $needsFx = strtoupper($cur) !== 'IDR';
+                            $rateLocked = (bool) ($invoice->is_paid ?? false);
+                            $idrDef = $cf->definition('IDR');
+                        @endphp
+                        @if ($needsFx)
+                            <!-- Exchange Rate -->
+                            <div
+                                class="flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-700">
+                                <span
+                                    class="text-gray-600 dark:text-gray-400">{{ __('pm::invoice.exchange_rate') }}</span>
+                                @if ($rateLocked)
+                                    <span class="font-mono font-medium text-gray-900 dark:text-white">
+                                        {{ $cf->format($exchangeRate, 'IDR') }}</span>
+                                @else
+                                    <div class="input-group w-40">
+                                        <span class="input-group-item left">{{ $idrDef['symbol'] }}</span>
+                                        <input
+                                            class="form-input pl-[62px]! w-full text-right"
+                                            type="text"
+                                            wire:model.live.debounce.500ms="exchangeRateInput"
+                                            x-mask:dynamic="$money($input, '{{ $idrDef['decimal'] }}', '{{ $idrDef['thousands'] }}', {{ (int) $idrDef['decimals'] }})"
+                                            x-on:focus="if ($event.target.value == '0') $event.target.select()"
+                                        >
+                                    </div>
+                                @endif
+                            </div>
+
+                            <!-- Grand Total (IDR) -->
+                            <div
+                                class="flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-700">
+                                <span
+                                    class="text-gray-600 dark:text-gray-400">{{ __('pm::invoice.grand_total_idr') }}</span>
+                                <span class="font-mono font-medium text-gray-900 dark:text-white">
+                                    {{ $cf->format($this->grandTotalIdr, 'IDR') }}</span>
+                            </div>
+                        @endif
+
+                        <!-- Sub Total (Items) -->
+                        <div
+                            class="flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-700">
                             <span
                                 class="text-gray-600 dark:text-gray-400">{{ __('pm::invoice.sub_total_items') }}</span>
-                            <span class="font-mono font-medium text-gray-900 dark:text-white">Rp
-                                {{ number_format($this->subTotal, 0, ',', '.') }}</span>
+                            <span class="font-mono font-medium text-gray-900 dark:text-white">
+                                {{ $cf->format((float) $this->subTotal, $cur) }}</span>
                         </div>
 
                         <!-- Invoice Discount -->
@@ -389,8 +455,8 @@
                                 @endif
                             </div>
                             @if ($includeDiscount && $discountPercentage > 0)
-                                <span class="font-mono font-medium text-red-600">- Rp
-                                    {{ number_format($this->invoiceDiscountAmount, 0, ',', '.') }}</span>
+                                <span class="font-mono font-medium text-red-600">-
+                                    {{ $cf->format((float) $this->invoiceDiscountAmount, $cur) }}</span>
                             @endif
                         </div>
 
@@ -399,72 +465,74 @@
                             <div class="flex items-center justify-between">
                                 <span
                                     class="text-gray-600 dark:text-gray-400">{{ __('pm::invoice.after_discount') }}</span>
-                                <span class="font-mono font-medium text-gray-900 dark:text-white">Rp
-                                    {{ number_format($this->afterDiscountAmount, 0, ',', '.') }}</span>
+                                <span class="font-mono font-medium text-gray-900 dark:text-white">
+                                    {{ $cf->format((float) $this->afterDiscountAmount, $cur) }}</span>
                             </div>
                         @endif
 
-                        <!-- DPP Option (VAT base — calculated from after-discount sub total) -->
-                        <div
-                            class="flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-700">
-                            <div class="flex items-center gap-3">
-                                <input
-                                    class="h-4 w-4 rounded border-gray-300"
-                                    id="includeDpp"
-                                    type="checkbox"
-                                    wire:model.live.debounce.500ms="includeDpp"
-                                >
-                                <label
-                                    class="text-gray-600 dark:text-gray-400"
-                                    for="includeDpp"
-                                >{{ __('pm::invoice.include_dpp') }} {{ $this->dppLabel }}</label>
-                            </div>
-                            @if ($includeDpp)
-                                <span class="font-mono font-medium text-gray-900 dark:text-white">Rp
-                                    {{ number_format($this->dppAmount, 0, ',', '.') }}</span>
-                            @endif
-                        </div>
-
-                        <!-- VAT -->
-                        <div
-                            class="flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-700">
-                            <div class="flex items-center gap-3">
-                                <input
-                                    class="h-4 w-4 rounded border-gray-300"
-                                    id="includeVat"
-                                    type="checkbox"
-                                    wire:model.live.debounce.500ms="includeVat"
-                                >
-                                <label
-                                    class="text-gray-600 dark:text-gray-400"
-                                    for="includeVat"
-                                >{{ __('pm::invoice.include_vat') }} (PPN)</label>
-                                @if ($includeVat)
+                        @if ($taxable)
+                            <!-- DPP Option (VAT base — calculated from after-discount sub total) -->
+                            <div
+                                class="flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-700">
+                                <div class="flex items-center gap-3">
                                     <input
-                                        class="form-input no-spin w-20 text-center"
-                                        type="number"
-                                        step="0.05"
-                                        wire:model.live.debounce.500ms="vatPercentage"
-                                        min="0"
-                                        max="100"
-                                        x-on:focus="if (parseFloat($event.target.value) === 0) $event.target.select()"
+                                        class="h-4 w-4 rounded border-gray-300"
+                                        id="includeDpp"
+                                        type="checkbox"
+                                        wire:model.live.debounce.500ms="includeDpp"
                                     >
-                                    <span>%</span>
+                                    <label
+                                        class="text-gray-600 dark:text-gray-400"
+                                        for="includeDpp"
+                                    >{{ __('pm::invoice.include_dpp') }} {{ $this->dppLabel }}</label>
+                                </div>
+                                @if ($includeDpp)
+                                    <span class="font-mono font-medium text-gray-900 dark:text-white">
+                                        {{ $cf->format((float) $this->dppAmount, $cur) }}</span>
                                 @endif
                             </div>
-                            @if ($includeVat)
-                                <span class="font-mono font-medium text-gray-900 dark:text-white">Rp
-                                    {{ number_format($this->vatAmount, 0, ',', '.') }}</span>
-                            @endif
-                        </div>
+
+                            <!-- VAT -->
+                            <div
+                                class="flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-700">
+                                <div class="flex items-center gap-3">
+                                    <input
+                                        class="h-4 w-4 rounded border-gray-300"
+                                        id="includeVat"
+                                        type="checkbox"
+                                        wire:model.live.debounce.500ms="includeVat"
+                                    >
+                                    <label
+                                        class="text-gray-600 dark:text-gray-400"
+                                        for="includeVat"
+                                    >{{ __('pm::invoice.include_vat') }} (PPN)</label>
+                                    @if ($includeVat)
+                                        <input
+                                            class="form-input no-spin w-20 text-center"
+                                            type="number"
+                                            step="0.05"
+                                            wire:model.live.debounce.500ms="vatPercentage"
+                                            min="0"
+                                            max="100"
+                                            x-on:focus="if (parseFloat($event.target.value) === 0) $event.target.select()"
+                                        >
+                                        <span>%</span>
+                                    @endif
+                                </div>
+                                @if ($includeVat)
+                                    <span class="font-mono font-medium text-gray-900 dark:text-white">
+                                        {{ $cf->format((float) $this->vatAmount, $cur) }}</span>
+                                @endif
+                            </div>
+                        @endif
 
                         <!-- Grand Total -->
                         <div
                             class="flex items-center justify-between border-t-2 border-gray-300 pt-3 dark:border-gray-600">
                             <span
                                 class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('pm::invoice.grand_total') }}</span>
-                            <span class="font-mono text-lg font-bold text-gray-900 dark:text-white">Rp
-                                {{ number_format($this->grandTotal, 0, ',', '.') }}</span>
+                            <span class="font-mono text-lg font-bold text-gray-900 dark:text-white">
+                                {{ $cf->format((float) $this->grandTotal, $cur) }}</span>
                         </div>
 
                         <!-- Notes -->
@@ -488,22 +556,68 @@
             class="flex shrink-0 items-center justify-between gap-3 border-t border-gray-200 p-5 dark:border-gray-700">
             <div class="flex items-center gap-2">
                 @if ($invoice->invoice_document_id)
-                    <a
-                        class="btn info"
-                        href="{{ route('backend.pm.invoice.download', $invoice->id) }}"
-                        target="_blank"
+                    <div
+                        class="relative"
+                        x-data="{ open: false }"
+                        @click.away.capture="open = false"
                     >
-                        <span class="fa-solid fa-download mr-1"></span>
-                        {{ __('pm::invoice.download') }}
-                    </a>
-                    <a
-                        class="btn secondary"
-                        href="{{ route('backend.pm.invoice.print', $invoice->id) }}"
-                        target="_blank"
+                        <button
+                            class="btn info"
+                            type="button"
+                            @click="open = !open"
+                        >
+                            <span class="fa-solid fa-download mr-1"></span>
+                            {{ __('pm::invoice.download') }}
+                            <span class="fa-solid fa-caret-down ml-1"></span>
+                        </button>
+                        <div
+                            class="absolute bottom-full z-20 mb-1 w-48 rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+                            x-show="open"
+                            x-cloak
+                        >
+                            <a
+                                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                                href="{{ route('backend.pm.invoice.download', ['id' => $invoice->id, 'lang' => 'id']) }}"
+                                target="_blank"
+                            >{{ __('pm::invoice.lang_indonesian') }}</a>
+                            <a
+                                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                                href="{{ route('backend.pm.invoice.download', ['id' => $invoice->id, 'lang' => 'en']) }}"
+                                target="_blank"
+                            >{{ __('pm::invoice.lang_english') }}</a>
+                        </div>
+                    </div>
+                    <div
+                        class="relative"
+                        x-data="{ open: false }"
+                        @click.away.capture="open = false"
                     >
-                        <span class="fa-solid fa-print mr-1"></span>
-                        {{ __('pm::invoice.print') }}
-                    </a>
+                        <button
+                            class="btn secondary"
+                            type="button"
+                            @click="open = !open"
+                        >
+                            <span class="fa-solid fa-print mr-1"></span>
+                            {{ __('pm::invoice.print') }}
+                            <span class="fa-solid fa-caret-down ml-1"></span>
+                        </button>
+                        <div
+                            class="absolute bottom-full z-20 mb-1 w-48 rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+                            x-show="open"
+                            x-cloak
+                        >
+                            <a
+                                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                                href="{{ route('backend.pm.invoice.print', ['id' => $invoice->id, 'lang' => 'id']) }}"
+                                target="_blank"
+                            >{{ __('pm::invoice.lang_indonesian') }}</a>
+                            <a
+                                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                                href="{{ route('backend.pm.invoice.print', ['id' => $invoice->id, 'lang' => 'en']) }}"
+                                target="_blank"
+                            >{{ __('pm::invoice.lang_english') }}</a>
+                        </div>
+                    </div>
                 @endif
             </div>
             <div class="flex items-center gap-3">

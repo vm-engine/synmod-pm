@@ -258,5 +258,9 @@
             "update": 0,
             "delete": 0
         }
+    },
+    "currencies": {
+        "IDR": { "symbol": "Rp", "decimals": 0, "thousands": ".", "decimal": ",", "taxable": true, "name": "Rupiah", "name_plural": "Rupiah" },
+        "USD": { "symbol": "$", "decimals": 2, "thousands": ",", "decimal": ".", "taxable": false, "name": "Dollar", "name_plural": "Dollars" }
     }
 }

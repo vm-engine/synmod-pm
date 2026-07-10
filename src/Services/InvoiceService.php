@@ -27,6 +27,13 @@ class InvoiceService
      */
     public function create(Project $project, array $invoiceData): ProjectInvoice
     {
+        $conversion = app(InvoiceConversionService::class);
+        $currency = $invoiceData['currency'] ?? 'IDR';
+        $exchangeRate = $conversion->normalizeRate(
+            $currency,
+            (float) ($invoiceData['exchange_rate'] ?? $conversion->defaultExchangeRate($currency))
+        );
+
         $data = [
             // DbConfig defaults for VAT — caller may still override via $invoiceData.
             // These drive the initial stored row; the invoice-detail editor will
@@ -39,6 +46,12 @@ class InvoiceService
             'amount' => 0,
             'total_amount' => 0,
             'paid_amount' => 0,
+            'exchange_rate' => $exchangeRate,
+            'amount_idr' => 0,
+            'vat_amount_idr' => 0,
+            'dpp_amount_idr' => 0,
+            'discount_amount_idr' => 0,
+            'total_amount_idr' => 0,
         ];
 
         $invoice = ProjectInvoice::create($data);
@@ -179,10 +192,10 @@ class InvoiceService
     {
         $invoiceCount = $this->baseInvoiceQuery($year)->count();
         $receiptCount = $this->baseInvoiceQuery($year)->whereNotNull('receipt_number')->count();
-        $sumUnpaid = $this->baseInvoiceQuery($year)->where('is_paid', 0)->sum('total_amount');
-        $sumPaid = $this->baseInvoiceQuery($year)->where('is_paid', 1)->sum('total_amount');
-        $totalInvoiced = $this->baseInvoiceQuery($year)->sum('total_amount');
-        $vatTotal = $this->baseInvoiceQuery($year)->sum('vat_amount');
+        $sumUnpaid = $this->baseInvoiceQuery($year)->where('is_paid', 0)->sum('total_amount_idr');
+        $sumPaid = $this->baseInvoiceQuery($year)->where('is_paid', 1)->sum('total_amount_idr');
+        $totalInvoiced = $this->baseInvoiceQuery($year)->sum('total_amount_idr');
+        $vatTotal = $this->baseInvoiceQuery($year)->sum('vat_amount_idr');
 
         return [
             'invoice_count' => $invoiceCount,
@@ -235,11 +248,11 @@ class InvoiceService
             ->select(
                 'created_by',
                 DB::raw('COUNT(CASE WHEN is_paid = 0 THEN 1 ELSE NULL END) as unpaid_count'),
-                DB::raw('SUM(CASE WHEN is_paid = 0 THEN total_amount ELSE NULL END) as unpaid_amount'),
+                DB::raw('SUM(CASE WHEN is_paid = 0 THEN total_amount_idr ELSE NULL END) as unpaid_amount'),
                 DB::raw('COUNT(CASE WHEN is_paid = 1 THEN 1 ELSE NULL END) as paid_count'),
-                DB::raw('SUM(CASE WHEN is_paid = 1 THEN total_amount ELSE NULL END) as paid_amount'),
+                DB::raw('SUM(CASE WHEN is_paid = 1 THEN total_amount_idr ELSE NULL END) as paid_amount'),
                 DB::raw('COUNT(*) as total_count'),
-                DB::raw('SUM(total_amount) as total_amount'))
+                DB::raw('SUM(total_amount_idr) as total_amount'))
             ->groupBy('created_by')
             ->with('creator:id,name');
 
@@ -256,13 +269,13 @@ class InvoiceService
             ->select(
                 'project_category_id',
                 DB::raw('COUNT(*) as total_count'),
-                DB::raw('SUM(amount) as sum_amount'),
+                DB::raw('SUM(amount_idr) as sum_amount'),
                 DB::raw('COUNT(CASE WHEN is_paid = 0 THEN 1 ELSE NULL END) as unpaid_count'),
-                DB::raw('SUM(CASE WHEN is_paid = 0 THEN total_amount ELSE NULL END) as unpaid_amount'),
+                DB::raw('SUM(CASE WHEN is_paid = 0 THEN total_amount_idr ELSE NULL END) as unpaid_amount'),
                 DB::raw('COUNT(CASE WHEN is_paid = 1 THEN 1 ELSE NULL END) as paid_count'),
-                DB::raw('SUM(CASE WHEN is_paid = 1 THEN total_amount ELSE NULL END) as paid_amount'),
-                DB::raw('SUM(total_amount) as total_amount'),
-                DB::raw('SUM(vat_amount) as vat_amount'))
+                DB::raw('SUM(CASE WHEN is_paid = 1 THEN total_amount_idr ELSE NULL END) as paid_amount'),
+                DB::raw('SUM(total_amount_idr) as total_amount'),
+                DB::raw('SUM(vat_amount_idr) as vat_amount'))
             ->groupBy('project_category_id')
             ->with('projectCategory')
             ->get();
@@ -281,15 +294,15 @@ class InvoiceService
             COUNT(*) as total_invoice,
             COUNT(DISTINCT project_category_id) as total_invoice_categories,
             COUNT(DISTINCT created_by) as total_invoice_creator,
-            SUM(total_amount) as grand_total_amount,
-            SUM(CASE WHEN is_paid = 0 THEN total_amount ELSE 0 END) as grand_total_unpaid,
-            SUM(CASE WHEN is_paid = 1 THEN total_amount ELSE 0 END) as grand_total_paid,
-            SUM(vat_amount) as total_vat,
-            SUM(amount) as total_amount,
-            SUM(CASE WHEN is_paid = 0 THEN vat_amount ELSE 0 END) as unpaid_vat,
-            SUM(CASE WHEN is_paid = 1 THEN vat_amount ELSE 0 END) as paid_vat,
-            SUM(CASE WHEN is_paid = 0 THEN amount ELSE 0 END) as unpaid_amount,
-            SUM(CASE WHEN is_paid = 1 THEN amount ELSE 0 END) as paid_amount
+            SUM(total_amount_idr) as grand_total_amount,
+            SUM(CASE WHEN is_paid = 0 THEN total_amount_idr ELSE 0 END) as grand_total_unpaid,
+            SUM(CASE WHEN is_paid = 1 THEN total_amount_idr ELSE 0 END) as grand_total_paid,
+            SUM(vat_amount_idr) as total_vat,
+            SUM(amount_idr) as total_amount,
+            SUM(CASE WHEN is_paid = 0 THEN vat_amount_idr ELSE 0 END) as unpaid_vat,
+            SUM(CASE WHEN is_paid = 1 THEN vat_amount_idr ELSE 0 END) as paid_vat,
+            SUM(CASE WHEN is_paid = 0 THEN amount_idr ELSE 0 END) as unpaid_amount,
+            SUM(CASE WHEN is_paid = 1 THEN amount_idr ELSE 0 END) as paid_amount
         ')->first();
 
         return [
@@ -321,13 +334,13 @@ class InvoiceService
                 DB::raw("{$yearExpr} as year"),
                 DB::raw("{$monthExpr} as month"),
                 DB::raw('COUNT(*) as total_count'),
-                DB::raw('SUM(amount) as sum_amount'),
-                DB::raw('SUM(vat_amount) as vat_amount'),
-                DB::raw('SUM(total_amount) as total_amount'),
+                DB::raw('SUM(amount_idr) as sum_amount'),
+                DB::raw('SUM(vat_amount_idr) as vat_amount'),
+                DB::raw('SUM(total_amount_idr) as total_amount'),
                 DB::raw('COUNT(CASE WHEN is_paid = 0 THEN 1 ELSE NULL END) as unpaid_count'),
-                DB::raw('SUM(CASE WHEN is_paid = 0 THEN total_amount ELSE NULL END) as unpaid_amount'),
+                DB::raw('SUM(CASE WHEN is_paid = 0 THEN total_amount_idr ELSE NULL END) as unpaid_amount'),
                 DB::raw('COUNT(CASE WHEN is_paid = 1 THEN 1 ELSE NULL END) as paid_count'),
-                DB::raw('SUM(CASE WHEN is_paid = 1 THEN total_amount ELSE NULL END) as paid_amount'),
+                DB::raw('SUM(CASE WHEN is_paid = 1 THEN total_amount_idr ELSE NULL END) as paid_amount'),
             )
             ->groupBy(DB::raw($yearExpr), DB::raw($monthExpr))
             ->orderBy(DB::raw($yearExpr))
@@ -414,7 +427,10 @@ class InvoiceService
             });
         }
 
-        $query->with(['project:id,name', 'projectCategory:id,name', 'creator:id,name', 'client:id,company'])
+        $query->with([
+            'project:id,name', 'projectCategory:id,name', 'creator:id,name', 'client:id,company',
+            'issuer:id,name', 'bankAccount:id,bank_name,number',
+        ])
             ->orderBy($sortBy, $sortDesc ? 'desc' : 'asc');
 
         return $query->paginate($limit);
@@ -465,7 +481,7 @@ class InvoiceService
                     'transformer' => DateFormatTransformer::class,
                     'config' => ['format' => 'Y-m-d'],
                 ],
-                __('pm::report.invoice.export.total_amount') => 'total_amount',
+                __('pm::report.invoice.export.total_amount') => 'total_amount_idr',
                 __('pm::report.invoice.export.receipt_number') => 'receipt_number',
                 __('pm::report.invoice.export.paid_status') => [
                     'field' => 'is_paid',

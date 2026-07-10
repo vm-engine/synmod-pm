@@ -299,8 +299,13 @@
     @endif
 
     <div class="content">
+        @php
+            $cf = app(\VmEngine\Pm\Services\CurrencyFormatter::class);
+            $cur = $invoice->currency ?? 'IDR';
+            $taxable = $cf->isTaxable($cur);
+        @endphp
         {{-- Invoice To Section --}}
-        <div class="invoice-to-label">Invoice To</div>
+        <div class="invoice-to-label">{{ __('pm::pdf.invoice.invoice_to') }}</div>
         <div class="invoice-to-name">{{ $invoice->recipient }}</div>
 
         {{-- Details Section --}}
@@ -310,13 +315,13 @@
                     <td class="details-left">
                         <table class="detail-table">
                             <tr>
-                                <td class="label">Address</td>
+                                <td class="label">{{ __('pm::pdf.invoice.address') }}</td>
                                 <td class="sep">:</td>
                                 <td class="value">{{ $invoice->address }}</td>
                             </tr>
                             @if ($invoice->attention)
                                 <tr>
-                                    <td class="label">Attention</td>
+                                    <td class="label">{{ __('pm::pdf.invoice.attention') }}</td>
                                     <td class="sep">:</td>
                                     <td class="value">{{ $invoice->attention }}</td>
                                 </tr>
@@ -326,25 +331,30 @@
                     <td class="details-right">
                         <table class="detail-table">
                             <tr>
-                                <td class="label">No Invoice</td>
+                                <td class="label">{{ __('pm::pdf.invoice.invoice_number') }}</td>
                                 <td class="sep">:</td>
                                 <td class="value">{{ $invoice->invoice_number }}</td>
                             </tr>
                             <tr>
-                                <td class="label">Invoice Date</td>
+                                <td class="label">{{ __('pm::pdf.invoice.invoice_date') }}</td>
                                 <td class="sep">:</td>
                                 <td class="value">{{ $invoice->issue_date?->format('d-m-Y') }}</td>
                             </tr>
                             <tr>
-                                <td class="label">Due Date</td>
+                                <td class="label">{{ __('pm::pdf.invoice.due_date') }}</td>
                                 <td class="sep">:</td>
                                 <td class="value">{{ $invoice->due_date?->format('d-m-Y') }}</td>
                             </tr>
-                            @if ($invoice->spkDocument)
+                            @php
+                                $spkNumber = $invoice->is_external_spk
+                                    ? $invoice->spk_number
+                                    : $invoice->spkDocument?->number;
+                            @endphp
+                            @if ($spkNumber)
                                 <tr>
-                                    <td class="label">SPK No</td>
+                                    <td class="label">{{ __('pm::pdf.invoice.spk_number') }}</td>
                                     <td class="sep">:</td>
-                                    <td class="value">{{ $invoice->spkDocument->number }}</td>
+                                    <td class="value">{{ $spkNumber }}</td>
                                 </tr>
                             @endif
                         </table>
@@ -359,9 +369,9 @@
             <table class="items-table">
                 <thead>
                     <tr>
-                        <th class="description-col">Description</th>
-                        <th class="discount-col text-center">Discount</th>
-                        <th class="price-col text-right">Price</th>
+                        <th class="description-col">{{ __('pm::pdf.invoice.description') }}</th>
+                        <th class="discount-col text-center">{{ __('pm::pdf.invoice.discount') }}</th>
+                        <th class="price-col text-right">{{ __('pm::pdf.invoice.price') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -384,7 +394,7 @@
                                 @endif
                             </td>
                             <td class="price-col text-right">
-                                Rp {{ number_format($item->amount, 2, ',', '.') }}
+                                {{ $cf->format((float) $item->amount, $cur) }}
                             </td>
                         </tr>
                     @endforeach
@@ -394,7 +404,7 @@
             {{-- Notes Section --}}
             @if ($invoice->notes)
                 <div class="notes-section">
-                    <span class="notes-label">Notes :</span> {{ $invoice->notes }}
+                    <span class="notes-label">{{ __('pm::pdf.invoice.notes') }} :</span> {{ $invoice->notes }}
                 </div>
             @endif
 
@@ -416,30 +426,32 @@
 
             <table class="totals-table">
                 <tr>
-                    <td class="label-col">Sub Total</td>
-                    <td class="value-col">Rp {{ number_format($subTotal, 2, ',', '.') }}</td>
+                    <td class="label-col">{{ __('pm::pdf.invoice.sub_total') }}</td>
+                    <td class="value-col">{{ $cf->format((float) $subTotal, $cur) }}</td>
                 </tr>
                 @if ($invoice->include_discount && $invoice->discount_percentage > 0)
                     <tr>
-                        <td class="label-col">Discount ({{ $invoice->discount_percentage }}%)</td>
-                        <td class="value-col">- Rp {{ number_format($discountAmount, 2, ',', '.') }}</td>
+                        <td class="label-col">{{ __('pm::pdf.invoice.discount') }}
+                            ({{ $invoice->discount_percentage }}%)</td>
+                        <td class="value-col">- {{ $cf->format((float) $discountAmount, $cur) }}</td>
                     </tr>
                 @endif
-                @if ($invoice->include_dpp)
+                @if ($taxable && $invoice->include_dpp)
                     <tr>
-                        <td class="label-col">DPP ({{ $dppNumerator }}/{{ $dppDenominator }})</td>
-                        <td class="value-col">Rp {{ number_format($dppAmount, 2, ',', '.') }}</td>
+                        <td class="label-col">{{ __('pm::pdf.invoice.dpp') }}
+                            ({{ $dppNumerator }}/{{ $dppDenominator }})</td>
+                        <td class="value-col">{{ $cf->format((float) $dppAmount, $cur) }}</td>
                     </tr>
                 @endif
-                @if ($invoice->include_vat)
+                @if ($taxable && $invoice->include_vat)
                     <tr>
-                        <td class="label-col">PPN</td>
-                        <td class="value-col">Rp {{ number_format($vatAmount, 2, ',', '.') }}</td>
+                        <td class="label-col">{{ __('pm::pdf.invoice.vat') }}</td>
+                        <td class="value-col">{{ $cf->format((float) $vatAmount, $cur) }}</td>
                     </tr>
                 @endif
                 <tr class="total-row">
-                    <td class="label-col">TOTAL</td>
-                    <td class="value-col">Rp {{ number_format($grandTotal, 2, ',', '.') }}</td>
+                    <td class="label-col">{{ __('pm::pdf.invoice.total') }}</td>
+                    <td class="value-col">{{ $cf->format((float) $grandTotal, $cur) }}</td>
                 </tr>
             </table>
         </div>
@@ -449,18 +461,26 @@
             <table class="footer-table">
                 <tr>
                     <td class="payment-info">
-                        <div class="payment-title">Payment Method</div>
+                        <div class="payment-title">{{ __('pm::pdf.invoice.payment_method') }}</div>
                         <div class="payment-details">
-                            Pembayaran dapat dilakukan melalui transfer atau setoran<br>
-                            tunai ke Bank {{ $invoice->bankAccount?->bank_name ?? 'BRI' }}<br>
+                            {{ __('pm::pdf.invoice.payment_instruction') }}:<br>
+                            <strong>{{ __('pm::pdf.invoice.bank') }}:</strong>
+                            {{ $invoice->bankAccount?->bank_name ?? '-' }}<br>
+                            <strong>{{ __('pm::pdf.invoice.account_name') }}:</strong>
                             <span
                                 class="bank-name">{{ $invoice->bankAccount?->name ?? $invoice->issuer?->name }}</span><br>
+                            <strong>{{ __('pm::pdf.invoice.account_number') }}:</strong>
                             <span class="bank-account">{{ $invoice->bankAccount?->number ?? '-' }}</span>
+                            @if ($invoice->bankAccount?->swift_code)
+                                <br><strong>{{ __('pm::pdf.invoice.swift_code') }}:</strong>
+                                {{ $invoice->bankAccount->swift_code }}
+                            @endif
                         </div>
 
                         @if ($invoice->issuer?->tax_id_number)
                             <div class="npwp-section">
-                                <span class="npwp-label">NPWP : {{ $invoice->issuer->tax_id_number }}</span><br>
+                                <span class="npwp-label">{{ __('pm::pdf.invoice.npwp') }} :
+                                    {{ $invoice->issuer->tax_id_number }}</span><br>
                                 <span class="bank-name">{{ $invoice->issuer->name }}</span>
                                 <div class="company-address">
                                     {{ $invoice->issuer->tax_id_address ?? $invoice->issuer->address }}

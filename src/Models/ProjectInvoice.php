@@ -26,7 +26,10 @@ class ProjectInvoice extends Model
         'client_id',
         'user_id',
         'invoice_number',
+        'currency',
         'spk_document_id',
+        'is_external_spk',
+        'spk_number',
         'issue_date',
         'due_date',
         'recipient',
@@ -43,6 +46,12 @@ class ProjectInvoice extends Model
         'include_dpp',
         'dpp_amount',
         'total_amount',
+        'exchange_rate',
+        'amount_idr',
+        'vat_amount_idr',
+        'dpp_amount_idr',
+        'discount_amount_idr',
+        'total_amount_idr',
         'is_paid',
         'paid_at',
         'payment_notes',
@@ -52,9 +61,11 @@ class ProjectInvoice extends Model
         'has_signature',
         'signature_id',
         'invoice_document_id',
+        'invoice_document_en_id',
         'receipt_number',
         'receipt_amount_text',
         'receipt_document_id',
+        'receipt_document_en_id',
         'created_by',
         'updated_by',
     ];
@@ -64,6 +75,9 @@ class ProjectInvoice extends Model
         return [
             'issue_date' => 'date',
             'due_date' => 'date',
+            'currency' => 'string',
+            'is_external_spk' => 'boolean',
+            'amount' => 'decimal:2',
             'include_vat' => 'boolean',
             'vat_percentage' => 'decimal:2',
             'vat_amount' => 'decimal:2',
@@ -73,6 +87,12 @@ class ProjectInvoice extends Model
             'include_dpp' => 'boolean',
             'dpp_amount' => 'decimal:2',
             'total_amount' => 'decimal:2',
+            'exchange_rate' => 'decimal:6',
+            'amount_idr' => 'decimal:2',
+            'vat_amount_idr' => 'decimal:2',
+            'dpp_amount_idr' => 'decimal:2',
+            'discount_amount_idr' => 'decimal:2',
+            'total_amount_idr' => 'decimal:2',
             'is_paid' => 'boolean',
             'paid_at' => 'datetime',
             'has_signature' => 'boolean',
@@ -137,5 +157,15 @@ class ProjectInvoice extends Model
     public function receiptDocument(): BelongsTo
     {
         return $this->belongsTo(ProjectDocument::class, 'receipt_document_id');
+    }
+
+    public function invoiceDocumentEn(): BelongsTo
+    {
+        return $this->belongsTo(ProjectDocument::class, 'invoice_document_en_id');
+    }
+
+    public function receiptDocumentEn(): BelongsTo
+    {
+        return $this->belongsTo(ProjectDocument::class, 'receipt_document_en_id');
     }
 }

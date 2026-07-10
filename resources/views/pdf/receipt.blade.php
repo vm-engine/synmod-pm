@@ -175,7 +175,7 @@
     <div class="content">
         {{-- Title Section --}}
         <div class="title-section">
-            <div class="title">KUITANSI</div>
+            <div class="title">{{ __('pm::pdf.receipt.title') }}</div>
             <div class="receipt-number">{{ $receiptNumber }}</div>
         </div>
 
@@ -236,7 +236,8 @@
                 <tr>
                     <td class="amount-cell">
                         <div class="amount-box">
-                            Rp. {{ number_format($invoice->total_amount, 0, ',', '.') }}, -
+                            @php($cf = app(\VmEngine\Pm\Services\CurrencyFormatter::class))
+                            {{ $cf->format((float) $invoice->total_amount, $invoice->currency ?? 'IDR') }}
                         </div>
                     </td>
                     <td class="signature-cell">

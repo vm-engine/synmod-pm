@@ -16,6 +16,8 @@ return [
     'name_placeholder' => 'Account holder name',
     'number_placeholder' => '1234567890',
     'bank_name_placeholder' => 'e.g., BCA, Mandiri, BNI',
+    'swift_code' => 'SWIFT Code',
+    'swift_code_placeholder' => 'e.g. CENAIDJA',
     'search_placeholder' => 'Search by name, number, or bank name...',
 
     // Upload

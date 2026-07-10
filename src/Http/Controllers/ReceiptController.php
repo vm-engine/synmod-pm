@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Storage;
@@ -11,27 +12,41 @@ use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use VmEngine\Pm\Helpers\Terbilang;
 use VmEngine\Pm\Models\ProjectInvoice;
+use VmEngine\Pm\Services\CurrencyFormatter;
 
 class ReceiptController extends Controller
 {
     /**
+     * Resolve the requested language, defaulting to Indonesian.
+     */
+    private function resolveLang(Request $request): string
+    {
+        return $request->query('lang') === 'en' ? 'en' : 'id';
+    }
+
+    /**
      * Download the receipt PDF.
      */
-    public function download(int $id): BinaryFileResponse|Response
+    public function download(Request $request, int $id): BinaryFileResponse|Response
     {
-        $invoice = ProjectInvoice::with(['receiptDocument'])->findOrFail($id);
+        $lang = $this->resolveLang($request);
+        $invoice = ProjectInvoice::with(['receiptDocument', 'receiptDocumentEn'])->findOrFail($id);
 
-        if (! $invoice->receipt_document_id || ! $invoice->receiptDocument) {
+        $document = $lang === 'en'
+            ? ($invoice->receiptDocumentEn ?? $invoice->receiptDocument)
+            : ($invoice->receiptDocument ?? $invoice->receiptDocumentEn);
+
+        if (! $document) {
             abort(404, __('pm::receipt.pdf_not_found'));
         }
 
-        $filePath = Storage::path($invoice->receiptDocument->file_path);
+        $filePath = Storage::path($document->file_path);
 
         if (! file_exists($filePath)) {
             abort(404, __('pm::receipt.pdf_not_found'));
         }
 
-        $fileName = $invoice->receiptDocument->file_info['name']
+        $fileName = $document->file_info['name']
             ?? 'receipt_'.str_replace(['/', '\\', ' '], '_', $invoice->receipt_number).'.pdf';
 
         return response()->download($filePath, $fileName, [
@@ -42,8 +57,11 @@ class ReceiptController extends Controller
     /**
      * Print the receipt (display view directly).
      */
-    public function print(int $id): View
+    public function print(Request $request, int $id): View
     {
+        $lang = $this->resolveLang($request);
+        app()->setLocale($lang);
+
         $invoice = ProjectInvoice::with([
             'project',
             'project.client',
@@ -55,7 +73,22 @@ class ReceiptController extends Controller
 
         // Get receipt number and amount text
         $receiptNumber = $invoice->receipt_number ?? '-';
-        $amountText = $invoice->receipt_amount_text ?? Terbilang::rupiah((float) $invoice->total_amount);
+        // Amount-in-words reflects the invoice's native currency (e.g. "One
+        // Hundred Dollars" for a USD invoice). The stored receipt_amount_text
+        // is Indonesian-only, so it can only be reused for the 'id' language.
+        if ($lang === 'id' && $invoice->receipt_amount_text) {
+            $amountText = $invoice->receipt_amount_text;
+        } else {
+            $cf = app(CurrencyFormatter::class);
+            $currency = $invoice->currency ?? 'IDR';
+
+            $amountText = Terbilang::amountInWords(
+                (float) $invoice->total_amount,
+                $cf->currencyName($currency),
+                $cf->currencyNamePlural($currency),
+                $lang
+            );
+        }
 
         return view('pm::pdf.receipt', [
             'invoice' => $invoice,

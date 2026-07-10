@@ -10,6 +10,7 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 use VmEngine\Pm\Models\ProjectInvoice;
 use VmEngine\Pm\Models\ProjectInvoiceItem;
+use VmEngine\Pm\Services\InvoiceConversionService;
 use VmEngine\Pm\Services\InvoicePdfService;
 use VmEngine\SynAuth\Facades\SynAuth;
 
@@ -49,6 +50,12 @@ new class extends Component
     public float $discountPercentage = 0;
 
     public bool $includeDpp = false;
+
+    public string $currency = 'IDR';
+
+    public float $exchangeRate = 1.0;
+
+    public string $exchangeRateInput = '0';
 
     public string $invoiceNotes = '';
 
@@ -95,6 +102,9 @@ new class extends Component
             $this->includeDiscount = (bool) $this->invoice->include_discount;
             $this->discountPercentage = (float) $this->invoice->discount_percentage;
             $this->includeDpp = (bool) $this->invoice->include_dpp;
+            $this->currency = $this->invoice->currency ?? 'IDR';
+            $this->exchangeRate = (float) $this->invoice->exchange_rate;
+            $this->exchangeRateInput = $this->currencyFormatter()->number($this->exchangeRate, 'IDR');
             $this->invoiceNotes = $this->invoice->notes ?? '';
         } catch (ModelNotFoundException) {
             $this->dispatch('notify',
@@ -106,14 +116,48 @@ new class extends Component
         }
     }
 
+    private function currencyFormatter(): \VmEngine\Pm\Services\CurrencyFormatter
+    {
+        return app(\VmEngine\Pm\Services\CurrencyFormatter::class);
+    }
+
+    private function isTaxable(): bool
+    {
+        return $this->currencyFormatter()->isTaxable($this->currency);
+    }
+
+    // "Needs FX conversion" is a separate concept from "is taxable" — a
+    // currency could theoretically be taxable but still not IDR, so keep
+    // this check independent rather than reusing isTaxable().
+    private function needsExchangeRate(): bool
+    {
+        return strtoupper($this->currency) !== 'IDR';
+    }
+
+    private function sanitizeAmountInput(string $value): string
+    {
+        $def = $this->currencyFormatter()->definition($this->currency);
+
+        // Strip thousands separators; keep the decimal separator only when decimals are allowed.
+        $value = str_replace((string) $def['thousands'], '', $value);
+
+        if ((int) $def['decimals'] === 0) {
+            return preg_replace('/[^0-9]/', '', $value) ?? '';
+        }
+
+        $decimal = preg_quote((string) $def['decimal'], '/');
+
+        return preg_replace('/[^0-9'.$decimal.']/', '', $value) ?? '';
+    }
+
     public function updatingNewItemAmount($value): string
     {
-        return str_replace('.', '', $value);
+        return $this->sanitizeAmountInput((string) $value);
     }
 
     public function updatingEditItemAmount($value): string
     {
-        return str_replace('.', '', $value);
+        return $this->sanitizeAmountInput((string) $value);
     }
 
     #[On('close-modal-invoice-detail')]
@@ -148,7 +192,7 @@ new class extends Component
         $item = ProjectInvoiceItem::findOrFail($id);
         $this->editItemId = $item->id;
         $this->editItemName = $item->name;
-        $this->editItemAmount = (string) (int) $item->amount;
+        $this->editItemAmount = $this->currencyFormatter()->number((float) $item->amount, $this->currency);
         $this->editItemIncludeDiscount = (bool) $item->include_discount;
         $this->editItemDiscountPercentage = (float) $item->discount_percentage;
     }
@@ -156,7 +200,7 @@ new class extends Component
     public function updateItem(int $id): void
     {
         // Clean the formatted amount before validation
-        $this->editItemAmount = str_replace('.', '', $this->editItemAmount);
+        $this->editItemAmount = (string) $this->currencyFormatter()->parse($this->editItemAmount, $this->currency);
 
         $this->validate([
             'editItemName' => 'required|string|max:500',
@@ -166,7 +210,7 @@ new class extends Component
 
         try {
             $item = ProjectInvoiceItem::findOrFail($id);
-            $amount = (float) str_replace('.', '', $this->editItemAmount);
+            $amount = (float) $this->editItemAmount;
             $discountAmount = $this->editItemIncludeDiscount
                 ? ($amount * $this->editItemDiscountPercentage / 100)
                 : 0;
@@ -200,7 +244,7 @@ new class extends Component
     public function storeItem(): void
     {
         // Clean the formatted amount before validation
-        $this->newItemAmount = str_replace('.', '', $this->newItemAmount);
+        $this->newItemAmount = (string) $this->currencyFormatter()->parse($this->newItemAmount, $this->currency);
 
         $this->validate([
             'newItemName' => 'required|string|max:500',
@@ -209,7 +253,7 @@ new class extends Component
         ]);
 
         try {
-            $amount = (float) str_replace('.', '', $this->newItemAmount);
+            $amount = (float) $this->newItemAmount;
             $discountAmount = $this->newItemIncludeDiscount
                 ? ($amount * $this->newItemDiscountPercentage / 100)
                 : 0;
@@ -297,10 +341,36 @@ new class extends Component
         $this->recalculateTotals();
     }
 
+    public function updatedExchangeRate(): void
+    {
+        if (! $this->needsExchangeRate()) {
+            $this->exchangeRate = 1.0;
+        }
+        $this->recalculateTotals();
+    }
+
+    public function updatedExchangeRateInput(): void
+    {
+        $this->exchangeRate = $this->currencyFormatter()->parse($this->exchangeRateInput, 'IDR');
+        $this->updatedExchangeRate();
+    }
+
     public function recalculateTotals(): void
     {
         if (! $this->invoice) {
             return;
+        }
+
+        // Non-taxable currencies (e.g. USD) have no VAT/DPP concept.
+        if (! $this->isTaxable()) {
+            $this->includeVat = false;
+            $this->includeDpp = false;
+        }
+
+        // Rate is locked once paid — reset any stray in-memory value back to
+        // what's persisted before this recalculation uses it.
+        if ($this->invoice->is_paid) {
+            $this->exchangeRate = (float) $this->invoice->exchange_rate;
         }
 
         $items = ProjectInvoiceItem::where('project_invoice_id', $this->invoice->id)->get();
@@ -335,6 +405,16 @@ new class extends Component
         // Grand total = sub total of items (after discount) + VAT — NOT dppAmount + VAT
         $grandTotal = $afterDiscount + $vatAmount;
 
+        $conversion = app(InvoiceConversionService::class);
+        $exchangeRate = $conversion->normalizeRate($this->currency, $this->exchangeRate);
+        $idrAmounts = $conversion->convert($this->currency, $exchangeRate, [
+            'amount' => $baseAmount,
+            'vat_amount' => $vatAmount,
+            'dpp_amount' => $this->includeDpp ? $dppAmount : 0,
+            'discount_amount' => $discountAmount,
+            'total_amount' => $grandTotal,
+        ]);
+
         // Update invoice
         $this->invoice->update([
             'amount' => $baseAmount,
@@ -347,8 +427,13 @@ new class extends Component
             'vat_percentage' => $this->includeVat ? $this->vatPercentage : 0,
             'vat_amount' => $vatAmount,
             'total_amount' => $grandTotal,
+            'exchange_rate' => $exchangeRate,
+            ...$idrAmounts,
             'notes' => $this->invoiceNotes,
         ]);
+
+        $this->exchangeRate = $exchangeRate;
+        $this->exchangeRateInput = $this->currencyFormatter()->number($exchangeRate, 'IDR');
     }
 
     public function saveAndGeneratePdf(): void
@@ -467,13 +552,15 @@ new class extends Component
     {
         // DPP is purely the VAT base, calculated from after-discount sub total.
         // It is NOT used as the service total for the grand total.
-        return $this->includeDpp ? ($this->afterDiscountAmount * $this->dppRatio()) : $this->afterDiscountAmount;
+        return ($this->includeDpp && $this->isTaxable())
+            ? ($this->afterDiscountAmount * $this->dppRatio())
+            : $this->afterDiscountAmount;
     }
 
     #[Computed]
     public function vatAmount(): float
     {
-        return $this->includeVat ? ($this->dppAmount * $this->vatPercentage / 100) : 0;
+        return ($this->includeVat && $this->isTaxable()) ? ($this->dppAmount * $this->vatPercentage / 100) : 0;
     }
 
     #[Computed]
@@ -481,5 +568,13 @@ new class extends Component
     {
         // Grand total = sub total of items (after discount) + VAT — NOT dppAmount + VAT
         return $this->afterDiscountAmount + $this->vatAmount;
+    }
+
+    #[Computed]
+    public function grandTotalIdr(): float
+    {
+        $rate = strtoupper($this->currency) === 'IDR' ? 1.0 : $this->exchangeRate;
+
+        return round($this->grandTotal * $rate, 2);
     }
 };

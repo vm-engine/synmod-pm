@@ -27,6 +27,10 @@ beforeEach(function () {
     setupDocumentConfig();
 });
 
+afterEach(function () {
+    app()->setLocale(config('app.locale'));
+});
+
 function setupDocumentConfig(): void
 {
     // Create a project category for testing
@@ -100,6 +104,94 @@ test('generates amount text preview', function () {
         ->dispatch('load-receipt-detail', id: $invoice->id);
 
     expect($component->get('amountText'))->toContain('Rupiah');
+});
+
+test('amount text uses the invoice native currency, not a forced IDR conversion', function () {
+    $client = Client::factory()->create();
+    $project = createTestProject(['client_id' => $client->id]);
+    $invoice = ProjectInvoice::factory()->create([
+        'project_id' => $project->id,
+        'client_id' => $client->id,
+        'currency' => 'USD',
+        'exchange_rate' => 16000,
+        'total_amount' => 100,
+        'total_amount_idr' => 1600000,
+        'is_paid' => false,
+        'receipt_amount_text' => null,
+    ]);
+
+    app()->setLocale('id');
+
+    $component = Livewire::test('pm::project.receipt-detail')
+        ->dispatch('load-receipt-detail', id: $invoice->id);
+
+    expect($component->get('amountText'))->toBe('Seratus Dollar');
+});
+
+test('receipt preview shows the amount in the invoice native currency, not hardcoded IDR', function () {
+    $client = Client::factory()->create();
+    $project = createTestProject(['client_id' => $client->id]);
+    $invoice = ProjectInvoice::factory()->create([
+        'project_id' => $project->id,
+        'client_id' => $client->id,
+        'currency' => 'USD',
+        'exchange_rate' => 16000,
+        'total_amount' => 100,
+        'total_amount_idr' => 1600000,
+    ]);
+
+    $component = Livewire::test('pm::project.receipt-detail')
+        ->dispatch('load-receipt-detail', id: $invoice->id);
+
+    $component->assertSee('$')
+        ->assertDontSee('Rp. 100');
+});
+
+test('amount text says Dollars, not Rupiah, for a USD invoice in English', function () {
+    $client = Client::factory()->create();
+    $project = createTestProject(['client_id' => $client->id]);
+    $invoice = ProjectInvoice::factory()->create([
+        'project_id' => $project->id,
+        'client_id' => $client->id,
+        'currency' => 'USD',
+        'exchange_rate' => 16000,
+        'total_amount' => 100,
+        'total_amount_idr' => 1600000,
+        'is_paid' => false,
+        'receipt_amount_text' => null,
+    ]);
+
+    app()->setLocale('en');
+
+    $component = Livewire::test('pm::project.receipt-detail')
+        ->dispatch('load-receipt-detail', id: $invoice->id);
+
+    expect($component->get('amountText'))->toBe('One Hundred Dollars');
+
+    app()->setLocale('id');
+});
+
+test('amount text falls back to a live English recompute even when an Indonesian receipt_amount_text is already stored', function () {
+    $client = Client::factory()->create();
+    $project = createTestProject(['client_id' => $client->id]);
+    $invoice = ProjectInvoice::factory()->create([
+        'project_id' => $project->id,
+        'client_id' => $client->id,
+        'currency' => 'USD',
+        'exchange_rate' => 16000,
+        'total_amount' => 100,
+        'total_amount_idr' => 1600000,
+        'receipt_amount_text' => 'Seratus Dollar',
+    ]);
+
+    app()->setLocale('en');
+
+    $component = Livewire::test('pm::project.receipt-detail')
+        ->dispatch('load-receipt-detail', id: $invoice->id);
+
+    expect($component->get('amountText'))->toBe('One Hundred Dollars');
+
+    app()->setLocale('id');
 });
 
 test('can generate receipt pdf', function () {

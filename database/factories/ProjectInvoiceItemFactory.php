@@ -35,7 +35,7 @@ class ProjectInvoiceItemFactory extends Factory
             'Consultation Services',
         ];
 
-        $amount = fake()->numberBetween(1000000, 10000000);
+        $amount = (float) fake()->numberBetween(1000000, 10000000);
         $includeDiscount = fake()->boolean(30);
         $discountPercentage = $includeDiscount ? fake()->randomFloat(2, 5, 20) : 0;
         $discountAmount = $includeDiscount ? round($amount * $discountPercentage / 100, 2) : 0;

@@ -10,6 +10,7 @@ use Illuminate\Support\ServiceProvider;
 use VmEngine\Pm\Console\Commands\ImportProjectsCommand;
 use VmEngine\Pm\Console\Commands\MigrateOldDataCommand;
 use VmEngine\Pm\Console\Commands\MigrateProjectUploadsCommand;
+use VmEngine\Pm\Console\Commands\RecalculateInvoiceConversionsCommand;
 use VmEngine\Pm\Console\Commands\ResetIndexCommand;
 use VmEngine\Pm\Console\Commands\SyncClientUserStatusCommand;
 use VmEngine\Pm\Http\Middleware\ApiLogger;
@@ -38,6 +39,7 @@ class PmServiceProvider extends ServiceProvider
                 SyncClientUserStatusCommand::class,
                 ResetIndexCommand::class,
                 MigrateProjectUploadsCommand::class,
+                RecalculateInvoiceConversionsCommand::class,
             ]);
 
             $schedule = $this->app->make(Schedule::class);

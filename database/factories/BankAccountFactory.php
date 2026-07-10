@@ -23,6 +23,7 @@ class BankAccountFactory extends Factory
             'name' => fake()->name(),
             'number' => fake()->numerify('##########'),
             'bank_name' => fake()->randomElement($banks),
+            'swift_code' => fake()->optional()->regexify('[A-Z]{4}IDJA'),
             'bank_logo' => fake()->imageUrl(200, 100, 'business', true),
             'created_by' => User::factory(),
             'updated_by' => null,
