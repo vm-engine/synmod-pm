@@ -1,0 +1,252 @@
+{
+	"info": {
+		"_postman_id": "pm-client-api-collection",
+		"name": "PM Client API",
+		"description": "Client, Client Category, and Service API endpoints for the Project Management module.\n\nAll endpoints require:\n- Sanctum bearer token authentication\n- `pm.client.read` permission\n\n## Authentication\n\n### Option A: Permanent Token (H2H / Server-to-Server)\n1. Create an API User in **Auth > API Users** admin panel.\n2. Copy the generated token (shown once).\n3. Paste the token into the `access_token` collection variable.\n\n### Option B: Login Flow (Interactive Users)\n1. Run the **Login** request in the Auth folder.\n2. The token is automatically saved to the `access_token` collection variable.\n\n## Status Code Format\n`\"<http_code><service_code><response_code>\"` as string.\n\n| Service | Code |\n|---------|------|\n| Client List | 06 |\n| Client Detail | 07 |\n| Client Category List | 08 |\n| Service List | 09 |",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{ "key": "base_url", "value": "http://localhost:8000", "type": "string" },
+		{ "key": "access_token", "value": "", "type": "string" },
+		{ "key": "permanent_token", "value": "", "type": "string", "description": "Paste your H2H permanent token here (from Auth > API Users). Run 'Set Permanent Token' request to activate it." },
+		{ "key": "client_id", "value": "1", "type": "string" }
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }]
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"description": "Authentication endpoints to obtain access tokens.",
+			"item": [
+				{
+					"name": "Set Permanent Token (H2H)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var token = pm.variables.replaceIn('{{permanent_token}}');",
+									"if (token && token !== '{{permanent_token}}') {",
+									"    pm.collectionVariables.set('access_token', token);",
+									"    console.log('Permanent token set as access_token.');",
+									"} else {",
+									"    console.warn('Please set the permanent_token collection variable first.');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var token = pm.collectionVariables.get('access_token');",
+									"if (token) {",
+									"    pm.test('Permanent token is set', function () { pm.expect(token).to.not.be.empty; });",
+									"} else {",
+									"    pm.test('Permanent token is NOT set', function () { pm.expect.fail('Set the permanent_token collection variable first.'); });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/pm/client/list",
+							"host": ["{{base_url}}"],
+							"path": ["api", "pm", "client", "list"]
+						},
+						"description": "Helper request to set a permanent (H2H) token as the active access token. Also serves as a connectivity test."
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.access_token) {",
+									"        pm.collectionVariables.set('access_token', jsonData.data.access_token);",
+									"        console.log('Access token saved.');",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"credential\": \"{{credential}}\",\n    \"password\": \"{{password}}\",\n    \"device_name\": \"Postman\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "login"]
+						},
+						"description": "Authenticate and obtain a bearer token. Saved automatically to `access_token`."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Clients",
+			"description": "Client list and detail endpoints.",
+			"item": [
+				{
+					"name": "List (Default)",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": {
+							"raw": "{{base_url}}/api/pm/client/list",
+							"host": ["{{base_url}}"],
+							"path": ["api", "pm", "client", "list"],
+							"query": [
+								{ "key": "client_category_id", "value": "1", "description": "Filter by client category ID.", "disabled": true },
+								{ "key": "status", "value": "1", "description": "0=prospect, 1=active.", "disabled": true },
+								{ "key": "active", "value": "1", "description": "Boolean active flag.", "disabled": true },
+								{ "key": "services[]", "value": "1", "description": "Filter by service ID (any-match). Repeat for multiple.", "disabled": true },
+								{ "key": "q", "value": "", "description": "Search company/address/city/director/pic.", "disabled": true },
+								{ "key": "sort_by", "value": "created_at", "description": "company, status, active, created_at.", "disabled": true },
+								{ "key": "sort_desc", "value": "1", "disabled": true },
+								{ "key": "page", "value": "1", "disabled": true },
+								{ "key": "limit", "value": "20", "disabled": true }
+							]
+						},
+						"description": "Get paginated client list with default settings (sorted by created_at desc, 20 per page)."
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"header": [{ "key": "Content-Type", "value": "application/json" }],
+							"body": "{\n    \"status\": \"2000600\",\n    \"message\": \"Success\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"company\": \"PT Example Corp\",\n            \"address\": \"Jl. Example No. 1\",\n            \"city\": \"Jakarta\",\n            \"director\": \"John Doe\",\n            \"pic\": \"Jane Doe\",\n            \"phone\": \"+62812345678\",\n            \"status\": 1,\n            \"active\": true,\n            \"is_proposal\": false,\n            \"social_media\": { \"website\": \"https://example.com\" },\n            \"services\": [ { \"id\": 1, \"label\": \"Company Profile\" } ],\n            \"category\": { \"id\": 1, \"name\": \"Retail\" },\n            \"created_at\": \"2026-01-15T00:00:00+00:00\"\n        }\n    ],\n    \"meta\": {\n        \"current_page\": 1,\n        \"last_page\": 1,\n        \"per_page\": 20,\n        \"total\": 1\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "List (Filtered by Category & Services)",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": {
+							"raw": "{{base_url}}/api/pm/client/list?client_category_id=1&services[]=1&services[]=2",
+							"host": ["{{base_url}}"],
+							"path": ["api", "pm", "client", "list"],
+							"query": [
+								{ "key": "client_category_id", "value": "1" },
+								{ "key": "services[]", "value": "1" },
+								{ "key": "services[]", "value": "2" }
+							]
+						},
+						"description": "Get clients in category 1 that use service 1 or 2."
+					},
+					"response": []
+				},
+				{
+					"name": "Detail",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": {
+							"raw": "{{base_url}}/api/pm/client/{{client_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "pm", "client", "{{client_id}}"]
+						},
+						"description": "Get a single client's detail, including resolved category and service labels."
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"header": [{ "key": "Content-Type", "value": "application/json" }],
+							"body": "{\n    \"status\": \"2000700\",\n    \"message\": \"Success\",\n    \"data\": {\n        \"id\": 1,\n        \"company\": \"PT Example Corp\",\n        \"address\": \"Jl. Example No. 1\",\n        \"city\": \"Jakarta\",\n        \"director\": \"John Doe\",\n        \"pic\": \"Jane Doe\",\n        \"phone\": \"+62812345678\",\n        \"status\": 1,\n        \"active\": true,\n        \"is_proposal\": false,\n        \"social_media\": { \"website\": \"https://example.com\" },\n        \"services\": [ { \"id\": 1, \"label\": \"Company Profile\" } ],\n        \"category\": { \"id\": 1, \"name\": \"Retail\" },\n        \"created_at\": \"2026-01-15T00:00:00+00:00\"\n    }\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Client Categories",
+			"description": "Client category list endpoint.",
+			"item": [
+				{
+					"name": "List",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": {
+							"raw": "{{base_url}}/api/pm/client-category/list",
+							"host": ["{{base_url}}"],
+							"path": ["api", "pm", "client-category", "list"],
+							"query": [
+								{ "key": "q", "value": "", "description": "Search by category name.", "disabled": true },
+								{ "key": "page", "value": "1", "disabled": true },
+								{ "key": "limit", "value": "20", "disabled": true }
+							]
+						},
+						"description": "Get paginated client category list."
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"header": [{ "key": "Content-Type", "value": "application/json" }],
+							"body": "{\n    \"status\": \"2000800\",\n    \"message\": \"Success\",\n    \"data\": [\n        { \"id\": 1, \"name\": \"Retail\", \"description\": null, \"created_at\": \"2026-01-15T00:00:00+00:00\" }\n    ],\n    \"meta\": {\n        \"current_page\": 1,\n        \"last_page\": 1,\n        \"per_page\": 20,\n        \"total\": 1\n    }\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Services",
+			"description": "Static service enum list endpoint.",
+			"item": [
+				{
+					"name": "List",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": {
+							"raw": "{{base_url}}/api/pm/service/list",
+							"host": ["{{base_url}}"],
+							"path": ["api", "pm", "service", "list"]
+						},
+						"description": "Get the static list of all available services (id + label)."
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"header": [{ "key": "Content-Type", "value": "application/json" }],
+							"body": "{\n    \"status\": \"2000900\",\n    \"message\": \"Success\",\n    \"data\": [\n        { \"id\": 1, \"label\": \"Company Profile\" },\n        { \"id\": 2, \"label\": \"Web Application\" },\n        { \"id\": 3, \"label\": \"Hosting\" },\n        { \"id\": 4, \"label\": \"Domain\" },\n        { \"id\": 5, \"label\": \"Maintenance\" },\n        { \"id\": 6, \"label\": \"Digital Marketing\" },\n        { \"id\": 7, \"label\": \"4vm Studio\" },\n        { \"id\": 8, \"label\": \"CCTV\" }\n    ]\n}"
+						}
+					]
+				}
+			]
+		}
+	]
+}

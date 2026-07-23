@@ -71,6 +71,37 @@ All endpoints require authentication via `auth:sanctum` and the `pm.report.invoi
 
 A Postman collection (`postman/PM_Invoice_API.postman_collection.json`) and environment (`postman/PM_Invoice_API.postman_environment.json`) are included for easy testing.
 
+### Client REST API
+Read-only API endpoints for external integrations needing client data and its related lookups:
+
+| Endpoint | Description |
+|----------|--------------|
+| `GET /api/pm/client/list` | Paginated client list with filters (category, status, active, services, search) and sorting |
+| `GET /api/pm/client/{id}` | Client detail, including resolved category and service labels |
+| `GET /api/pm/client-category/list` | Paginated client category list with name search |
+| `GET /api/pm/service/list` | Static list of all available services (id + label), backed by the `Services` enum |
+
+**List filters (`/client/list`):**
+
+| Parameter | Description |
+|-----------|--------------|
+| `client_category_id` | Filter by client category ID |
+| `status` | `0` = prospect, `1` = active |
+| `active` | Boolean — client's active flag |
+| `services[]` | Array of service IDs — any-match |
+| `q` | Search across company, address, city, director, pic |
+| `sort_by` | `company`, `status`, `active`, or `created_at` (default: `created_at`) |
+| `sort_desc` | `1` = descending (default), `0` = ascending |
+| `page`, `limit` | Pagination (`limit` max 100, default 20) |
+
+All endpoints require authentication via `auth:sanctum` and the `pm.client.read` permission. Supports the same two authentication methods as the Invoice API (permanent H2H tokens or login flow).
+
+A Postman collection (`postman/PM_Client_API.postman_collection.json`) and environment (`postman/PM_Client_API.postman_environment.json`) are included for easy testing. A standalone smoke-test script is also available at `scripts/test-client-api.php` (plain PHP + `ext-curl`, no framework bootstrap required) — authenticate with a permanent API token (Auth > API Users) and run it against a live instance with:
+
+```bash
+php scripts/test-client-api.php '1|your-permanent-token' http://localhost:8000
+```
+
 ### API Request Logging
 - All API requests/responses are logged via the `pm.api.logger` terminable middleware
 - Logs stored in `api_logs` table: user, method, URL, route, headers, input, IP, user agent, status code, response body, duration

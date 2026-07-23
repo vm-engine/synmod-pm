@@ -7,6 +7,7 @@ use Livewire\Livewire;
 use VmEngine\Pm\Models\BankAccount;
 use VmEngine\Pm\Models\DocumentIssuer;
 use VmEngine\Pm\Models\Project;
+use VmEngine\Pm\Models\ProjectDocument;
 use VmEngine\Pm\Models\ProjectInvoice;
 use VmEngine\Pm\Models\ProjectInvoiceItem;
 
@@ -21,7 +22,7 @@ beforeEach(function () {
 
 it('stores an invoice with a chosen currency', function () {
     $project = Project::factory()->create();
-    $spk = \VmEngine\Pm\Models\ProjectDocument::factory()->create(['project_id' => $project->id]);
+    $spk = ProjectDocument::factory()->create(['project_id' => $project->id]);
 
     Livewire::test('pm::project.invoice-form')
         ->call('createInvoice', $project->id)

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Services;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -161,6 +162,56 @@ class ClientService
                 'pm',
             );
         });
+    }
+
+    /**
+     * Get paginated client list with filters.
+     *
+     * @param  array<string, mixed>  $filters
+     */
+    public function getClientList(array $filters): LengthAwarePaginator
+    {
+        $allowedSortColumns = ['company', 'status', 'active', 'created_at'];
+
+        $categoryId = $filters['client_category_id'] ?? null;
+        $status = isset($filters['status']) ? (string) $filters['status'] : null;
+        $active = $filters['active'] ?? null;
+        $services = $filters['services'] ?? [];
+        $q = isset($filters['q']) ? trim((string) $filters['q']) : null;
+        $sortBy = $filters['sort_by'] ?? 'created_at';
+        $sortDesc = $filters['sort_desc'] ?? true;
+        $limit = min((int) ($filters['limit'] ?? 20), 100);
+
+        if (! in_array($sortBy, $allowedSortColumns, true)) {
+            $sortBy = 'created_at';
+        }
+
+        $query = Client::query();
+
+        if ($categoryId !== null) {
+            $query->where('client_category_id', (int) $categoryId);
+        }
+
+        if ($status !== null && $status !== '') {
+            $query->where('status', (int) $status);
+        }
+
+        if ($active !== null && $active !== '') {
+            $query->where('active', filter_var($active, FILTER_VALIDATE_BOOLEAN));
+        }
+
+        if (! empty($services)) {
+            $query->byServiceAny(array_map('intval', (array) $services));
+        }
+
+        if ($q !== null && $q !== '') {
+            $query->search($q);
+        }
+
+        $query->with(['category:id,name'])
+            ->orderBy($sortBy, $sortDesc ? 'desc' : 'asc');
+
+        return $query->paginate($limit);
     }
 
     /**

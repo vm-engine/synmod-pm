@@ -10,6 +10,7 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 use VmEngine\Pm\Models\ProjectInvoice;
 use VmEngine\Pm\Models\ProjectInvoiceItem;
+use VmEngine\Pm\Services\CurrencyFormatter;
 use VmEngine\Pm\Services\InvoiceConversionService;
 use VmEngine\Pm\Services\InvoicePdfService;
 use VmEngine\SynAuth\Facades\SynAuth;
@@ -116,9 +117,9 @@ new class extends Component
         }
     }
 
-    private function currencyFormatter(): \VmEngine\Pm\Services\CurrencyFormatter
+    private function currencyFormatter(): CurrencyFormatter
     {
-        return app(\VmEngine\Pm\Services\CurrencyFormatter::class);
+        return app(CurrencyFormatter::class);
     }
 
     private function isTaxable(): bool

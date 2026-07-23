@@ -12,6 +12,7 @@ use VmEngine\Pm\Models\DocumentIssuer;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Pm\Models\ProjectInvoice;
 use VmEngine\Pm\Models\Signature;
+use VmEngine\Pm\Services\CurrencyFormatter;
 
 new class extends Component
 {
@@ -92,7 +93,7 @@ new class extends Component
     #[Computed]
     public function currencyOptions(): array
     {
-        return app(\VmEngine\Pm\Services\CurrencyFormatter::class)->options();
+        return app(CurrencyFormatter::class)->options();
     }
 
     #[Computed]

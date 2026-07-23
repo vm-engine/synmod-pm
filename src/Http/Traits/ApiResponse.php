@@ -19,6 +19,14 @@ trait ApiResponse
 
     protected const SERVICE_INVOICE_LIST = '05';
 
+    protected const SERVICE_CLIENT_LIST = '06';
+
+    protected const SERVICE_CLIENT_DETAIL = '07';
+
+    protected const SERVICE_CLIENT_CATEGORY_LIST = '08';
+
+    protected const SERVICE_SERVICE_LIST = '09';
+
     /** Response codes */
     protected const RESPONSE_SUCCESS = '00';
 

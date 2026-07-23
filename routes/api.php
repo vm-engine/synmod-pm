@@ -3,7 +3,10 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
+use VmEngine\Pm\Http\Controllers\Api\ClientApiController;
+use VmEngine\Pm\Http\Controllers\Api\ClientCategoryApiController;
 use VmEngine\Pm\Http\Controllers\Api\InvoiceApiController;
+use VmEngine\Pm\Http\Controllers\Api\ServiceApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,4 +36,27 @@ Route::middleware([
         Route::get('/by-project-category', [InvoiceApiController::class, 'byProjectCategory'])->name('invoice.by-project-category');
         Route::get('/by-month', [InvoiceApiController::class, 'byMonth'])->name('invoice.by-month');
         Route::get('/list', [InvoiceApiController::class, 'list'])->name('invoice.list');
+    });
+
+Route::middleware([
+    'auth:sanctum',
+    'api.auth',
+    'api.token.expiry',
+    'api.permission:pm.client.read',
+    'throttle:api',
+    'pm.api.logger',
+])
+    ->group(function () {
+        Route::prefix('client')->group(function () {
+            Route::get('/list', [ClientApiController::class, 'list'])->name('client.list');
+            Route::get('/{id}', [ClientApiController::class, 'show'])->name('client.show');
+        });
+
+        Route::prefix('client-category')->group(function () {
+            Route::get('/list', [ClientCategoryApiController::class, 'list'])->name('client-category.list');
+        });
+
+        Route::prefix('service')->group(function () {
+            Route::get('/list', [ServiceApiController::class, 'list'])->name('service.list');
+        });
     });

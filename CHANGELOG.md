@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased] - 2026-07-10
+## [0.8.9] - 2026-07-23
 
 ### Added
 - **Multi-currency invoices**: `currency` field on invoices (IDR/USD, configurable), currency-locked once items exist, external SPK entry with free-text SPK number.
@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - Bilingual (Indonesian/English) invoice and receipt PDFs, each generated and stored separately; `?lang=en` query param on download/print routes selects the language.
 - Bank account SWIFT code field, with bank-name autocomplete suggestions on the form.
 - `CurrencyFormatter` service (symbol/decimal formatting, currency name lookup) and `InvoiceConversionService` (exchange-rate normalization and conversion).
+- **Client REST API**: read-only endpoints for external integrations — `GET /api/pm/client/list` (paginated, filterable by category/status/active/services, searchable, sortable), `GET /api/pm/client/{id}` (detail with resolved category and service labels), `GET /api/pm/client-category/list`, and `GET /api/pm/service/list` (static `Services` enum list). Gated by the existing `pm.client.read` permission via the same `auth:sanctum` + `api.auth` + `api.token.expiry` + `throttle:api` + `pm.api.logger` middleware stack as the Invoice API. Includes a Postman collection/environment (`postman/PM_Client_API.postman_collection.json`) and a standalone PHP smoke-test script (`scripts/test-client-api.php`) that authenticates with a permanent API token and prints each request's response body alongside its pass/fail result.
 
 ### Fixed
 - Receipt amount-in-words ("Terbilang") now reflects the invoice's actual currency (e.g. "One Hundred Dollars" for a USD invoice) and the active language, instead of always saying "...Rupiah" in Indonesian regardless of currency or locale.
@@ -18,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - Invoice list dropdown menu positioning: removed incorrect scroll-offset math for the `position:fixed` menu and replaced a hardcoded height guess with the actual measured element height.
 - Click-outside handling on `adv-select` and several hand-rolled dropdowns (exchange-rate lock, receipt/invoice-detail menus) now closes reliably even from inside a modal.
 - Invoice item `amount` now casts to `decimal:2` consistently.
+- `ClientApiController::show()` no longer relies on implicit route-model binding — a missing or non-numeric client ID now returns a clean `404` JSON error instead of leaking a framework stack trace when `APP_DEBUG` is enabled.
 
 ## [0.8.8] - 2026-05-21
 
