@@ -10,7 +10,6 @@ use VmEngine\Pm\Enums\ProjectPriority;
 use VmEngine\Pm\Enums\ProjectStatus;
 use VmEngine\Pm\Enums\RiskLevel;
 use VmEngine\Pm\Enums\SalesSources;
-use VmEngine\Pm\Enums\Services;
 use VmEngine\Pm\Form\ProjectFormObject;
 use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\Division;
@@ -182,15 +181,6 @@ new class extends Component
         }
 
         return null;
-    }
-
-    #[Computed()]
-    public function services(): array
-    {
-        return collect(Services::cases())->map(fn ($s) => [
-            'value' => $s->value,
-            'label' => $s->label(),
-        ])->toArray();
     }
 
     #[Computed()]

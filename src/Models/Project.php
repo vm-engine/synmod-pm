@@ -221,6 +221,18 @@ class Project extends Model
     }
 
     /**
+     * Scope a query to filter by project category (ANY match).
+     */
+    public function scopeByProjectCategoryAny(Builder $query, array $categoryIds): Builder
+    {
+        if (empty($categoryIds)) {
+            return $query;
+        }
+
+        return $query->whereIn('project_category_id', $categoryIds);
+    }
+
+    /**
      * Get overdue projects.
      */
     public function scopeOverdue(Builder $query): Builder

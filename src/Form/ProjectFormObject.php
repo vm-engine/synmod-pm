@@ -11,7 +11,6 @@ use VmEngine\Pm\Enums\ProjectPriority;
 use VmEngine\Pm\Enums\ProjectStatus;
 use VmEngine\Pm\Enums\RiskLevel;
 use VmEngine\Pm\Enums\SalesSources;
-use VmEngine\Pm\Enums\Services;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Pm\Services\ProjectService;
 
@@ -35,7 +34,7 @@ class ProjectFormObject extends Form
     public ?int $client_id = null;
 
     // Services & Sales
-    public array $services = [];
+    // public array $services = [];
 
     public ?int $source_of_sales = null;
 
@@ -123,7 +122,7 @@ class ProjectFormObject extends Form
         $this->client_id = $project->client_id;
 
         // Services & Sales
-        $this->services = $project->services ?? [];
+        // $this->services = $project->services ?? [];
         $this->source_of_sales = $project->source_of_sales?->value;
 
         // Financial - format for display with 2 decimals (will be cleaned on update/save)
@@ -206,8 +205,8 @@ class ProjectFormObject extends Form
             'client_id' => 'required|exists:clients,id',
 
             // Services & Sales
-            'services' => 'nullable|array',
-            'services.*' => ['integer', Rule::enum(Services::class)],
+            // 'services' => 'nullable|array',
+            // 'services.*' => ['integer', Rule::enum(Services::class)],
             'source_of_sales' => ['nullable', 'integer', Rule::enum(SalesSources::class)],
 
             // Financial
@@ -325,7 +324,7 @@ class ProjectFormObject extends Form
             'description' => $this->description,
             'year' => $this->year ?: (int) date('Y'),
             'sub_division' => $this->sub_division,
-            'services' => $this->services,
+            // 'services' => $this->services,
             'source_of_sales' => $this->source_of_sales ?? SalesSources::WEB->value,
             'nominal' => $this->nominal ?: null,
             'budget' => $this->budget ?: null,

@@ -22,6 +22,7 @@ new class extends Component
         try {
             $this->project = Project::with([
                 'division',
+                'projectCategory',
                 'client',
                 'user',
                 'projectManager',

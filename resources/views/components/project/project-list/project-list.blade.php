@@ -366,14 +366,14 @@
 
             <div>
                 <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {{ __('pm::project.filter_services') }}
+                    {{ __('pm::project.filter_project_category') }}
                 </label>
                 <x-synapse-adv-select
-                    wire-model="filterServices"
+                    wire-model="filterProjectCategories"
                     :live="true"
-                    :options="$this->services"
+                    :options="$this->projectCategories"
                     :multiple="true"
-                    placeholder="{{ __('pm::project.all_divisions') }}"
+                    placeholder="{{ __('pm::project.all_project_categories') }}"
                 />
             </div>
 

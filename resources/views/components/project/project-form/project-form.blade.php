@@ -83,15 +83,18 @@
                         @enderror
                     </div>
 
-                    @if($form->division_id)
-                        <div class="form-box" wire:key="sub-division-{{ $form->division_id }}">
+                    @if ($form->division_id)
+                        <div
+                            class="form-box"
+                            wire:key="sub-division-{{ $form->division_id }}"
+                        >
                             <label for="sub_division">{{ __('pm::project.sub_division') }}</label>
 
                             {{-- Debug info (remove after testing) --}}
                             <div class="mb-2 text-xs text-gray-600">
                                 Division ID: {{ $form->division_id }} |
                                 Sub-divisions count: {{ count($this->subDivisions) }}
-                                @if(count($this->subDivisions) === 0)
+                                @if (count($this->subDivisions) === 0)
                                     <span class="text-red-600">(No sub-divisions found for this division)</span>
                                 @endif
                             </div>
@@ -170,6 +173,7 @@
                         @enderror
                     </div>
 
+                    {{-- Services field removed — superseded by project_category_id
                     <div class="form-box">
                         <label for="services">{{ __('pm::project.services') }}</label>
                         <x-synapse-adv-select
@@ -183,6 +187,7 @@
                             <p class="form-error-message">{{ $message }}</p>
                         @enderror
                     </div>
+                    --}}
 
                     <div class="form-box">
                         <label for="source_of_sales">{{ __('pm::project.source_of_sales') }}</label>
@@ -644,8 +649,14 @@
             wire:loading.attr="disabled"
             wire:target="save"
         >
-            <span wire:loading.remove wire:target="save">{{ __('pm::project.save') }}</span>
-            <span wire:loading wire:target="save">
+            <span
+                wire:loading.remove
+                wire:target="save"
+            >{{ __('pm::project.save') }}</span>
+            <span
+                wire:loading
+                wire:target="save"
+            >
                 <span class="fa-solid fa-spinner fa-spin mr-1"></span>
                 {{ __('pm::project.save') }}
             </span>

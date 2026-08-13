@@ -162,26 +162,8 @@
                             </div>
                             <div class="flex justify-between">
                                 <dt class="font-medium text-gray-600 dark:text-gray-400">
-                                    {{ __('pm::project.services') }}:</dt>
-                                <dd>
-                                    <div class="flex flex-wrap gap-1">
-                                        @if (!empty($project->services))
-                                            @foreach ($project->services as $serviceId)
-                                                @php
-                                                    $service = \VmEngine\Pm\Enums\Services::tryFrom($serviceId);
-                                                @endphp
-                                                @if ($service)
-                                                    <span
-                                                        class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
-                                                    >
-                                                        {{ $service->label() }}
-                                                    </span>
-                                                @endif
-                                            @endforeach
-                                        @else
-                                            <span class="text-gray-400">-</span>
-                                        @endif
-                                    </div>
+                                    {{ __('pm::project.project_category') }}:</dt>
+                                <dd class="text-gray-900 dark:text-white">{{ $project->projectCategory?->name ?? '-' }}
                                 </dd>
                             </div>
                             <div class="flex justify-between">
@@ -371,17 +353,26 @@
 
         <!-- Timeline Tab -->
         <div x-show="activeTab === 'timeline'">
-            <livewire:pm::project.activity :projectId="$project->id" :key="'activity-' . $project->id . '-' . now()" />
+            <livewire:pm::project.activity
+                :projectId="$project->id"
+                :key="'activity-' . $project->id . '-' . now()"
+            />
         </div>
 
         <!-- Documents Tab -->
         <div x-show="activeTab === 'documents'">
-            <livewire:pm::project.document-manager :project="$project" :key="'document-manager-' . $project->id . '-' . now()" />
+            <livewire:pm::project.document-manager
+                :project="$project"
+                :key="'document-manager-' . $project->id . '-' . now()"
+            />
         </div>
 
         <!-- Invoices Tab -->
         <div x-show="activeTab === 'invoices'">
-            <livewire:pm::project.invoice-list :projectId="$project->id" :key="'invoice-list-' . $project->id . '-' . now()" />
+            <livewire:pm::project.invoice-list
+                :projectId="$project->id"
+                :key="'invoice-list-' . $project->id . '-' . now()"
+            />
         </div>
 
         <!-- Financial Tab -->
