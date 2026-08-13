@@ -35,14 +35,14 @@ return [
     'col_company' => 'Company',
     'col_category' => 'Category',
     'col_pic' => 'PIC',
-    'col_services' => 'Services',
+    'col_project_categories' => 'Project Categories',
     'col_status' => 'Status',
     'col_active' => 'Active',
     'col_actions' => 'Actions',
 
     // Placeholders
     'search_placeholder' => 'Search by company, address, city, director, PIC...',
-    'select_services' => 'Select services',
+    'select_project_categories' => 'Select project categories',
     'select_categories' => 'Select categories',
     'social_media_placeholder' => 'Enter social media URLs, one per line',
     'social_media_help' => 'Enter one URL per line (e.g., Facebook, Instagram, LinkedIn URLs)',
@@ -56,7 +56,7 @@ return [
 
     // Filter labels
     'filter_category' => 'Client Category',
-    'filter_services' => 'Services',
+    'filter_project_categories' => 'Project Categories',
     'filter_status' => 'Status',
     'filter_active_status' => 'Active Status',
     'all' => '-- All --',
@@ -76,6 +76,7 @@ return [
     // Tooltips
     'tooltip_filter_category' => 'Click to filter by this category',
     'tooltip_filter_service' => 'Click to filter by this service',
+    'tooltip_project_category' => 'Project category',
     'tooltip_edit' => 'Edit',
     'tooltip_delete' => 'Delete',
 ];

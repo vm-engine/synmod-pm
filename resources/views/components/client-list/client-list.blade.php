@@ -69,7 +69,7 @@
                                     <p>{{ __('pm::client.col_pic') }}</p>
                                 </th>
                                 <th>
-                                    <p>{{ __('pm::client.col_services') }}</p>
+                                    <p>{{ __('pm::client.col_project_categories') }}</p>
                                 </th>
                                 <th>
                                     <p>{{ __('pm::client.col_status') }}</p>
@@ -146,7 +146,7 @@
                                                     <button
                                                         class="inline-flex cursor-pointer items-center gap-1 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700 transition-colors dark:bg-blue-900/30 dark:text-blue-300"
                                                         type="button"
-                                                        title="{{ __('pm::client.tooltip_filter_service') }}"
+                                                        title="{{ __('pm::client.tooltip_project_category') }}"
                                                     >
                                                         <span>{{ $category->name }}</span>
                                                     </button>
@@ -271,14 +271,15 @@
 
             <div>
                 <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {{ __('pm::client.filter_services') }}
+                    {{ __('pm::client.filter_project_categories') }}
                 </label>
                 <x-synapse-adv-select
-                    wire-model="filterServices"
+                    wire-model="filterProjectCategories"
                     :live="true"
-                    :options="$this->services"
+                    :options="$this->projectCategories"
                     :multiple="true"
-                    placeholder="{{ __('pm::client.select_services') }}"
+                    :preload="$filterProjectCategories"
+                    placeholder="{{ __('pm::client.select_project_categories') }}"
                 />
             </div>
 

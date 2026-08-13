@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
 use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\ClientCategory;
+use VmEngine\Pm\Models\Project;
+use VmEngine\Pm\Models\ProjectCategory;
 use VmEngine\SynAuth\Http\Middleware\Api\ValidateClientToken;
 use VmEngine\SynAuth\Models\ApiToken;
 use VmEngine\SynAuth\Models\Role;
@@ -149,6 +151,25 @@ test('list filters by services any-match', function () {
     Client::factory()->create(['services' => [1, 3]]);
 
     $response = clientApiGet('/list?services[]=1');
+
+    $response->assertSuccessful();
+    expect($response->json('meta.total'))->toBe(2);
+});
+
+test('list filters by project_category any-match', function () {
+    $categoryA = ProjectCategory::factory()->create();
+    $categoryB = ProjectCategory::factory()->create();
+
+    $clientA = Client::factory()->create();
+    Project::factory()->create(['client_id' => $clientA->id, 'project_category_id' => $categoryA->id]);
+
+    $clientB = Client::factory()->create();
+    Project::factory()->create(['client_id' => $clientB->id, 'project_category_id' => $categoryB->id]);
+
+    $clientC = Client::factory()->create();
+    Project::factory()->create(['client_id' => $clientC->id, 'project_category_id' => $categoryA->id]);
+
+    $response = clientApiGet('/list?project_category[]='.$categoryA->id);
 
     $response->assertSuccessful();
     expect($response->json('meta.total'))->toBe(2);

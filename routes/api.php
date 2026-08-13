@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use VmEngine\Pm\Http\Controllers\Api\ClientApiController;
 use VmEngine\Pm\Http\Controllers\Api\ClientCategoryApiController;
 use VmEngine\Pm\Http\Controllers\Api\InvoiceApiController;
+use VmEngine\Pm\Http\Controllers\Api\ProjectCategoryApiController;
 use VmEngine\Pm\Http\Controllers\Api\ServiceApiController;
 
 /*
@@ -59,4 +60,17 @@ Route::middleware([
         Route::prefix('service')->group(function () {
             Route::get('/list', [ServiceApiController::class, 'list'])->name('service.list');
         });
+    });
+
+Route::middleware([
+    'auth:sanctum',
+    'api.auth',
+    'api.token.expiry',
+    'api.permission:pm.master.project_category.read',
+    'throttle:api',
+    'pm.api.logger',
+])
+    ->prefix('project-category')
+    ->group(function () {
+        Route::get('/list', [ProjectCategoryApiController::class, 'list'])->name('project-category.list');
     });

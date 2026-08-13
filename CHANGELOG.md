@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+- New unpaginated `GET /api/pm/project-category/list` API endpoint (search by name/code, permission `pm.master.project_category.read`).
+- `project_category` filter param on the Client API list endpoint (`GET /api/pm/client/list`), additive to the existing `services` filter.
+- `Client::byProjectCategoryAny()` query scope.
+
+### Changed
+- Internal client list UI (advanced-filter drawer, table column, filter state) now filters/displays by project category instead of the legacy `services` field. The `services` DB column, model casts/fillable, and `Services` enum are untouched — this is a UI-level migration, not a removal.
+
 ## [0.8.9] - 2026-07-23
 
 ### Added

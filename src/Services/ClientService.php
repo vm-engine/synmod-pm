@@ -177,6 +177,7 @@ class ClientService
         $status = isset($filters['status']) ? (string) $filters['status'] : null;
         $active = $filters['active'] ?? null;
         $services = $filters['services'] ?? [];
+        $projectCategories = $filters['project_category'] ?? [];
         $q = isset($filters['q']) ? trim((string) $filters['q']) : null;
         $sortBy = $filters['sort_by'] ?? 'created_at';
         $sortDesc = $filters['sort_desc'] ?? true;
@@ -202,6 +203,10 @@ class ClientService
 
         if (! empty($services)) {
             $query->byServiceAny(array_map('intval', (array) $services));
+        }
+
+        if (! empty($projectCategories)) {
+            $query->byProjectCategoryAny(array_map('intval', (array) $projectCategories));
         }
 
         if ($q !== null && $q !== '') {

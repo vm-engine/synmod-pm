@@ -30,6 +30,8 @@ class ClientApiController extends Controller
             'active' => 'nullable|boolean',
             'services' => 'nullable|array',
             'services.*' => 'integer',
+            'project_category' => 'nullable|array',
+            'project_category.*' => 'integer|exists:project_categories,id',
             'sort_by' => 'nullable|string|in:company,status,active,created_at',
             'sort_desc' => 'nullable|boolean',
             'page' => 'nullable|integer|min:1',
@@ -42,7 +44,7 @@ class ClientApiController extends Controller
         }
 
         $filters = $request->only([
-            'client_category_id', 'status', 'active', 'services',
+            'client_category_id', 'status', 'active', 'services', 'project_category',
             'sort_by', 'sort_desc', 'limit', 'q',
         ]);
 

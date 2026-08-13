@@ -8,9 +8,9 @@ use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
-use VmEngine\Pm\Enums\Services;
 use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\ClientCategory;
+use VmEngine\Pm\Models\ProjectCategory;
 use VmEngine\Pm\Services\ClientService;
 use VmEngine\Synapse\Services\Helper\Breadcrumbs;
 use VmEngine\Synapse\Traits\RemembersQueryParams;
@@ -27,7 +27,7 @@ new class extends Component
     public array $filterCategories = [];
 
     #[Url()]
-    public array $filterServices = [];
+    public array $filterProjectCategories = [];
 
     #[Url()]
     public string $filterStatus = '';
@@ -48,7 +48,7 @@ new class extends Component
 
     protected function rememberedParams(): array
     {
-        return ['q', 'filterCategories', 'filterServices', 'filterStatus', 'filterActive', 'limit', 'sort', 'sortDirection'];
+        return ['q', 'filterCategories', 'filterProjectCategories', 'filterStatus', 'filterActive', 'limit', 'sort', 'sortDirection'];
     }
 
     protected function rememberKey(): string
@@ -101,10 +101,10 @@ new class extends Component
         $this->resetPage();
     }
 
-    public function updatedFilterServices($value): void
+    public function updatedFilterProjectCategories($value): void
     {
         if (empty($value)) {
-            $this->filterServices = [];
+            $this->filterProjectCategories = [];
         }
         $this->resetPage();
     }
@@ -133,12 +133,12 @@ new class extends Component
         $this->resetPage();
     }
 
-    public function filterByService($serviceId): void
+    public function filterByProjectCategory($categoryId): void
     {
-        if (in_array($serviceId, $this->filterServices)) {
-            $this->filterServices = array_values(array_diff($this->filterServices, [$serviceId]));
+        if (in_array($categoryId, $this->filterProjectCategories)) {
+            $this->filterProjectCategories = array_values(array_diff($this->filterProjectCategories, [$categoryId]));
         } else {
-            $this->filterServices[] = $serviceId;
+            $this->filterProjectCategories[] = $categoryId;
         }
         $this->resetPage();
     }
@@ -207,8 +207,8 @@ new class extends Component
             $query->whereIn('client_category_id', $this->filterCategories);
         }
 
-        if (! empty($this->filterServices)) {
-            $query->byServiceAny($this->filterServices);
+        if (! empty($this->filterProjectCategories)) {
+            $query->byProjectCategoryAny($this->filterProjectCategories);
         }
 
         if ($this->filterStatus === 'prospect') {
@@ -236,12 +236,9 @@ new class extends Component
     }
 
     #[Computed()]
-    public function services(): array
+    public function projectCategories(): array
     {
-        return collect(Services::cases())->map(fn ($s) => [
-            'value' => $s->value,
-            'label' => $s->label(),
-        ])->toArray();
+        return ProjectCategory::orderBy('name')->select('id as value', 'name as label')->get()->toArray();
     }
 
     #[Computed()]

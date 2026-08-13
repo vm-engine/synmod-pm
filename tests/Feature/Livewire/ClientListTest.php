@@ -6,6 +6,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\ClientCategory;
+use VmEngine\Pm\Models\Project;
+use VmEngine\Pm\Models\ProjectCategory;
 
 uses(RefreshDatabase::class);
 
@@ -94,12 +96,18 @@ test('can filter by multiple categories', function () {
         ->assertDontSee('Company C');
 });
 
-test('can filter by services', function () {
-    Client::factory()->create(['company' => 'Web Dev Co', 'services' => [1, 2]]);
-    Client::factory()->create(['company' => 'Mobile App Co', 'services' => [3, 4]]);
+test('can filter by project category', function () {
+    $webCategory = ProjectCategory::factory()->create();
+    $mobileCategory = ProjectCategory::factory()->create();
+
+    $webClient = Client::factory()->create(['company' => 'Web Dev Co']);
+    Project::factory()->create(['client_id' => $webClient->id, 'project_category_id' => $webCategory->id]);
+
+    $mobileClient = Client::factory()->create(['company' => 'Mobile App Co']);
+    Project::factory()->create(['client_id' => $mobileClient->id, 'project_category_id' => $mobileCategory->id]);
 
     Livewire::test('pm::client-list')
-        ->set('filterServices', [1])
+        ->set('filterProjectCategories', [$webCategory->id])
         ->assertSee('Web Dev Co')
         ->assertDontSee('Mobile App Co');
 });
@@ -146,32 +154,34 @@ test('can filter by inactive flag', function () {
 
 test('can combine multiple filters', function () {
     $category = ClientCategory::factory()->create();
+    $projectCategory = ProjectCategory::factory()->create();
+    $otherProjectCategory = ProjectCategory::factory()->create();
 
-    Client::factory()->prospect()->create([
+    $matchClient = Client::factory()->prospect()->create([
         'company' => 'Match',
         'client_category_id' => $category->id,
-        'services' => [1],
     ]);
+    Project::factory()->create(['client_id' => $matchClient->id, 'project_category_id' => $projectCategory->id]);
 
-    Client::factory()->active()->create([
+    $wrongStatusClient = Client::factory()->active()->create([
         'company' => 'No Match - Different Status',
         'client_category_id' => $category->id,
-        'services' => [1],
     ]);
+    Project::factory()->create(['client_id' => $wrongStatusClient->id, 'project_category_id' => $projectCategory->id]);
 
-    Client::factory()->prospect()->create([
-        'company' => 'No Match - Different Services',
+    $wrongCategoryClient = Client::factory()->prospect()->create([
+        'company' => 'No Match - Different Project Category',
         'client_category_id' => $category->id,
-        'services' => [2],
     ]);
+    Project::factory()->create(['client_id' => $wrongCategoryClient->id, 'project_category_id' => $otherProjectCategory->id]);
 
     Livewire::test('pm::client-list')
         ->set('filterCategories', [$category->id])
-        ->set('filterServices', [1])
+        ->set('filterProjectCategories', [$projectCategory->id])
         ->set('filterStatus', 'prospect')
         ->assertSee('Match')
         ->assertDontSee('No Match - Different Status')
-        ->assertDontSee('No Match - Different Services');
+        ->assertDontSee('No Match - Different Project Category');
 });
 
 test('can sort by column', function () {
@@ -205,12 +215,14 @@ test('can toggle category filter', function () {
         ->assertSet('filterCategories', []);
 });
 
-test('can toggle service filter', function () {
+test('can toggle project category filter', function () {
+    $category = ProjectCategory::factory()->create();
+
     Livewire::test('pm::client-list')
-        ->call('filterByService', 1)
-        ->assertSet('filterServices', [1])
-        ->call('filterByService', 1)
-        ->assertSet('filterServices', []);
+        ->call('filterByProjectCategory', $category->id)
+        ->assertSet('filterProjectCategories', [$category->id])
+        ->call('filterByProjectCategory', $category->id)
+        ->assertSet('filterProjectCategories', []);
 });
 
 test('can toggle client active status', function () {

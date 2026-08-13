@@ -186,6 +186,21 @@ class Client extends Model
         });
     }
 
+    /**
+     * Scope a query to filter by project category (ANY match).
+     */
+    #[Scope]
+    protected function byProjectCategoryAny(Builder $builder, array $categoryIds): void
+    {
+        if (empty($categoryIds)) {
+            return;
+        }
+
+        $builder->whereHas('projectCategories', function (Builder $q) use ($categoryIds) {
+            $q->whereIn('project_categories.id', $categoryIds);
+        });
+    }
+
     public function activate(): void
     {
         $this->status = self::STATUS_ACTIVE;

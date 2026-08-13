@@ -27,6 +27,8 @@ trait ApiResponse
 
     protected const SERVICE_SERVICE_LIST = '09';
 
+    protected const SERVICE_PROJECT_CATEGORY_LIST = '10';
+
     /** Response codes */
     protected const RESPONSE_SUCCESS = '00';
 
