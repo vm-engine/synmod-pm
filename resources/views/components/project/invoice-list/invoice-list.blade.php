@@ -23,7 +23,8 @@
                             <button
                                 class="btn primary"
                                 type="button"
-                                @click="$dispatch('open-modal-invoice-form'); $wire.dispatch('create-invoice', { projectId: {{ $projectId }} })"
+                                @click="$dispatch('open-modal-invoice-form')"
+                                wire:click="$dispatch('create-invoice', { projectId: {{ $projectId }} })"
                             >
                                 <span class="fa-solid fa-plus"></span>
                                 {{ __('pm::invoice.add_invoice') }}
@@ -224,14 +225,15 @@
                                     <td>
                                         <div
                                             class="flex items-center gap-1"
-                                            x-data="{ dropdownOpen: false }"
+                                            x-data="pmInvoiceDropdown()"
                                         >
                                             @if (!$invoice->archived)
                                                 @canAccess('pm.invoice.read')
                                                 <button
                                                     class="btn-icon info has-tooltip group"
                                                     type="button"
-                                                    @click="$dispatch('open-modal-invoice-detail'); $wire.dispatch('load-invoice-detail', { id: {{ $invoice->id }} })"
+                                                    @click="$dispatch('open-modal-invoice-detail')"
+                                                    wire:click="$dispatch('load-invoice-detail', { id: {{ $invoice->id }} })"
                                                 >
                                                     <span class="fa-solid fa-eye"></span>
                                                     <span class="tooltip">{{ __('pm::invoice.tooltip_detail') }}</span>
@@ -242,7 +244,8 @@
                                                 <button
                                                     class="btn-icon warning has-tooltip group"
                                                     type="button"
-                                                    @click="$dispatch('open-modal-invoice-form'); $wire.dispatch('load-invoice', { id: {{ $invoice->id }} })"
+                                                    @click="$dispatch('open-modal-invoice-form')"
+                                                    wire:click="$dispatch('load-invoice', { id: {{ $invoice->id }} })"
                                                 >
                                                     <span class="fa-solid fa-edit"></span>
                                                     <span class="tooltip">{{ __('pm::invoice.tooltip_edit') }}</span>
@@ -274,62 +277,13 @@
                                             <!-- Dropdown Menu -->
                                             <div
                                                 class="relative"
-                                                x-data="{
-                                                    dropdownPosition: { top: 0, left: 0 },
-                                                    updatePosition() {
-                                                        const btn = this.$refs.dropdownBtn;
-                                                        const menu = this.$refs.dropdownMenu;
-                                                        const rect = btn.getBoundingClientRect();
-                                                        // Measure the real menu height instead of guessing — item count
-                                                        // varies per invoice (receipts/download are conditional), so a
-                                                        // fixed approximation picks the wrong above/below branch and
-                                                        // overshoots the offset for shorter menus. Call this only after
-                                                        // $nextTick so x-show has already applied to the DOM.
-                                                        const menuHeight = menu.offsetHeight || 300;
-                                                        const menuWidth = 192; // w-48 = 12rem = 192px
-                                                        const viewportHeight = window.innerHeight;
-                                                        const viewportWidth = window.innerWidth;
-                                                
-                                                        // Check if there's enough space below
-                                                        const spaceBelow = viewportHeight - rect.bottom;
-                                                        const spaceAbove = rect.top;
-                                                
-                                                        // Position vertically (prefer below, use above if not enough space)
-                                                        // .icon-dropdown is position:fixed, so these are viewport-relative —
-                                                        // do NOT add window.scrollY/scrollX (that's only correct for
-                                                        // position:absolute, document-relative elements). Adding it here
-                                                        // offset the dropdown by the scroll distance, which grew with
-                                                        // page zoom and made the menu appear far from the trigger button.
-                                                        let top;
-                                                        if (spaceBelow >= menuHeight || spaceBelow > spaceAbove) {
-                                                            top = rect.bottom + 8;
-                                                        } else {
-                                                            top = rect.top - menuHeight - 8;
-                                                        }
-                                                
-                                                        // Position horizontally (align to right of button)
-                                                        let left = rect.right - menuWidth;
-                                                
-                                                        // Ensure dropdown doesn't go off the left edge
-                                                        if (left < 0) {
-                                                            left = 8;
-                                                        }
-                                                
-                                                        // Ensure dropdown doesn't go off the right edge
-                                                        if (left + menuWidth > viewportWidth) {
-                                                            left = viewportWidth - menuWidth - 8;
-                                                        }
-                                                
-                                                        this.dropdownPosition = { top, left };
-                                                    }
-                                                }"
                                                 @click.outside="dropdownOpen = false"
                                             >
                                                 <button
                                                     class="btn-icon secondary has-tooltip group"
                                                     type="button"
                                                     x-ref="dropdownBtn"
-                                                    @click="dropdownOpen = !dropdownOpen; if (dropdownOpen) { $nextTick(() => updatePosition()) }"
+                                                    @click="toggleDropdown()"
                                                 >
                                                     <span class="fa-solid fa-ellipsis-v"></span>
                                                     <span class="tooltip">{{ __('pm::invoice.tooltip_more') }}</span>
@@ -355,7 +309,8 @@
                                                             <button
                                                                 class="icon-dropdown-item"
                                                                 type="button"
-                                                                @click="dropdownOpen = false; $dispatch('open-modal-receipt-detail'); $wire.dispatch('load-receipt-detail', { id: {{ $invoice->id }} })"
+                                                                @click="closeDropdownAndOpenReceipt()"
+                                                                wire:click="$dispatch('load-receipt-detail', { id: {{ $invoice->id }} })"
                                                             >
                                                                 <span class="fa-solid fa-receipt w-4"></span>
                                                                 {{ __('pm::invoice.receipts') }}
@@ -557,3 +512,80 @@
         <livewire:pm::project.receipt-detail />
     </x-synapse-modal>
 </div>
+
+<script nonce="{{ csp_nonce() }}">
+    (() => {
+        const register = () => {
+            Alpine.data('pmInvoiceDropdown', () => ({
+                dropdownOpen: false,
+                dropdownPosition: {
+                    top: 0,
+                    left: 0
+                },
+                toggleDropdown() {
+                    this.dropdownOpen = !this.dropdownOpen;
+                    if (this.dropdownOpen) {
+                        this.$nextTick(() => this.updatePosition());
+                    }
+                },
+                closeDropdownAndOpenReceipt() {
+                    this.dropdownOpen = false;
+                    this.$dispatch('open-modal-receipt-detail');
+                },
+                updatePosition() {
+                    const btn = this.$refs.dropdownBtn;
+                    const menu = this.$refs.dropdownMenu;
+                    const rect = btn.getBoundingClientRect();
+                    // Measure the real menu height instead of guessing — item count
+                    // varies per invoice (receipts/download are conditional), so a
+                    // fixed approximation picks the wrong above/below branch and
+                    // overshoots the offset for shorter menus. Call this only after
+                    // $nextTick so x-show has already applied to the DOM.
+                    const menuHeight = menu.offsetHeight || 300;
+                    const menuWidth = 192; // w-48 = 12rem = 192px
+                    const viewportHeight = window.innerHeight;
+                    const viewportWidth = window.innerWidth;
+
+                    // Check if there's enough space below
+                    const spaceBelow = viewportHeight - rect.bottom;
+                    const spaceAbove = rect.top;
+
+                    // Position vertically (prefer below, use above if not enough space)
+                    // .icon-dropdown is position:fixed, so these are viewport-relative —
+                    // do NOT add window.scrollY/scrollX (that's only correct for
+                    // position:absolute, document-relative elements). Adding it here
+                    // offset the dropdown by the scroll distance, which grew with
+                    // page zoom and made the menu appear far from the trigger button.
+                    let top;
+                    if (spaceBelow >= menuHeight || spaceBelow > spaceAbove) {
+                        top = rect.bottom + 8;
+                    } else {
+                        top = rect.top - menuHeight - 8;
+                    }
+
+                    // Position horizontally (align to right of button)
+                    let left = rect.right - menuWidth;
+
+                    // Ensure dropdown doesn't go off the left edge
+                    if (left < 0) {
+                        left = 8;
+                    }
+
+                    // Ensure dropdown doesn't go off the right edge
+                    if (left + menuWidth > viewportWidth) {
+                        left = viewportWidth - menuWidth - 8;
+                    }
+
+                    this.dropdownPosition = {
+                        top,
+                        left
+                    };
+                }
+            }));
+        };
+        document.addEventListener('alpine:init', register);
+        if (window.Alpine) {
+            register();
+        }
+    })();
+</script>

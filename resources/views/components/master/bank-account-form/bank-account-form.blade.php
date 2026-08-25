@@ -69,25 +69,7 @@
         --}}
         <div
             class="form-box required"
-            x-data="{
-                open: false,
-                query: '',
-                suggestions: @js($this->bankNameSuggestions),
-                init() {
-                    this.query = (this.$wire?.get('form.bank_name')) || '';
-                },
-                get filtered() {
-                    const q = (this.query || '').toLowerCase();
-                    if (!q) return this.suggestions;
-                    return this.suggestions.filter(s => s.bank_name.toLowerCase().includes(q));
-                },
-                pick(s) {
-                    this.query = s.bank_name;
-                    this.$wire.set('form.bank_name', s.bank_name);
-                    if (s.swift_code) { this.$wire.set('form.swift_code', s.swift_code); }
-                    this.open = false;
-                }
-            }"
+            x-data="pmBankAccountAutocomplete()"
             {{-- .capture: this form renders inside <x-synapse-modal>, whose content
                  box calls stopPropagation() on click; without .capture this
                  bubble-phase document listener would never fire. --}}
@@ -102,7 +84,7 @@
                     type="text"
                     autocomplete="off"
                     wire:model="form.bank_name"
-                    @input="query = $event.target.value; open = true"
+                    @input="handleBankNameInput($event.target.value)"
                     @focus="open = true"
                     placeholder="{{ __('pm::bank_account.bank_name_placeholder') }}"
                 >
@@ -219,3 +201,39 @@
         </button>
     </div>
 </div>
+
+<script nonce="{{ csp_nonce() }}">
+    (() => {
+        const register = () => {
+            Alpine.data('pmBankAccountAutocomplete', () => ({
+                open: false,
+                query: '',
+                suggestions: @js($this->bankNameSuggestions),
+                init() {
+                    this.query = (this.$wire?.get('form.bank_name')) || '';
+                },
+                handleBankNameInput(value) {
+                    this.query = value;
+                    this.open = true;
+                },
+                get filtered() {
+                    const q = (this.query || '').toLowerCase();
+                    if (!q) return this.suggestions;
+                    return this.suggestions.filter(s => s.bank_name.toLowerCase().includes(q));
+                },
+                pick(s) {
+                    this.query = s.bank_name;
+                    this.$wire.set('form.bank_name', s.bank_name);
+                    if (s.swift_code) {
+                        this.$wire.set('form.swift_code', s.swift_code);
+                    }
+                    this.open = false;
+                }
+            }));
+        };
+        document.addEventListener('alpine:init', register);
+        if (window.Alpine) {
+            register();
+        }
+    })();
+</script>

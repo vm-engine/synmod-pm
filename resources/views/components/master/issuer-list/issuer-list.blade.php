@@ -19,7 +19,8 @@
                     <button
                         class="btn primary"
                         type="button"
-                        @click="$dispatch('open-modal-issuer-form'); $wire.dispatch('reset-issuer-form')"
+                        @click="$dispatch('open-modal-issuer-form')"
+                                                    wire:click="$dispatch('reset-issuer-form')"
                     >
                         <span class="fa-solid fa-plus"></span>
                         {{ __('pm::labels.add') }}
@@ -96,7 +97,8 @@
                                         <button
                                             class="btn-icon warning btn-sm warning flex-1"
                                             type="button"
-                                            @click="$dispatch('open-modal-issuer-form'); $wire.dispatch('load-issuer', { id: {{ $issuer->id }} })"
+                                            @click="$dispatch('open-modal-issuer-form')"
+                                                    wire:click="$dispatch('load-issuer', { id: {{ $issuer->id }} })"
                                         >
                                             <span class="fa-solid fa-edit"></span>
                                             {{ __('pm::labels.edit') }}

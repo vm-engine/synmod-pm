@@ -10,7 +10,8 @@
         @if (!$readonly)
         <button
             class="btn primary btn-sm mt-3"
-            @click="$dispatch('open-modal-upload-{{ $type->code(true) }}'); $wire.dispatch('reset-upload-form')"
+            @click="$dispatch('open-modal-upload-{{ $type->code(true) }}')"
+                                                    wire:click="$dispatch('reset-upload-form')"
         >
             <span class="fa-solid fa-upload mr-2"></span>
             {{ __('pm::project_document.upload_first_document') }}

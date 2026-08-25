@@ -19,7 +19,8 @@
                     <button
                         class="btn primary"
                         type="button"
-                        @click="$dispatch('open-modal-signature-form'); $wire.dispatch('reset-signature-form')"
+                        @click="$dispatch('open-modal-signature-form')"
+                                                    wire:click="$dispatch('reset-signature-form')"
                     >
                         <span class="fa-solid fa-plus"></span>
                         {{ __('pm::labels.add') }}
@@ -84,7 +85,8 @@
                                         <button
                                             class="btn-icon warning btn-sm warning flex-1"
                                             type="button"
-                                            @click="$dispatch('open-modal-signature-form'); $wire.dispatch('load-signature', { id: {{ $signature->id }} })"
+                                            @click="$dispatch('open-modal-signature-form')"
+                                                    wire:click="$dispatch('load-signature', { id: {{ $signature->id }} })"
                                         >
                                             <span class="fa-solid fa-edit"></span>
                                             {{ __('pm::labels.edit') }}

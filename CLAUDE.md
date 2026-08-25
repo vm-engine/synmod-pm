@@ -10,6 +10,32 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## ⚠️ Git Policy
+
+**NEVER commit/push without explicit user approval.** Always show changes and wait for user confirmation.
+
+## ⚠️ composer.json Versioning
+
+**IMPORTANT for local development and releases:**
+
+- `composer.json` in this package has a `"version"` key for **local development only** (currently: `1.0.0-dev`)
+- This version is required for path repository constraint resolution in the main project
+- **BEFORE COMMITTING** any changes:
+  - If **only the version key changed** → Remove the entire `"version"` line before committing
+  - If **other fields changed** along with version → Revert the version key to `"1.0.0-dev"` and keep other changes
+- **BEFORE RELEASING**:
+  - Remove the `"version"` key entirely from `composer.json`
+  - Create a git tag: `git tag v{X.Y.Z}` (e.g., `git tag v1.0.0`)
+  - Push the tag: `git push origin v{X.Y.Z}`
+  - Composer will read the version from the git tag automatically
+
+**Workflow:**
+```bash
+# During development: version key is present (1.0.0-dev)
+# Before committing: remove or revert version key
+# Before releasing: no version key, use git tag instead
+```
+
 ## Project Overview
 
 This is a **Laravel Synapse Package Module** for Project Management (PM). It's designed to work within the Laravel Synapse ecosystem and follows the package module architecture pattern (`synmod-*` prefix).

@@ -43,7 +43,9 @@
                                 $i = 1;
                             @endphp
                             @forelse ($this->categoryList as $category)
-                                <tr @class(['!bg-blue-50/50 dark:!bg-blue-900/10' => $editId == $category->id])>
+                                <tr @class([
+                                    '!bg-blue-50/50 dark:!bg-blue-900/10' => $editId == $category->id,
+                                ])>
                                     <td>
                                         <div class="flex items-center">
                                             <p>{{ $i }}</p>
@@ -172,8 +174,11 @@
                                 <tr>
                                     <td colspan="5">
                                         <div class="py-8 text-center">
-                                            <span class="fa-solid fa-folder-tree text-4xl text-gray-300 dark:text-gray-600"></span>
-                                            <p class="mt-3 text-gray-500 dark:text-gray-400">{{ __('pm::project_category.no_data') }}</p>
+                                            <span
+                                                class="fa-solid fa-folder-tree text-4xl text-gray-300 dark:text-gray-600"
+                                            ></span>
+                                            <p class="mt-3 text-gray-500 dark:text-gray-400">
+                                                {{ __('pm::project_category.no_data') }}</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -313,7 +318,7 @@
                     <button
                         class="btn btn-outline"
                         type="button"
-                        @click="$dispatch('close-modal-document-index');"
+                        @click="$dispatch('close-modal-document-index')"
                         wire:loading.attr="disabled"
                         wire:target="updateIndexes"
                     >

@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": "^8.2",
-        "vm-engine/synapse": "^2.2",
+        "vm-engine/synapse": "^2.2|^3.0",
         "vm-engine/synapps-auth": "^2.0",
         "barryvdh/laravel-dompdf": "^3.0"
     },

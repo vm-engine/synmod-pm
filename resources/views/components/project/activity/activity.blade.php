@@ -61,7 +61,8 @@
                                         <button
                                             class="btn-icon info has-tooltip group"
                                             type="button"
-                                            @click="$dispatch('open-modal-activity-detail'); $wire.showDetail({{ $activity->id }})"
+                                            @click="$dispatch('open-modal-activity-detail')"
+                                            wire:click="showDetail({{ $activity->id }})"
                                         >
                                             <span class="fa-solid fa-eye"></span>
                                             <span class="tooltip">{{ __('pm::labels.view_details') }}</span>
@@ -154,8 +155,10 @@
                         </h4>
                         @if ($selectedActivity->user)
                             <div>
-                                <p class="font-medium text-gray-900 dark:text-white">{{ $selectedActivity->user->name }}</p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">{{ $selectedActivity->user->email }}</p>
+                                <p class="font-medium text-gray-900 dark:text-white">
+                                    {{ $selectedActivity->user->name }}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    {{ $selectedActivity->user->email }}</p>
                             </div>
                         @else
                             <span class="italic text-gray-500 dark:text-gray-400">
@@ -172,7 +175,8 @@
                                 <label class="text-sm font-medium text-gray-500 dark:text-gray-400">
                                     {{ __('synauth::activity.table.activity') }}
                                 </label>
-                                <p class="font-mono text-sm text-gray-900 dark:text-white">{{ $selectedActivity->activity }}</p>
+                                <p class="font-mono text-sm text-gray-900 dark:text-white">
+                                    {{ $selectedActivity->activity }}</p>
                             </div>
 
                             <!-- Feature -->
@@ -180,7 +184,8 @@
                                 <label class="text-sm font-medium text-gray-500 dark:text-gray-400">
                                     {{ __('synauth::activity.table.feature') }}
                                 </label>
-                                <p class="font-mono text-sm text-gray-900 dark:text-white">{{ $selectedActivity->feature }}</p>
+                                <p class="font-mono text-sm text-gray-900 dark:text-white">
+                                    {{ $selectedActivity->feature }}</p>
                             </div>
 
                             <!-- Description -->
@@ -188,7 +193,8 @@
                                 <label class="text-sm font-medium text-gray-500 dark:text-gray-400">
                                     {{ __('synauth::activity.table.description') }}
                                 </label>
-                                <p class="whitespace-pre-wrap text-sm text-gray-900 dark:text-white">{{ $selectedActivity->description ?? '-' }}</p>
+                                <p class="whitespace-pre-wrap text-sm text-gray-900 dark:text-white">
+                                    {{ $selectedActivity->description ?? '-' }}</p>
                             </div>
 
                             <!-- IP Address -->
@@ -196,7 +202,8 @@
                                 <label class="text-sm font-medium text-gray-500 dark:text-gray-400">
                                     {{ __('synauth::activity.table.ip_address') }}
                                 </label>
-                                <p class="font-mono text-sm text-gray-900 dark:text-white">{{ $selectedActivity->ip_address ?? '-' }}</p>
+                                <p class="font-mono text-sm text-gray-900 dark:text-white">
+                                    {{ $selectedActivity->ip_address ?? '-' }}</p>
                             </div>
 
                             <!-- User Agent -->
@@ -204,7 +211,8 @@
                                 <label class="text-sm font-medium text-gray-500 dark:text-gray-400">
                                     {{ __('synauth::activity.table.user_agent') }}
                                 </label>
-                                <p class="break-all text-sm text-gray-900 dark:text-white">{{ $selectedActivity->user_agent ?? '-' }}</p>
+                                <p class="break-all text-sm text-gray-900 dark:text-white">
+                                    {{ $selectedActivity->user_agent ?? '-' }}</p>
                             </div>
 
                             <!-- Date & Time -->

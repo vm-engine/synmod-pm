@@ -33,7 +33,7 @@
                             name="company"
                             type="text"
                             wire:model.blur="form.company"
-                            x-on:input="if (!$wire.form.client) { $wire.form.name = $event.target.value }"
+                            x-on:input="!$wire.form.client && ($wire.form.name = $event.target.value)"
                         />
                         @error('form.company')
                             <p class="form-error-message">{{ $message }}</p>

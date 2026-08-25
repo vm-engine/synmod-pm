@@ -172,7 +172,7 @@
                                                         type="text"
                                                         wire:model="editItemAmount"
                                                         x-mask:dynamic="$money($input, '{{ $curDef['decimal'] }}', '{{ $curDef['thousands'] }}', {{ (int) $curDef['decimals'] }})"
-                                                        x-on:focus="if ($event.target.value == '0') $event.target.select()"
+                                                        x-on:focus="$event.target.value == '0' && $event.target.select()"
                                                     >
                                                 </div>
                                             @else
@@ -197,7 +197,7 @@
                                                         wire:model="editItemDiscountPercentage"
                                                         min="0"
                                                         max="100"
-                                                        x-on:focus="if (parseFloat($event.target.value) === 0) $event.target.select()"
+                                                        x-on:focus="parseFloat($event.target.value) === 0 && $event.target.select()"
                                                     >
                                                     <span>%</span>
                                                 @endif
@@ -306,7 +306,7 @@
                                                 type="text"
                                                 wire:model="newItemAmount"
                                                 x-mask:dynamic="$money($input, '{{ $curDef['decimal'] }}', '{{ $curDef['thousands'] }}', {{ (int) $curDef['decimals'] }})"
-                                                x-on:focus="if ($event.target.value == '0') $event.target.select()"
+                                                x-on:focus="$event.target.value == '0' && $event.target.select()"
                                             >
                                         </div>
                                         @error('newItemAmount')
@@ -329,7 +329,7 @@
                                                 wire:model="newItemDiscountPercentage"
                                                 min="0"
                                                 max="100"
-                                                x-on:focus="if (parseFloat($event.target.value) === 0) $event.target.select()"
+                                                x-on:focus="parseFloat($event.target.value) === 0 && $event.target.select()"
                                             >
                                             <span>%</span>
                                         @endif
@@ -402,7 +402,7 @@
                                             type="text"
                                             wire:model.live.debounce.500ms="exchangeRateInput"
                                             x-mask:dynamic="$money($input, '{{ $idrDef['decimal'] }}', '{{ $idrDef['thousands'] }}', {{ (int) $idrDef['decimals'] }})"
-                                            x-on:focus="if ($event.target.value == '0') $event.target.select()"
+                                            x-on:focus="$event.target.value == '0' && $event.target.select()"
                                         >
                                     </div>
                                 @endif
@@ -449,7 +449,7 @@
                                         wire:model.live.debounce.500ms="discountPercentage"
                                         min="0"
                                         max="100"
-                                        x-on:focus="if (parseFloat($event.target.value) === 0) $event.target.select()"
+                                        x-on:focus="parseFloat($event.target.value) === 0 && $event.target.select()"
                                     >
                                     <span>%</span>
                                 @endif
@@ -514,7 +514,7 @@
                                             wire:model.live.debounce.500ms="vatPercentage"
                                             min="0"
                                             max="100"
-                                            x-on:focus="if (parseFloat($event.target.value) === 0) $event.target.select()"
+                                            x-on:focus="parseFloat($event.target.value) === 0 && $event.target.select()"
                                         >
                                         <span>%</span>
                                     @endif

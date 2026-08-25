@@ -10,7 +10,8 @@
         @if (!$readonly)
         <button
             class="btn primary btn-sm mt-3"
-            @click="$dispatch('open-modal-upload-{{ $type->code(true) }}'); $wire.dispatch('reset-upload-form')"
+            @click="$dispatch('open-modal-upload-{{ $type->code(true) }}')"
+                                                    wire:click="$dispatch('reset-upload-form')"
         >
             <span class="fa-solid fa-upload mr-2"></span>
             {{ __('pm::project_document.upload_first_file') }}
@@ -132,7 +133,8 @@
         @if (!$readonly)
         <button
             class="flex min-h-[200px] flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 transition-colors hover:border-blue-400 hover:bg-blue-50/50 dark:border-gray-700 dark:bg-gray-800/30 dark:hover:border-blue-500 dark:hover:bg-blue-500/5"
-            @click="$dispatch('open-modal-upload-{{ $type->code(true) }}'); $wire.dispatch('reset-upload-form')"
+            @click="$dispatch('open-modal-upload-{{ $type->code(true) }}')"
+                                                    wire:click="$dispatch('reset-upload-form')"
         >
             <span class="fa-solid fa-plus text-3xl text-gray-400 dark:text-gray-600"></span>
             <span class="mt-2 text-sm font-medium text-gray-600 dark:text-gray-400">

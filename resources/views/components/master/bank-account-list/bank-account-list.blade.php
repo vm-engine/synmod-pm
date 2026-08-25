@@ -19,7 +19,8 @@
                     <button
                         class="btn primary"
                         type="button"
-                        @click="$dispatch('open-modal-bank-account-form'); $wire.dispatch('reset-bank-account-form')"
+                        @click="$dispatch('open-modal-bank-account-form')"
+                                                    wire:click="$dispatch('reset-bank-account-form')"
                     >
                         <span class="fa-solid fa-plus"></span>
                         {{ __('pm::labels.add') }}
@@ -91,7 +92,8 @@
                                         <button
                                             class="btn-icon warning btn-sm warning flex-1"
                                             type="button"
-                                            @click="$dispatch('open-modal-bank-account-form'); $wire.dispatch('load-bank-account', { id: {{ $account->id }} })"
+                                            @click="$dispatch('open-modal-bank-account-form')"
+                                                    wire:click="$dispatch('load-bank-account', { id: {{ $account->id }} })"
                                         >
                                             <span class="fa-solid fa-edit"></span>
                                             {{ __('pm::labels.edit') }}

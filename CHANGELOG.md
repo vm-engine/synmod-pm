@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.9.0] - Unreleased
 
 ### Added
 - New unpaginated `GET /api/pm/project-category/list` API endpoint (search by name/code, permission `pm.master.project_category.read`).
@@ -12,6 +12,10 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - Internal client list UI (advanced-filter drawer, table column, filter state) now filters/displays by project category instead of the legacy `services` field. The `services` DB column, model casts/fillable, and `Services` enum are untouched — this is a UI-level migration, not a removal.
 - Internal project form, list filter, and detail view now use project category instead of the legacy `services` field: the form's services field is disabled, the list's "Filter by Services" is now "Filter by Project Category" (also fixing a pre-existing placeholder copy-paste bug), and the detail page shows project category instead of services badges. `Project.services` DB column, model casts/fillable, and `Services` enum remain untouched.
+- **Requires `vm-engine/synapse` ^2.2|^3.0** — supports synapse's new default CSP-safe Alpine.js build.
+
+### Fixed
+- **CSP-safe Alpine.js compatibility.** `client-form`, `document-multiple-files-list`, `document-revision-list`, `bank-account-form`, `bank-account-list`, `issuer-list`, `signature-list`, `project-category`, `activity`, `invoice-detail`, and `invoice-list` migrated off inline `x-data="{ ... }"` object literals and multi-statement `@click`/`x-on:*` expressions (including `if (...)` statements and split Alpine/Livewire dispatch chains) to the `Alpine.data()` registry pattern, required by `vm-engine/synapse` ^3.0's new default CSP-safe Alpine build.
 
 ## [0.8.9] - 2026-07-23
 
