@@ -14,11 +14,9 @@
                 <div class="card-body">
                     <div class="form-box">
                         <label for="category">{{ __('pm::client.category') }}</label>
-                        <x-synapse-select
-                            id="client_category_id"
-                            name="client_category_id"
+                        <x-synapse-adv-select
+                            wire-model="form.client_category_id"
                             :options="$this->categories"
-                            wire:model="form.client_category_id"
                         />
                         @error('form.client_category_id')
                             <p class="form-error-message">{{ $message }}</p>
@@ -171,14 +169,12 @@
 
                     <div class="form-box required">
                         <label for="status">{{ __('pm::client.status') }}</label>
-                        <x-synapse-select
-                            id="status"
-                            name="status"
+                        <x-synapse-adv-select
+                            wire-model="form.status"
                             :options="[
-                                0 => __('pm::client.prospect'),
-                                1 => __('pm::client.active_client'),
+                                ['value' => 0, 'label' => __('pm::client.prospect')],
+                                ['value' => 1, 'label' => __('pm::client.active_client')],
                             ]"
-                            wire:model="form.status"
                         />
                         @error('form.status')
                             <p class="form-error-message">{{ $message }}</p>

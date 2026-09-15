@@ -407,12 +407,10 @@
                 <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     {{ __('pm::project.filter_year') }}
                 </label>
-                <x-synapse-select
-                    id="filterYear"
-                    name="filterYear"
-                    wire:model.live="filterYear"
-                    :options="['' => __('pm::project.all_years')] +
-                        collect($this->years)->pluck('label', 'value')->toArray()"
+                <x-synapse-adv-select
+                    wire-model="filterYear"
+                    :live="true"
+                    :options="array_merge([['value' => '', 'label' => __('pm::project.all_years')]], $this->years)"
                 />
             </div>
 
@@ -420,13 +418,12 @@
                 <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     {{ __('pm::project.filter_progress') }}
                 </label>
-                <x-synapse-select
-                    id="filterProgress"
-                    name="filterProgress"
-                    wire:model.live="filterProgress"
+                <x-synapse-adv-select
+                    wire-model="filterProgress"
+                    :live="true"
                     :options="array_merge(
-                        ['' => __('pm::project.all_progress')],
-                        collect($this->progressRanges)->pluck('label', 'value')->toArray(),
+                        [['value' => '', 'label' => __('pm::project.all_progress')]],
+                        $this->progressRanges,
                     )"
                 />
             </div>

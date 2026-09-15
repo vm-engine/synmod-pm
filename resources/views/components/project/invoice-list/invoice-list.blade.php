@@ -435,15 +435,14 @@
                 <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     {{ __('pm::invoice.filter_status') }}
                 </label>
-                <x-synapse-select
-                    id="filterStatus"
-                    name="filterStatus"
-                    wire:model.live="filterStatus"
+                <x-synapse-adv-select
+                    wire-model="filterStatus"
+                    :live="true"
                     :options="[
-                        '' => __('pm::invoice.all'),
-                        'paid' => __('pm::invoice.status_paid'),
-                        'unpaid' => __('pm::invoice.status_unpaid'),
-                        'partial' => __('pm::invoice.status_partial'),
+                        ['value' => '', 'label' => __('pm::invoice.all')],
+                        ['value' => 'paid', 'label' => __('pm::invoice.status_paid')],
+                        ['value' => 'unpaid', 'label' => __('pm::invoice.status_unpaid')],
+                        ['value' => 'partial', 'label' => __('pm::invoice.status_partial')],
                     ]"
                 />
             </div>
@@ -452,13 +451,15 @@
                 <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     {{ __('pm::invoice.filter_year') }}
                 </label>
-                <x-synapse-select
-                    id="filterYear"
-                    name="filterYear"
-                    wire:model.live="filterYear"
-                    :options="collect(['' => __('pm::invoice.all')])
-                        ->union(collect($this->availableYears)->mapWithKeys(fn($y) => [$y => $y]))
-                        ->toArray()"
+                <x-synapse-adv-select
+                    wire-model="filterYear"
+                    :live="true"
+                    :options="array_merge(
+                        [['value' => '', 'label' => __('pm::invoice.all')]],
+                        collect($this->availableYears)
+                            ->map(fn($y) => ['value' => $y, 'label' => (string) $y])
+                            ->toArray(),
+                    )"
                 />
             </div>
 

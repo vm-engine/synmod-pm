@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - **CSP-safe Alpine.js compatibility.** `client-form`, `document-multiple-files-list`, `document-revision-list`, `bank-account-form`, `bank-account-list`, `issuer-list`, `signature-list`, `project-category`, `activity`, `invoice-detail`, and `invoice-list` migrated off inline `x-data="{ ... }"` object literals and multi-statement `@click`/`x-on:*` expressions (including `if (...)` statements and split Alpine/Livewire dispatch chains) to the `Alpine.data()` registry pattern, required by `vm-engine/synapse` ^3.0's new default CSP-safe Alpine build.
+- Migrated the remaining `<x-synapse-select>` usages (removed from `vm-engine/synapse` v3.0) to `<x-synapse-adv-select>` in `client-list`, `client-form`, `invoice-list`, and `project-list` — these views were throwing unknown-component errors. `ClientForm::categories()` reshaped to the value/label array format the new component requires; `InvoiceList::availableYears()`/`ProjectList::years()`/`progressRanges()` left untouched, reshaped only at the Blade call site.
 
 ## [0.8.9] - 2026-07-23
 

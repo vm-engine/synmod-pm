@@ -287,14 +287,13 @@
                 <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     {{ __('pm::client.filter_status') }}
                 </label>
-                <x-synapse-select
-                    id="filterStatus"
-                    name="filterStatus"
-                    wire:model.live="filterStatus"
+                <x-synapse-adv-select
+                    wire-model="filterStatus"
+                    :live="true"
                     :options="[
-                        '' => __('pm::client.all'),
-                        'prospect' => __('pm::client.prospect'),
-                        'active' => __('pm::client.active_client'),
+                        ['value' => '', 'label' => __('pm::client.all')],
+                        ['value' => 'prospect', 'label' => __('pm::client.prospect')],
+                        ['value' => 'active', 'label' => __('pm::client.active_client')],
                     ]"
                 />
             </div>
@@ -303,14 +302,13 @@
                 <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     {{ __('pm::client.filter_active_status') }}
                 </label>
-                <x-synapse-select
-                    id="filterActive"
-                    name="filterActive"
-                    wire:model.live="filterActive"
+                <x-synapse-adv-select
+                    wire-model="filterActive"
+                    :live="true"
                     :options="[
-                        '' => __('pm::client.all'),
-                        'active' => __('pm::client.active_filter'),
-                        'inactive' => __('pm::client.inactive_filter'),
+                        ['value' => '', 'label' => __('pm::client.all')],
+                        ['value' => 'active', 'label' => __('pm::client.active_filter')],
+                        ['value' => 'inactive', 'label' => __('pm::client.inactive_filter')],
                     ]"
                 />
             </div>

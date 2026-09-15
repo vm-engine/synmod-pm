@@ -54,7 +54,7 @@ new class extends Component
     #[Computed()]
     public function categories(): array
     {
-        return ClientCategory::pluck('name', 'id')->toArray();
+        return ClientCategory::select('id as value', 'name as label')->get()->toArray();
     }
 
     #[Computed()]
