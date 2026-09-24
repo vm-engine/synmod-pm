@@ -27,7 +27,8 @@ class ApiLogger
         $durationMs = $startTime ? (int) round((microtime(true) - $startTime) * 1000) : 0;
 
         $responseBody = $response->getContent();
-        if (strlen($responseBody) > self::MAX_RESPONSE_BODY_SIZE) {
+        // Streamed/binary responses have no buffered content (getContent() returns false).
+        if ($responseBody === false || strlen($responseBody) > self::MAX_RESPONSE_BODY_SIZE) {
             $responseBody = null;
         }
 
@@ -48,6 +49,9 @@ class ApiLogger
 
     /**
      * Sanitize headers by masking the Authorization token value.
+     *
+     * @param  array<string, list<string|null>>  $headers
+     * @return array<string, list<string|null>>
      */
     protected function sanitizeHeaders(array $headers): array
     {

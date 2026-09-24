@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\ProjectDocument;
+use VmEngine\SynAuth\Models\User;
 
 class DocumentController extends Controller
 {
@@ -75,7 +76,7 @@ class DocumentController extends Controller
      */
     protected function canAccessDocument(ProjectDocument $document): bool
     {
-        /** @var VmEngine\SynAuth\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
 
         if (! $user) {

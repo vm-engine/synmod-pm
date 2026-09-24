@@ -42,7 +42,7 @@ class InvoicePdfService
 
             // Delete the previous document for this language, if any.
             if ($invoice->{$column}) {
-                $oldDocument = ProjectDocument::find($invoice->{$column});
+                $oldDocument = ProjectDocument::whereKey($invoice->{$column})->first();
                 if ($oldDocument && $oldDocument->file_path) {
                     Storage::delete($oldDocument->file_path);
                     $oldDocument->delete();

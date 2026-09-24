@@ -24,7 +24,6 @@ class Proposal extends Base
     {
         $toDelete = $project->documents()
             ->where('type', '>', Documents::PROPOSAL->value)
-            ->get()
             ->pluck('id');
 
         ProjectDocument::destroy($toDelete);

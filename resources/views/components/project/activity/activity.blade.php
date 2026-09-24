@@ -21,7 +21,7 @@
                             <th>
                                 <p>{{ __('synauth::activity.table.description') }}</p>
                             </th>
-                            <th class="w-20">
+                            <th class="datatable-col-actions w-20">
                                 <p>{{ __('pm::labels.actions') }}</p>
                             </th>
                             <th>
@@ -64,7 +64,7 @@
                                             @click="$dispatch('open-modal-activity-detail')"
                                             wire:click="showDetail({{ $activity->id }})"
                                         >
-                                            <span class="fa-solid fa-eye"></span>
+                                            <span class="ph ph-eye"></span>
                                             <span class="tooltip">{{ __('pm::labels.view_details') }}</span>
                                         </button>
                                     </div>
@@ -82,12 +82,11 @@
                             </tr>
                         @empty
                             <tr>
-                                <td
-                                    class="py-8 text-center text-gray-500 dark:text-gray-400"
-                                    colspan="5"
-                                >
-                                    <span class="fa-solid fa-clock-rotate-left mb-3 block text-4xl"></span>
-                                    {{ __('synauth::activity.no_activities') }}
+                                <td colspan="5">
+                                    <div class="syn-empty-state">
+                                        <span class="ph ph-clock-counter-clockwise syn-empty-state-icon"></span>
+                                        <p class="syn-empty-state-text">{{ __('synauth::activity.no_activities') }}</p>
+                                    </div>
                                 </td>
                             </tr>
                         @endforelse
@@ -97,28 +96,7 @@
 
             <!-- Pagination with Per Page Selector -->
             @if ($this->activities->hasPages() || $this->activities->total() > 10)
-                <div class="mt-4 flex flex-col items-center justify-between gap-4 sm:flex-row">
-                    <!-- Per Page Selector -->
-                    <div class="flex items-center gap-2">
-                        <select
-                            class="shadow-theme-sm rounded-sm p-1"
-                            id="perPage"
-                            name="perPage"
-                            wire:model.live="perPage"
-                        >
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                            <option value="200">200</option>
-                        </select>
-                    </div>
-
-                    <!-- Pagination Links -->
-                    <div class="pagination-container flex-1 grow">
-                        {{ $this->activities->links() }}
-                    </div>
-                </div>
+                <x-synapse-per-page-selector :paginator="$this->activities" />
             @endif
         </div>
     </div>
@@ -131,23 +109,19 @@
         @if ($selectedActivity)
             <div class="flex h-full flex-col">
                 <!-- Modal Header -->
-                <div class="shrink-0 border-b border-gray-200 dark:border-gray-700">
-                    <div class="flex items-center justify-between p-5">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                            {{ __('pm::labels.activity_detail') }}
-                        </h3>
-                        <button
-                            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                            type="button"
-                            @click="$dispatch('close-modal-activity-detail')"
-                        >
-                            <span class="fa-solid fa-times text-xl"></span>
-                        </button>
-                    </div>
+                <div class="syn-modal-header shrink-0">
+                    <h3 class="syn-modal-title">{{ __('pm::labels.activity_detail') }}</h3>
+                    <button
+                        class="syn-modal-close"
+                        type="button"
+                        @click="$dispatch('close-modal-activity-detail')"
+                    >
+                        <span class="ph ph-x text-xl"></span>
+                    </button>
                 </div>
 
                 <!-- Modal Body -->
-                <div class="flex-1 space-y-4 overflow-y-auto p-6">
+                <div class="syn-modal-body flex-1 space-y-4 overflow-y-auto">
                     <!-- User Information -->
                     <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
                         <h4 class="mb-3 font-medium text-gray-900 dark:text-white">
@@ -232,17 +206,15 @@
                 </div>
 
                 <!-- Modal Footer -->
-                <div class="shrink-0 border-t border-gray-200 p-5 dark:border-gray-700">
-                    <div class="flex justify-end">
-                        <button
-                            class="btn secondary"
-                            type="button"
-                            @click="$dispatch('close-modal-activity-detail')"
-                        >
-                            <span class="fa-solid fa-times mr-1"></span>
-                            {{ __('pm::labels.close') }}
-                        </button>
-                    </div>
+                <div class="syn-modal-footer shrink-0">
+                    <button
+                        class="btn secondary"
+                        type="button"
+                        @click="$dispatch('close-modal-activity-detail')"
+                    >
+                        <span class="ph ph-x mr-1"></span>
+                        {{ __('pm::labels.close') }}
+                    </button>
                 </div>
             </div>
         @endif

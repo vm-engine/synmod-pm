@@ -15,7 +15,10 @@ use VmEngine\SynAuth\Traits\HasUpdater;
 class DocumentIssuer extends Model
 {
     use HasCreator;
+
+    /** @use HasFactory<DocumentIssuerFactory> */
     use HasFactory;
+
     use HasUpdater;
     use WithDeleteToken;
 

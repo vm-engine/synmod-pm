@@ -37,7 +37,7 @@ abstract class Base
             '{YYYY}' => date('Y'),
             '{YY}' => date('y'),
             '{MM}' => date('m'),
-            '{MR}' => int2roman(date('n')),
+            '{MR}' => int2roman(now()->month),
             '{CNC}' => $cnc,
             '{PROJECT_CODE}' => $project->projectCategory->code,
             '{DIVISION_CODE}' => $project->division->code,

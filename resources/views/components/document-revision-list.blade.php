@@ -2,20 +2,18 @@
 
 @if (count($documents) === 0)
     {{-- Empty State --}}
-    <div class="px-5 py-8 text-center sm:px-6">
-        <span class="fa-solid fa-file-pdf fa-3x mb-3 text-gray-300 dark:text-gray-700"></span>
-        <p class="text-sm text-gray-500 dark:text-gray-500">
-            {{ __('pm::project_document.no_documents_uploaded') }}
-        </p>
+    <div class="syn-empty-state">
+        <span class="ph ph-file-pdf syn-empty-state-icon"></span>
+        <p class="syn-empty-state-text">{{ __('pm::project_document.no_documents_uploaded') }}</p>
         @if (!$readonly)
-        <button
-            class="btn primary btn-sm mt-3"
-            @click="$dispatch('open-modal-upload-{{ $type->code(true) }}')"
-                                                    wire:click="$dispatch('reset-upload-form')"
-        >
-            <span class="fa-solid fa-upload mr-2"></span>
-            {{ __('pm::project_document.upload_first_document') }}
-        </button>
+            <button
+                class="btn primary sm mt-3"
+                @click="$dispatch('open-modal-upload-{{ $type->code(true) }}')"
+                wire:click="$dispatch('reset-upload-form')"
+            >
+                <span class="ph ph-upload-simple mr-2"></span>
+                {{ __('pm::project_document.upload_first_document') }}
+            </button>
         @endif
     </div>
 @else
@@ -34,18 +32,18 @@
                     @php
                         $extension = strtolower(pathinfo($first->file_info['original_name'] ?? '', PATHINFO_EXTENSION));
                         $iconClass = match ($extension) {
-                            'pdf' => 'fa-file-pdf text-red-600 dark:text-red-400',
-                            'doc', 'docx' => 'fa-file-word text-blue-600 dark:text-blue-400',
-                            'xls', 'xlsx' => 'fa-file-excel text-green-600 dark:text-green-400',
-                            'ppt', 'pptx' => 'fa-file-powerpoint text-orange-600 dark:text-orange-400',
-                            'zip', 'rar', '7z' => 'fa-file-zipper text-purple-600 dark:text-purple-400',
-                            'jpg', 'jpeg', 'png', 'gif', 'svg' => 'fa-file-image text-pink-600 dark:text-pink-400',
-                            default => 'fa-file text-gray-600 dark:text-gray-400',
+                            'pdf' => 'ph-file-pdf text-red-600 dark:text-red-400',
+                            'doc', 'docx' => 'ph-file-doc text-blue-600 dark:text-blue-400',
+                            'xls', 'xlsx' => 'ph-file-xls text-green-600 dark:text-green-400',
+                            'ppt', 'pptx' => 'ph-file-ppt text-orange-600 dark:text-orange-400',
+                            'zip', 'rar', '7z' => 'ph-file-zip text-purple-600 dark:text-purple-400',
+                            'jpg', 'jpeg', 'png', 'gif', 'svg' => 'ph-file-image text-pink-600 dark:text-pink-400',
+                            default => 'ph-file text-gray-600 dark:text-gray-400',
                         };
                     @endphp
                     <div
                         class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gray-50 dark:bg-gray-800">
-                        <span class="fa-regular {{ $iconClass }} text-xl"></span>
+                        <span class="ph {{ $iconClass }} text-xl"></span>
                     </div>
 
                     {{-- Document Info --}}
@@ -56,19 +54,19 @@
                         <div
                             class="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
                             <span>
-                                <span class="fa-solid fa-file-arrow-up mr-1"></span>
+                                <span class="ph ph-file-arrow-up mr-1"></span>
                                 {{ __('pm::project_document.version') }} {{ $first->version ?? 1 }}
                             </span>
                             <span>
-                                <span class="fa-solid fa-calendar mr-1"></span>
+                                <span class="ph ph-calendar-blank mr-1"></span>
                                 {{ isset($first->updated_at) ? $first->updated_at->format('M d, Y') : __('pm::project_document.na') }}
                             </span>
                             <span>
-                                <span class="fa-solid fa-user mr-1"></span>
+                                <span class="ph ph-user mr-1"></span>
                                 {{ $first->creator->name ?? __('pm::project_document.unknown') }}
                             </span>
                             <span>
-                                <span class="fa-solid fa-hard-drive mr-1"></span>
+                                <span class="ph ph-hard-drive mr-1"></span>
                                 {{ human_filesize($first->file_info['size']) }}
                             </span>
                         </div>
@@ -85,16 +83,16 @@
                 {{-- Actions --}}
                 <div class="flex shrink-0 flex-wrap gap-2">
                     <button
-                        class="btn btn-sm btn-outline"
+                        class="btn secondary sm"
                         wire:click="downloadDocument({{ $first->id ?? 0 }})"
                     >
-                        <span class="fa-solid fa-download"></span>
+                        <span class="ph ph-download-simple"></span>
                     </button>
                     <button
-                        class="btn btn-sm btn-outline"
+                        class="btn secondary sm"
                         @click="showVersions = !showVersions"
                     >
-                        <span class="fa-solid fa-clock-rotate-left mr-1"></span>
+                        <span class="ph ph-clock-counter-clockwise mr-1"></span>
                         <span
                             x-text="showVersions ? '{{ __('pm::project_document.hide') }}' : '{{ __('pm::project_document.history') }}'"
                         ></span>
@@ -105,17 +103,17 @@
                         @endif
                     </button>
                     @if (!$readonly)
-                    <button
-                        class="btn primary btn-sm"
-                        wire:click="uploadNewVersion({{ $first->id ?? 0 }})"
-                    >
-                        <span class="fa-solid fa-upload mr-1"></span>
-                        <span class="hidden sm:inline">{{ __('pm::project_document.new_version') }}</span>
-                    </button>
-                    <button
-                        class="btn danger btn-sm"
-                        type="button"
-                        wire:click="$dispatch('confirm-dialog', {
+                        <button
+                            class="btn primary sm"
+                            wire:click="uploadNewVersion({{ $first->id ?? 0 }})"
+                        >
+                            <span class="ph ph-upload-simple mr-1"></span>
+                            <span class="hidden sm:inline">{{ __('pm::project_document.new_version') }}</span>
+                        </button>
+                        <button
+                            class="btn danger sm"
+                            type="button"
+                            wire:click="$dispatch('confirm-dialog', {
                                     title: '{{ __('pm::project_document.delete_document_title') }}',
                                     message: '{{ __('pm::project_document.delete_document_message') }}',
                                     confirmText: '{{ __('pm::labels.delete') }}',
@@ -126,9 +124,9 @@
                                     wireParams: ['{{ $first->delete_token }}'],
                                     wireComponent: '{{ $this->getId() }}'
                                 })"
-                    >
-                        <span class="fa-solid fa-trash"></span>
-                    </button>
+                        >
+                            <span class="ph ph-trash"></span>
+                        </button>
                     @endif
                 </div>
             </div>
@@ -177,7 +175,7 @@
                                             title="{{ __('pm::project_document.download_this_version') }}"
                                             wire:click="downloadDocument({{ $oldVersion->id ?? 0 }})"
                                         >
-                                            <span class="fa-solid fa-download"></span>
+                                            <span class="ph ph-download-simple"></span>
                                         </button>
                                     </div>
                                 </div>

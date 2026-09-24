@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace VmEngine\Pm\Form;
 
 use Illuminate\Validation\Rules\Password;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\Form;
 use Livewire\WithFileUploads;
 use VmEngine\Pm\Models\Client;
@@ -36,6 +37,9 @@ class ClientFormObject extends Form
 
     public string $social_media = '';  // Textarea input
 
+    /**
+     * @var TemporaryUploadedFile|null
+     */
     public $npwp_image; // Uploaded file
 
     public int $status = 0;
@@ -83,6 +87,8 @@ class ClientFormObject extends Form
 
     /**
      * Get validation rules.
+     *
+     * @return array<string, mixed>
      */
     public function rules(): array
     {
@@ -160,6 +166,8 @@ class ClientFormObject extends Form
 
     /**
      * Get custom validation messages.
+     *
+     * @return array<string, string>
      */
     protected function messages(): array
     {

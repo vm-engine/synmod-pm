@@ -82,22 +82,17 @@ class MigrateProjectUploadsCommand extends Command
                 }
 
                 if (! $isDryRun) {
-                    // Get file contents from public disk
+                    // Copy from public disk to local disk; put() reports whether the write succeeded
                     $fileContents = Storage::disk($sourceDisk)->get($file);
-
-                    // Put to local disk
-                    Storage::disk($destinationDisk)->put($file, $fileContents);
-
-                    // Verify file was copied successfully
-                    if (Storage::disk($destinationDisk)->exists($file)) {
-                        // Delete from public disk if not keeping originals
-                        if (! $keepOriginal) {
-                            Storage::disk($sourceDisk)->delete($file);
-                        }
-                        $migratedCount++;
-                    } else {
+                    if ($fileContents === null || ! Storage::disk($destinationDisk)->put($file, $fileContents)) {
                         throw new \Exception('File verification failed after copy');
                     }
+
+                    // Delete from public disk if not keeping originals
+                    if (! $keepOriginal) {
+                        Storage::disk($sourceDisk)->delete($file);
+                    }
+                    $migratedCount++;
                 } else {
                     $migratedCount++;
                 }

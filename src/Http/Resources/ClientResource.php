@@ -7,7 +7,11 @@ namespace VmEngine\Pm\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use VmEngine\Pm\Enums\Services;
+use VmEngine\Pm\Models\Client;
 
+/**
+ * @mixin Client
+ */
 class ClientResource extends JsonResource
 {
     /**

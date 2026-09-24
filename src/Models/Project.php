@@ -6,7 +6,6 @@ namespace VmEngine\Pm\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,15 +17,21 @@ use VmEngine\Pm\Enums\ProjectStatus;
 use VmEngine\Pm\Enums\RiskLevel;
 use VmEngine\Pm\Enums\SalesSources;
 use VmEngine\Pm\Factories\ProjectFactory;
+use VmEngine\Pm\Models\Concerns\ResolvesUserModel;
 use VmEngine\Synapse\Traits\WithDeleteToken;
+use VmEngine\SynAuth\Models\User;
 use VmEngine\SynAuth\Traits\HasCreator;
 use VmEngine\SynAuth\Traits\HasUpdater;
 
 class Project extends Model
 {
     use HasCreator;
+
+    /** @use HasFactory<ProjectFactory> */
     use HasFactory;
+
     use HasUpdater;
+    use ResolvesUserModel;
     use WithDeleteToken;
 
     protected $fillable = [
@@ -77,7 +82,7 @@ class Project extends Model
     /**
      * Create a new factory instance for the model.
      */
-    protected static function newFactory(): Factory
+    protected static function newFactory(): ProjectFactory
     {
         return ProjectFactory::new();
     }
@@ -117,14 +122,18 @@ class Project extends Model
 
     /**
      * Get the user that owns this project.
+     *
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(config('auth.providers.users.model'));
+        return $this->belongsTo(static::userModel());
     }
 
     /**
      * Get the division for this project.
+     *
+     * @return BelongsTo<Division, $this>
      */
     public function division(): BelongsTo
     {
@@ -133,6 +142,8 @@ class Project extends Model
 
     /**
      * Get the project category for this project.
+     *
+     * @return BelongsTo<ProjectCategory, $this>
      */
     public function projectCategory(): BelongsTo
     {
@@ -141,6 +152,8 @@ class Project extends Model
 
     /**
      * Alias
+     *
+     * @return BelongsTo<ProjectCategory, $this>
      */
     public function category(): BelongsTo
     {
@@ -149,6 +162,8 @@ class Project extends Model
 
     /**
      * Get the client for this project.
+     *
+     * @return BelongsTo<Client, $this>
      */
     public function client(): BelongsTo
     {
@@ -157,14 +172,18 @@ class Project extends Model
 
     /**
      * Get the project manager for this project.
+     *
+     * @return BelongsTo<User, $this>
      */
     public function projectManager(): BelongsTo
     {
-        return $this->belongsTo(config('auth.providers.users.model'), 'project_manager_id');
+        return $this->belongsTo(static::userModel(), 'project_manager_id');
     }
 
     /**
      * Get the documents for this project.
+     *
+     * @return HasMany<ProjectDocument, $this>
      */
     public function documents(): HasMany
     {
@@ -173,6 +192,9 @@ class Project extends Model
 
     /**
      * Search projects by query.
+     *
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
      */
     public function scopeSearch(Builder $query, string $q): Builder
     {
@@ -186,6 +208,9 @@ class Project extends Model
 
     /**
      * Filter projects by status.
+     *
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
      */
     public function scopeByStatus(Builder $query, ProjectStatus|int $status): Builder
     {
@@ -196,6 +221,9 @@ class Project extends Model
 
     /**
      * Filter projects by priority.
+     *
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
      */
     public function scopeByPriority(Builder $query, ProjectPriority|int $priority): Builder
     {
@@ -206,6 +234,10 @@ class Project extends Model
 
     /**
      * Filter projects by service (ANY match).
+     *
+     * @param  Builder<Project>  $query
+     * @param  array<int, int|string>  $services
+     * @return Builder<Project>
      */
     public function scopeByServiceAny(Builder $query, array $services): Builder
     {
@@ -222,6 +254,10 @@ class Project extends Model
 
     /**
      * Scope a query to filter by project category (ANY match).
+     *
+     * @param  Builder<Project>  $query
+     * @param  array<int, int|string>  $categoryIds
+     * @return Builder<Project>
      */
     public function scopeByProjectCategoryAny(Builder $query, array $categoryIds): Builder
     {
@@ -234,6 +270,9 @@ class Project extends Model
 
     /**
      * Get overdue projects.
+     *
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
      */
     public function scopeOverdue(Builder $query): Builder
     {
@@ -247,6 +286,9 @@ class Project extends Model
 
     /**
      * Get active projects.
+     *
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
      */
     public function scopeActive(Builder $query): Builder
     {
@@ -303,6 +345,9 @@ class Project extends Model
         return $this->documents()->byType(Documents::INVOICE)->exists();
     }
 
+    /**
+     * @return Attribute<string, string>
+     */
     protected function name(): Attribute
     {
         return Attribute::make(

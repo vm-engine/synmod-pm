@@ -36,7 +36,7 @@ new class extends Component
     public string $filterActive = '';
 
     #[Url()]
-    public int $limit = 10;
+    public int $perPage = 10;
 
     #[Url()]
     public string $sort = 'id';
@@ -48,7 +48,7 @@ new class extends Component
 
     protected function rememberedParams(): array
     {
-        return ['q', 'filterCategories', 'filterProjectCategories', 'filterStatus', 'filterActive', 'limit', 'sort', 'sortDirection'];
+        return ['q', 'filterCategories', 'filterProjectCategories', 'filterStatus', 'filterActive', 'perPage', 'sort', 'sortDirection'];
     }
 
     protected function rememberKey(): string
@@ -225,7 +225,7 @@ new class extends Component
 
         return $query
             ->orderBy($this->sort, $this->sortDirection)
-            ->paginate($this->limit)
+            ->paginate($this->perPage)
             ->onEachSide(1);
     }
 

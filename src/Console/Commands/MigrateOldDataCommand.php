@@ -356,7 +356,7 @@ class MigrateOldDataCommand extends Command
                 }
 
                 // Get client to determine user_id
-                $client = Client::find($proposal->client_id);
+                $client = Client::whereKey($proposal->client_id)->first();
                 $userId = $client ? $client->user_id : 1;
 
                 // Map jp_id (work_type) to project_category_id
@@ -474,7 +474,7 @@ class MigrateOldDataCommand extends Command
         foreach ($sphRecords as $sph) {
             try {
                 // Find the project by proposal_id
-                $project = Project::find($sph->proposal_id);
+                $project = Project::whereKey($sph->proposal_id)->first();
 
                 if (! $project) {
                     if ($this->option('skip-missing')) {
@@ -595,7 +595,7 @@ class MigrateOldDataCommand extends Command
         foreach ($spkRecords as $spk) {
             try {
                 // Find the project by proposal_id
-                $project = Project::find($spk->proposal_id);
+                $project = Project::whereKey($spk->proposal_id)->first();
 
                 if (! $project) {
                     if ($this->option('skip-missing')) {
@@ -724,7 +724,12 @@ class MigrateOldDataCommand extends Command
         }
 
         // Fallback to created_at
-        return (int) date('Y', strtotime($createdAt));
+        $timestamp = strtotime($createdAt);
+        if ($timestamp === false) {
+            throw new \InvalidArgumentException("Cannot determine a year from code '{$code}' or created_at '{$createdAt}'.");
+        }
+
+        return (int) date('Y', $timestamp);
     }
 
     /**
@@ -819,6 +824,8 @@ class MigrateOldDataCommand extends Command
 
     /**
      * Migrate proposal file from public/document/proposal to storage.
+     *
+     * @return array<string, mixed>|null
      */
     protected function migrateProposalFile(string $filename, int $proposalId): ?array
     {
@@ -886,6 +893,8 @@ class MigrateOldDataCommand extends Command
 
     /**
      * Migrate SPH file from public/document/sph to storage.
+     *
+     * @return array<string, mixed>|null
      */
     protected function migrateSphFile(string $filename, int $sphId, int $projectId): ?array
     {
@@ -953,6 +962,8 @@ class MigrateOldDataCommand extends Command
 
     /**
      * Migrate SPK file from public/document/spk to storage.
+     *
+     * @return array<string, mixed>|null
      */
     protected function migrateSpkFile(string $filename, int $spkId, int $projectId): ?array
     {
@@ -1020,6 +1031,8 @@ class MigrateOldDataCommand extends Command
 
     /**
      * Parse JSON string from old database.
+     *
+     * @return array<mixed>|null
      */
     protected function parseJson(?string $json): ?array
     {
@@ -1098,6 +1111,8 @@ class MigrateOldDataCommand extends Command
 
     /**
      * Parse sub_division field (comma-separated string to array).
+     *
+     * @return array<int, int>|null
      */
     protected function parseSubDivision(?string $subDivision): ?array
     {

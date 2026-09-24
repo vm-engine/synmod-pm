@@ -275,8 +275,8 @@ test('pagination works correctly', function () {
     Client::factory()->count(25)->create();
 
     $component = Livewire::test('pm::client-list')
-        ->set('limit', 10)
-        ->assertSet('limit', 10);
+        ->set('perPage', 10)
+        ->assertSet('perPage', 10);
 
     expect($component->clientList)->toHaveCount(10);
 });

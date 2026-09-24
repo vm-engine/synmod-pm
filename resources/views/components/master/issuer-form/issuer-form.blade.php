@@ -1,7 +1,7 @@
 <div class="flex h-full flex-col">
     <!-- Modal Header (Sticky) -->
-    <div class="flex shrink-0 items-center justify-between border-b border-gray-200 p-5 dark:border-gray-700">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+    <div class="syn-modal-header shrink-0">
+        <h3 class="syn-modal-title">
             @if ($form->issuer)
                 {{ __('pm::issuer.edit_title') }}
             @else
@@ -9,16 +9,16 @@
             @endif
         </h3>
         <button
-            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            class="syn-modal-close"
             type="button"
             @click="$dispatch('close-modal-issuer-form')"
         >
-            <span class="fa-solid fa-times text-xl"></span>
+            <span class="ph ph-x text-xl"></span>
         </button>
     </div>
 
     <!-- Modal Body (Scrollable) -->
-    <div class="max-h-[700px] flex-1 space-y-4 overflow-y-auto p-6">
+    <div class="syn-modal-body max-h-[700px] flex-1 space-y-4 overflow-y-auto">
         <!-- Name -->
         <div class="form-box required">
             <label for="name">{{ __('pm::labels.name') }}</label>
@@ -126,7 +126,7 @@
                     maxlength="16"
                 >
             </div>
-            <p class="mt-1 text-xs text-gray-500">{{ __('pm::issuer.tax_id_format') }}</p>
+            <p class="form-help">{{ __('pm::issuer.tax_id_format') }}</p>
             @error('form.tax_id_number')
                 <p class="form-error-message">
                     {{ $message }}
@@ -136,13 +136,13 @@
     </div>
 
     <!-- Modal Footer (Sticky) -->
-    <div class="flex shrink-0 items-center justify-end gap-3 border-t border-gray-200 p-5 dark:border-gray-700">
+    <div class="syn-modal-footer shrink-0">
         <button
             class="btn secondary"
             type="button"
             @click="$dispatch('close-modal-issuer-form')"
         >
-            <span class="fa-solid fa-times mr-1"></span>
+            <span class="ph ph-x mr-1"></span>
             {{ __('pm::labels.cancel') }}
         </button>
         <button

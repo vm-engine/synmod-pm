@@ -12,6 +12,8 @@ class ClientUserService
 {
     /**
      * Create a new user account for a client.
+     *
+     * @param  array<string, mixed>  $userData
      */
     public function createUser(array $userData, int $status, bool $active): Model
     {
@@ -40,6 +42,8 @@ class ClientUserService
 
     /**
      * Update an existing user account for a client.
+     *
+     * @param  array<string, mixed>  $userData
      */
     public function updateUser(Model $user, array $userData, int $status, bool $active): void
     {

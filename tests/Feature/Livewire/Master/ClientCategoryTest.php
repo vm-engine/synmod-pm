@@ -194,9 +194,9 @@ test('can delete category', function () {
 });
 
 test('handles non existent category on edit', function () {
-    expect(fn () => Livewire::test('pm::master.client-category')
+    Livewire::test('pm::master.client-category')
         ->call('edit', 99999)
-    )->toThrow(Exception::class);
+        ->assertNotFound();
 });
 
 test('handles non existent category on update', function () {

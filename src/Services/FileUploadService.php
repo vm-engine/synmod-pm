@@ -20,6 +20,9 @@ class FileUploadService
 
         // Store new file
         $newPath = $file->store('clients/npwp', 'local');
+        if ($newPath === false) {
+            throw new \RuntimeException('Failed to store NPWP image.');
+        }
 
         // Delete old file if exists
         if ($oldPath && Storage::disk('local')->exists($oldPath)) {

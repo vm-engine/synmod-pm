@@ -218,6 +218,9 @@ class ImportProjectsCommand extends Command
 
     /**
      * Map CSV columns to expected positions.
+     *
+     * @param  array<int, string|null>  $header
+     * @return array<string, int>|null
      */
     protected function mapColumns(array $header): ?array
     {
@@ -259,13 +262,17 @@ class ImportProjectsCommand extends Command
 
     /**
      * Process a single CSV row.
+     *
+     * @param  array<int, string|null>  $row
+     * @param  array<string, int>  $columns
+     * @return bool|string|array<string, mixed>
      */
     protected function processRow(array $row, array $columns, int $createdBy, int $defaultDivisionId, bool $isDryRun = false): bool|string|array
     {
         $clientName = trim($row[$columns['Recepient']] ?? '');
         $projectName = trim($row[$columns['Project Name']] ?? '');
         $categoryCode = trim($row[$columns['Project Categories']] ?? '');
-        $divisionName = isset($columns['Division']) && $columns['Division'] !== null
+        $divisionName = isset($columns['Division'])
             ? trim($row[$columns['Division']] ?? '')
             : '';
 

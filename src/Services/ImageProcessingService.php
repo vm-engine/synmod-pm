@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace VmEngine\Pm\Services;
 
 use Exception;
+use GdImage;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
@@ -25,11 +26,17 @@ class ImageProcessingService
         if (app()->environment('testing')) {
             $filename = 'image_'.uniqid().'_'.time().'.'.$file->getClientOriginalExtension();
             $path = $file->storeAs($storagePath, $filename, $disk);
+            if ($path === false) {
+                throw new Exception('Failed to store image: '.$filename);
+            }
 
             return $path;
         }
 
         $imageInfo = getimagesize($imagePath);
+        if ($imageInfo === false) {
+            throw new Exception('Uploaded file is not a readable image.');
+        }
         $mimeType = $imageInfo['mime'];
 
         // Create source image
@@ -42,11 +49,11 @@ class ImageProcessingService
         $aspectRatio = $sourceWidth / $sourceHeight;
 
         if ($sourceWidth > $maxWidth) {
-            $targetWidth = $maxWidth;
-            $targetHeight = (int) ($maxWidth / $aspectRatio);
+            $targetWidth = max(1, $maxWidth);
+            $targetHeight = max(1, (int) ($maxWidth / $aspectRatio));
         } else {
-            $targetWidth = $sourceWidth;
-            $targetHeight = $sourceHeight;
+            $targetWidth = max(1, $sourceWidth);
+            $targetHeight = max(1, $sourceHeight);
         }
 
         // Create and resize image
@@ -57,7 +64,9 @@ class ImageProcessingService
             imagealphablending($destImage, false);
             imagesavealpha($destImage, true);
             $transparent = imagecolorallocatealpha($destImage, 0, 0, 0, 127);
-            imagefilledrectangle($destImage, 0, 0, $targetWidth, $targetHeight, $transparent);
+            if ($transparent !== false) {
+                imagefilledrectangle($destImage, 0, 0, $targetWidth, $targetHeight, $transparent);
+            }
         }
 
         // Resize while maintaining aspect ratio
@@ -93,7 +102,11 @@ class ImageProcessingService
 
         // Move to final location
         $finalPath = $storagePath.'/'.$filename;
-        Storage::disk($disk)->put($finalPath, file_get_contents($tempPath));
+        $contents = file_get_contents($tempPath);
+        if ($contents === false) {
+            throw new Exception('Failed to read processed image: '.$tempPath);
+        }
+        Storage::disk($disk)->put($finalPath, $contents);
 
         // Delete temp file
         unlink($tempPath);
@@ -114,20 +127,26 @@ class ImageProcessingService
     /**
      * Create source image from file path.
      */
-    private function createSourceImage(string $imagePath, string $mimeType)
+    private function createSourceImage(string $imagePath, string $mimeType): GdImage
     {
-        return match ($mimeType) {
+        $image = match ($mimeType) {
             'image/jpeg' => imagecreatefromjpeg($imagePath),
             'image/png' => imagecreatefrompng($imagePath),
             'image/webp' => imagecreatefromwebp($imagePath),
             default => throw new Exception('Unsupported image type: '.$mimeType),
         };
+
+        if ($image === false) {
+            throw new Exception('Failed to decode image: '.$imagePath);
+        }
+
+        return $image;
     }
 
     /**
      * Save image to file path.
      */
-    private function saveImage($image, string $path, string $mimeType): void
+    private function saveImage(GdImage $image, string $path, string $mimeType): void
     {
         match ($mimeType) {
             'image/jpeg' => imagejpeg($image, $path, 90),

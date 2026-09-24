@@ -32,7 +32,6 @@ class Spk extends Base
     {
         $toDelete = $project->documents()
             ->where('type', '>', Documents::SPK->value)
-            ->get()
             ->pluck('id');
 
         ProjectDocument::destroy($toDelete);

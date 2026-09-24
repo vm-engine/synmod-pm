@@ -14,7 +14,10 @@ use VmEngine\SynAuth\Traits\HasUpdater;
 class Signature extends Model
 {
     use HasCreator;
+
+    /** @use HasFactory<SignatureFactory> */
     use HasFactory;
+
     use HasUpdater;
     use WithDeleteToken;
 

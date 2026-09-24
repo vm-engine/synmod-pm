@@ -6,10 +6,6 @@ use VmEngine\Pm\Http\Controllers\InvoiceController;
 use VmEngine\Pm\Http\Controllers\ReceiptController;
 
 Route::group([], function () {
-    Route::get('/', function () {
-        return view('pm::livewire.index');
-    })->name('index')->middleware('can-access:pm.manage');
-
     // Project routes
     Route::livewire('/project', 'pm::project.project-list')
         ->name('project.index')->middleware('can-access:pm.project.read');

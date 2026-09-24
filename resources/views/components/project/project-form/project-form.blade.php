@@ -90,14 +90,7 @@
                         >
                             <label for="sub_division">{{ __('pm::project.sub_division') }}</label>
 
-                            {{-- Debug info (remove after testing) --}}
-                            <div class="mb-2 text-xs text-gray-600">
-                                Division ID: {{ $form->division_id }} |
-                                Sub-divisions count: {{ count($this->subDivisions) }}
-                                @if (count($this->subDivisions) === 0)
-                                    <span class="text-red-600">(No sub-divisions found for this division)</span>
-                                @endif
-                            </div>
+
 
                             <x-synapse-adv-select
                                 wire-model="form.sub_division"
@@ -105,7 +98,7 @@
                                 :multiple="true"
                                 placeholder="{{ __('pm::project.placeholder_sub_division') }}"
                             />
-                            <small class="text-gray-500">{{ __('pm::project.help_sub_division') }}</small>
+                            <p class="form-help">{{ __('pm::project.help_sub_division') }}</p>
                             @error('form.sub_division')
                                 <p class="form-error-message">{{ $message }}</p>
                             @enderror
@@ -116,7 +109,7 @@
                             <div class="form-input bg-gray-50 text-gray-500 cursor-not-allowed">
                                 {{ __('pm::project.select_division_first') }}
                             </div>
-                            <small class="text-gray-500">{{ __('pm::project.help_sub_division') }}</small>
+                            <p class="form-help">{{ __('pm::project.help_sub_division') }}</p>
                         </div>
                     @endif
                 </div>
@@ -137,7 +130,7 @@
                             search-method="searchClients"
                             placeholder="{{ __('pm::project.placeholder_client') }}"
                         />
-                        <small class="text-gray-500">{{ __('pm::project.help_client_search') }}</small>
+                        <p class="form-help">{{ __('pm::project.help_client_search') }}</p>
                         @error('form.client_id')
                             <p class="form-error-message">{{ $message }}</p>
                         @enderror
@@ -182,7 +175,7 @@
                             :multiple="true"
                             placeholder="{{ __('pm::project.placeholder_services') }}"
                         />
-                        <small class="text-gray-500">{{ __('pm::project.help_services') }}</small>
+                        <p class="form-help">{{ __('pm::project.help_services') }}</p>
                         @error('form.services')
                             <p class="form-error-message">{{ $message }}</p>
                         @enderror
@@ -217,7 +210,7 @@
                             currency="Rp."
                             wire:model="form.nominal"
                         />
-                        <small class="text-gray-500">{{ __('pm::project.help_nominal') }}</small>
+                        <p class="form-help">{{ __('pm::project.help_nominal') }}</p>
                         @error('form.nominal')
                             <p class="form-error-message">{{ $message }}</p>
                         @enderror
@@ -231,7 +224,7 @@
                             currency="Rp."
                             wire:model="form.budget"
                         />
-                        <small class="text-gray-500">{{ __('pm::project.help_budget') }}</small>
+                        <p class="form-help">{{ __('pm::project.help_budget') }}</p>
                         @error('form.budget')
                             <p class="form-error-message">{{ $message }}</p>
                         @enderror
@@ -245,7 +238,7 @@
                             currency="Rp."
                             wire:model="form.down_payment"
                         />
-                        <small class="text-gray-500">{{ __('pm::project.help_down_payment') }}</small>
+                        <p class="form-help">{{ __('pm::project.help_down_payment') }}</p>
                         @error('form.down_payment')
                             <p class="form-error-message">{{ $message }}</p>
                         @enderror
@@ -263,7 +256,7 @@
                             placeholder="{{ __('pm::project.placeholder_total_terms') }}"
                             wire:model="form.total_terms"
                         />
-                        <small class="text-gray-500">{{ __('pm::project.help_total_terms') }}</small>
+                        <p class="form-help">{{ __('pm::project.help_total_terms') }}</p>
                         @error('form.total_terms')
                             <p class="form-error-message">{{ $message }}</p>
                         @enderror
@@ -279,7 +272,7 @@
                             placeholder="{{ __('pm::project.placeholder_payment_terms') }}"
                             wire:model="form.payment_terms"
                         ></textarea>
-                        <small class="text-gray-500">{{ __('pm::project.help_payment_terms') }}</small>
+                        <p class="form-help">{{ __('pm::project.help_payment_terms') }}</p>
                         @error('form.payment_terms')
                             <p class="form-error-message">{{ $message }}</p>
                         @enderror
@@ -327,7 +320,7 @@
                             <span>75%</span>
                             <span>100%</span>
                         </div>
-                        <small class="text-gray-500">{{ __('pm::project.help_progress') }}</small>
+                        <p class="form-help">{{ __('pm::project.help_progress') }}</p>
                         @error('form.progress')
                             <p class="form-error-message">{{ $message }}</p>
                         @enderror
@@ -494,7 +487,7 @@
                             :multiple="true"
                             placeholder="{{ __('pm::project.placeholder_assigned_team') }}"
                         />
-                        <small class="text-gray-500">{{ __('pm::project.help_assigned_team') }}</small>
+                        <p class="form-help">{{ __('pm::project.help_assigned_team') }}</p>
                         @error('form.assigned_team')
                             <p class="form-error-message">{{ $message }}</p>
                         @enderror
@@ -630,7 +623,7 @@
                             :taggable="true"
                             placeholder="{{ __('pm::project.placeholder_tags') }}"
                         />
-                        <small class="text-gray-500">{{ __('pm::project.help_tags') }}</small>
+                        <p class="form-help">{{ __('pm::project.help_tags') }}</p>
                         @error('form.tags')
                             <p class="form-error-message">{{ $message }}</p>
                         @enderror
@@ -657,7 +650,7 @@
                 wire:loading
                 wire:target="save"
             >
-                <span class="fa-solid fa-spinner fa-spin mr-1"></span>
+                <span class="ph ph-spinner syn-spin mr-1"></span>
                 {{ __('pm::project.save') }}
             </span>
         </button>

@@ -5,13 +5,8 @@
     <x-synapse-confirm-dialog />
 
     <div class="space-y-5 sm:space-y-6">
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-            <div class="flex items-center justify-between p-5">
-                <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
-                    {{ __('pm::division.title') }}
-                </h3>
-            </div>
-            <div class="border-t border-gray-100 dark:border-gray-800">
+        <x-synapse-panel :title="__('pm::division.title')">
+            <div class="syn-panel-body">
                 <div class="max-w-full overflow-x-auto">
                     <table
                         class="datatable min-w-full"
@@ -30,7 +25,7 @@
                                 <th class="w-1/12">
                                     <p>{{ __('pm::division.division_code') }}</p>
                                 </th>
-                                <th class="w-1/12">
+                                <th class="datatable-col-actions w-1/12">
                                     <p>{{ __('pm::labels.actions') }}</p>
                                 </th>
                             </tr>
@@ -40,7 +35,9 @@
                                 $i = 1;
                             @endphp
                             @forelse ($this->divisionList as $list)
-                                <tr @class(['!bg-blue-50/50 dark:!bg-blue-900/10' => $editId == $list->id])>
+                                <tr @class([
+                                    '!bg-blue-50/50 dark:!bg-blue-900/10' => $editId == $list->id,
+                                ])>
                                     <td>
                                         <div class="flex items-center">
                                             <p>{{ $i }}</p>
@@ -98,7 +95,7 @@
                                                     type="button"
                                                     wire:click="cancelEdit"
                                                 >
-                                                    <span class="fa-solid fa-xmark"></span>
+                                                    <span class="ph ph-x"></span>
                                                     <span class="tooltip">{{ __('pm::labels.cancel') }}</span>
                                                 </button>
                                             @endif
@@ -109,7 +106,7 @@
                                                     type="button"
                                                     wire:click="edit({{ $list->id }})"
                                                 >
-                                                    <span class="fa-solid fa-edit"></span>
+                                                    <span class="ph ph-pencil-simple"></span>
                                                     <span class="tooltip">{{ __('pm::labels.edit') }}</span>
                                                 </button>
                                             @endif
@@ -130,7 +127,7 @@
                                                     wireComponent: '{{ $this->getId() }}'
                                                 })"
                                             >
-                                                <span class="fa-solid fa-trash"></span>
+                                                <span class="ph ph-trash"></span>
                                                 <span class="tooltip">{{ __('pm::labels.delete') }}</span>
                                             </button>
                                             @endcanAccess
@@ -152,7 +149,8 @@
                                         </td>
                                         <td colspan="2">
                                             <div class="flex items-center pl-6">
-                                                <i class="fa-solid fa-arrow-turn-down mr-2 text-gray-300 dark:text-gray-600"></i>
+                                                <i
+                                                    class="ph ph-arrow-elbow-down-right mr-2 text-gray-300 dark:text-gray-600"></i>
                                                 @if ($editSubId == $sub->id)
                                                     <input
                                                         class="form-input"
@@ -180,7 +178,7 @@
                                                         type="button"
                                                         wire:click="cancelEdit"
                                                     >
-                                                        <span class="fa-solid fa-xmark"></span>
+                                                        <span class="ph ph-x"></span>
                                                         <span class="tooltip">{{ __('pm::labels.cancel') }}</span>
                                                     </button>
                                                 @else
@@ -197,7 +195,7 @@
                                                         type="button"
                                                         wire:click="editSub({{ $sub->id }})"
                                                     >
-                                                        <span class="fa-solid fa-edit"></span>
+                                                        <span class="ph ph-pencil-simple"></span>
                                                         <span class="tooltip">{{ __('pm::labels.edit') }}</span>
                                                     </button>
                                                 @endif
@@ -218,7 +216,7 @@
                                                     wireComponent: '{{ $this->getId() }}'
                                                 })"
                                                 >
-                                                    <span class="fa-solid fa-trash"></span>
+                                                    <span class="ph ph-trash"></span>
                                                     <span class="tooltip">{{ __('pm::labels.delete') }}</span>
                                                 </button>
                                                 @endcanAccess
@@ -229,13 +227,14 @@
                                         $i2++;
                                     @endphp
                                 @endforeach
-                                <tr class="bg-gray-50/50 dark:bg-white/[0.02]">
+                                <tr class="syn-row-muted">
                                     <td>
                                         <span class="text-gray-400 dark:text-gray-500">{{ $i . '.' . $i2 }}</span>
                                     </td>
                                     <td colspan="3">
                                         <div class="flex items-center pl-6">
-                                            <i class="fa-solid fa-arrow-turn-down mr-2 text-gray-300 dark:text-gray-600"></i>
+                                            <i
+                                                class="ph ph-arrow-elbow-down-right mr-2 text-gray-300 dark:text-gray-600"></i>
                                             <input
                                                 class="form-input"
                                                 type="text"
@@ -266,14 +265,14 @@
                             @empty
                                 <tr>
                                     <td colspan="4">
-                                        <div class="py-8 text-center">
-                                            <span class="fa-solid fa-building text-4xl text-gray-300 dark:text-gray-600"></span>
-                                            <p class="mt-3 text-gray-500 dark:text-gray-400">{{ __('pm::division.no_data') }}</p>
+                                        <div class="syn-empty-state">
+                                            <span class="ph ph-buildings syn-empty-state-icon"></span>
+                                            <p class="syn-empty-state-text">{{ __('pm::division.no_data') }}</p>
                                         </div>
                                     </td>
                                 </tr>
                             @endforelse
-                            <tr class="!bg-gray-50/50 dark:!bg-white/[0.02]">
+                            <tr class="syn-row-muted">
                                 <td>
                                     {{ $i }}
                                 </td>
@@ -322,6 +321,6 @@
                     </table>
                 </div>
             </div>
-        </div>
+        </x-synapse-panel>
     </div>
 </div>

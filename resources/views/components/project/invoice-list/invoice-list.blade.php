@@ -8,49 +8,38 @@
     <!-- Invoice List -->
     <div class="space-y-5 sm:space-y-6">
 
-        <div class="dark:bg-white/3 rounded-2xl border border-gray-200 bg-white dark:border-gray-800">
-
-            <div class="flex justify-between">
-                <div class="px-5 py-4 sm:px-6 sm:py-5">
-                    <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
-                        {{ __('pm::invoice.list_title') }}
-                    </h3>
-                </div>
-                <div class="my-auto flex gap-3 px-5">
-                    @if ($project?->hasSPKDocument())
-                        @canAccess('pm.invoice.create')
-                        <div>
-                            <button
-                                class="btn primary"
-                                type="button"
-                                @click="$dispatch('open-modal-invoice-form')"
-                                wire:click="$dispatch('create-invoice', { projectId: {{ $projectId }} })"
-                            >
-                                <span class="fa-solid fa-plus"></span>
-                                {{ __('pm::invoice.add_invoice') }}
-                            </button>
-                        </div>
-                        @endcanAccess
-                    @endif
-                    <div class="input-group">
+        <x-synapse-panel :title="__('pm::invoice.list_title')">
+            <x-slot:toolbar>
+                @if ($project?->hasSPKDocument())
+                    @canAccess('pm.invoice.create')
+                    <button
+                        class="btn primary"
+                        type="button"
+                        @click="$dispatch('open-modal-invoice-form')"
+                        wire:click="$dispatch('create-invoice', { projectId: {{ $projectId }} })"
+                    >
+                        <span class="ph ph-plus"></span>
+                        {{ __('pm::invoice.add_invoice') }}
+                    </button>
+                    @endcanAccess
+                @endif
+                <x-synapse-search-box
+                    id="q"
+                    name="q"
+                    :placeholder="__('pm::invoice.search_placeholder')"
+                    wire:model.live.debounce="q"
+                >
+                    <x-slot:trailing>
                         <button
-                            class="input-group-item right btn"
+                            class="btn"
                             type="button"
                             title="{{ __('pm::invoice.advanced_filter') }}"
                             @click="drawerOpen = true"
-                        ><span class="fa-solid fa-filter"></span></button>
-                        <input
-                            class="form-input p-2"
-                            id="q"
-                            name="q"
-                            type="text"
-                            placeholder="{{ __('pm::invoice.search_placeholder') }}"
-                            wire:model.live.debounce="q"
-                        >
-                    </div>
-                </div>
-            </div>
-            <div class="border-t border-gray-100 dark:border-gray-800">
+                        ><span class="ph ph-funnel"></span></button>
+                    </x-slot:trailing>
+                </x-synapse-search-box>
+            </x-slot:toolbar>
+            <div class="syn-panel-body">
                 <div class="max-w-full overflow-x-auto">
                     <table
                         class="datatable datatable-sm min-w-full"
@@ -81,7 +70,7 @@
                                 <th>
                                     <p>{{ __('pm::invoice.col_creator') }}</p>
                                 </th>
-                                <th>
+                                <th class="datatable-col-actions">
                                     <p>{{ __('pm::invoice.col_actions') }}</p>
                                 </th>
                             </tr>
@@ -100,7 +89,7 @@
                                 >
                                     <td>
                                         <div class="flex items-center">
-                                            <p>{{ ($this->invoiceList->currentPage() - 1) * $limit + $i }}</p>
+                                            <p>{{ ($this->invoiceList->currentPage() - 1) * $perPage + $i }}</p>
                                         </div>
                                     </td>
                                     <td>
@@ -121,8 +110,7 @@
                                             @if ($hasBreakdown)
                                                 <p class="leading-tight">
                                                     <span
-                                                        class="block text-[10px] font-sans font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500"
-                                                    >{{ __('pm::invoice.sub_total') }}</span>
+                                                        class="syn-field-caption font-sans">{{ __('pm::invoice.sub_total') }}</span>
                                                     <span
                                                         class="block text-gray-600 dark:text-gray-400">{{ $cf->format((float) $invoice->amount, $cur) }}</span>
                                                 </p>
@@ -130,8 +118,7 @@
                                             @if ($invoice->include_vat)
                                                 <p class="leading-tight">
                                                     <span
-                                                        class="block text-[10px] font-sans font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500"
-                                                    >{{ __('pm::invoice.vat') }}
+                                                        class="syn-field-caption font-sans">{{ __('pm::invoice.vat') }}
                                                         ({{ rtrim(rtrim(number_format((float) $invoice->vat_percentage, 2), '0'), '.') }}%)
                                                     </span>
                                                     <span
@@ -141,8 +128,7 @@
                                             @if ($invoice->include_dpp)
                                                 <p class="leading-tight">
                                                     <span
-                                                        class="block text-[10px] font-sans font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500"
-                                                    >{{ __('pm::invoice.dpp') }}</span>
+                                                        class="syn-field-caption font-sans">{{ __('pm::invoice.dpp') }}</span>
                                                     <span
                                                         class="block text-gray-600 dark:text-gray-400">{{ $cf->format((float) $invoice->dpp_amount, $cur) }}</span>
                                                 </p>
@@ -150,16 +136,14 @@
                                             @if ($invoice->include_discount)
                                                 <p class="leading-tight">
                                                     <span
-                                                        class="block text-[10px] font-sans font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500"
-                                                    >{{ __('pm::invoice.discount') }}</span>
+                                                        class="syn-field-caption font-sans">{{ __('pm::invoice.discount') }}</span>
                                                     <span class="block text-gray-600 dark:text-gray-400">-
                                                         {{ $cf->format((float) $invoice->discount_amount, $cur) }}</span>
                                                 </p>
                                             @endif
                                             <p class="leading-tight">
                                                 <span
-                                                    class="block text-[10px] font-sans font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500"
-                                                >{{ __('pm::invoice.grand_total') }}</span>
+                                                    class="syn-field-caption font-sans">{{ __('pm::invoice.grand_total') }}</span>
                                                 <span
                                                     class="block text-sm font-semibold text-gray-800 dark:text-white/90"
                                                 >{{ $cf->format((float) $invoice->total_amount, $cur) }}</span>
@@ -170,15 +154,12 @@
                                         <div class="flex flex-col gap-1.5">
                                             <p class="leading-tight">
                                                 <span
-                                                    class="block text-[10px] font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500"
-                                                >{{ __('pm::invoice.issue_date') }}</span>
+                                                    class="syn-field-caption">{{ __('pm::invoice.issue_date') }}</span>
                                                 <span
                                                     class="block text-gray-600 dark:text-gray-400">{{ $invoice->issue_date?->format('d M Y') ?? '-' }}</span>
                                             </p>
                                             <p class="leading-tight">
-                                                <span
-                                                    class="block text-[10px] font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500"
-                                                >{{ __('pm::invoice.due_date') }}</span>
+                                                <span class="syn-field-caption">{{ __('pm::invoice.due_date') }}</span>
                                                 <span
                                                     class="block text-gray-600 dark:text-gray-400">{{ $invoice->due_date?->format('d M Y') ?? '-' }}</span>
                                             </p>
@@ -195,8 +176,7 @@
                                             @if ($invoice->is_paid && $invoice->paid_at)
                                                 <p class="leading-tight">
                                                     <span
-                                                        class="block text-[10px] font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500"
-                                                    >{{ __('pm::invoice.paid_on') }}</span>
+                                                        class="syn-field-caption">{{ __('pm::invoice.paid_on') }}</span>
                                                     <span
                                                         class="block text-[11px] text-gray-500 dark:text-gray-400">{{ $invoice->paid_at->format('d M Y') }}</span>
                                                 </p>
@@ -209,8 +189,7 @@
                                             @if ($invoice->bankAccount)
                                                 <p class="leading-tight">
                                                     <span
-                                                        class="block text-[10px] font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500"
-                                                    >{{ $invoice->bankAccount->bank_name }}</span>
+                                                        class="syn-field-caption">{{ $invoice->bankAccount->bank_name }}</span>
                                                     <span
                                                         class="block font-mono text-gray-600 dark:text-gray-400">{{ $invoice->bankAccount->number }}</span>
                                                 </p>
@@ -235,7 +214,7 @@
                                                     @click="$dispatch('open-modal-invoice-detail')"
                                                     wire:click="$dispatch('load-invoice-detail', { id: {{ $invoice->id }} })"
                                                 >
-                                                    <span class="fa-solid fa-eye"></span>
+                                                    <span class="ph ph-eye"></span>
                                                     <span class="tooltip">{{ __('pm::invoice.tooltip_detail') }}</span>
                                                 </button>
                                                 @endcanAccess
@@ -247,7 +226,7 @@
                                                     @click="$dispatch('open-modal-invoice-form')"
                                                     wire:click="$dispatch('load-invoice', { id: {{ $invoice->id }} })"
                                                 >
-                                                    <span class="fa-solid fa-edit"></span>
+                                                    <span class="ph ph-pencil-simple"></span>
                                                     <span class="tooltip">{{ __('pm::invoice.tooltip_edit') }}</span>
                                                 </button>
                                                 @endcanAccess
@@ -269,7 +248,7 @@
                                                     wireComponent: '{{ $this->getId() }}'
                                                 })"
                                             >
-                                                <span class="fa-solid fa-trash"></span>
+                                                <span class="ph ph-trash"></span>
                                                 <span class="tooltip">{{ __('pm::invoice.tooltip_delete') }}</span>
                                             </button>
                                             @endcanAccess
@@ -285,13 +264,13 @@
                                                     x-ref="dropdownBtn"
                                                     @click="toggleDropdown()"
                                                 >
-                                                    <span class="fa-solid fa-ellipsis-v"></span>
+                                                    <span class="ph ph-dots-three-vertical"></span>
                                                     <span class="tooltip">{{ __('pm::invoice.tooltip_more') }}</span>
                                                 </button>
 
                                                 <template x-teleport="body">
                                                     <div
-                                                        class="icon-dropdown"
+                                                        class="syn-icon-dropdown"
                                                         x-ref="dropdownMenu"
                                                         x-show="dropdownOpen"
                                                         :style="'top: ' + dropdownPosition.top + 'px; left: ' + dropdownPosition
@@ -307,39 +286,39 @@
                                                     >
                                                         @if ($invoice->invoice_document_id)
                                                             <button
-                                                                class="icon-dropdown-item"
+                                                                class="syn-icon-dropdown-item"
                                                                 type="button"
                                                                 @click="closeDropdownAndOpenReceipt()"
                                                                 wire:click="$dispatch('load-receipt-detail', { id: {{ $invoice->id }} })"
                                                             >
-                                                                <span class="fa-solid fa-receipt w-4"></span>
+                                                                <span class="ph ph-receipt w-4"></span>
                                                                 {{ __('pm::invoice.receipts') }}
                                                             </button>
                                                         @endif
                                                         @canAccess('pm.invoice.read')
                                                         @if ($invoice->invoice_document_id)
                                                             <a
-                                                                class="icon-dropdown-item"
+                                                                class="syn-icon-dropdown-item"
                                                                 href="{{ route('backend.pm.invoice.download', $invoice->id) }}"
                                                                 target="_blank"
                                                             >
-                                                                <span class="fa-solid fa-download w-4"></span>
+                                                                <span class="ph ph-download-simple w-4"></span>
                                                                 {{ __('pm::invoice.download') }}
                                                             </a>
                                                         @endif
                                                         <a
-                                                            class="icon-dropdown-item"
+                                                            class="syn-icon-dropdown-item"
                                                             href="{{ route('backend.pm.invoice.print', $invoice->id) }}"
                                                             target="_blank"
                                                         >
-                                                            <span class="fa-solid fa-print w-4"></span>
+                                                            <span class="ph ph-printer w-4"></span>
                                                             {{ __('pm::invoice.print') }}
                                                         </a>
                                                         @endcanAccess
                                                         @canAccess('pm.invoice.update')
                                                         @if ($invoice->archived)
                                                             <button
-                                                                class="icon-dropdown-item"
+                                                                class="syn-icon-dropdown-item"
                                                                 type="button"
                                                                 wire:click="$dispatch('confirm-dialog', {
                                                                     title: '{{ __('pm::invoice.unarchive_title') }}',
@@ -353,12 +332,12 @@
                                                                     wireComponent: '{{ $this->getId() }}'
                                                                 })"
                                                             >
-                                                                <span class="fa-solid fa-box-open w-4"></span>
+                                                                <span class="ph ph-package w-4"></span>
                                                                 {{ __('pm::invoice.unarchive') }}
                                                             </button>
                                                         @else
                                                             <button
-                                                                class="icon-dropdown-item"
+                                                                class="syn-icon-dropdown-item"
                                                                 type="button"
                                                                 wire:click="$dispatch('confirm-dialog', {
                                                                     title: '{{ __('pm::invoice.archive_title') }}',
@@ -372,7 +351,7 @@
                                                                     wireComponent: '{{ $this->getId() }}'
                                                                 })"
                                                             >
-                                                                <span class="fa-solid fa-archive w-4"></span>
+                                                                <span class="ph ph-archive w-4"></span>
                                                                 {{ __('pm::invoice.archive') }}
                                                             </button>
                                                         @endif
@@ -388,16 +367,11 @@
                                 @endphp
                             @empty
                                 <tr>
-                                    <td
-                                        class="py-12 text-center"
-                                        colspan="10"
-                                    >
-                                        <span
-                                            class="fa-solid fa-file-invoice text-6xl text-gray-300 dark:text-gray-600"
-                                        ></span>
-                                        <p class="mt-4 text-gray-500 dark:text-gray-400">
-                                            {{ __('pm::invoice.no_data') }}
-                                        </p>
+                                    <td colspan="10">
+                                        <div class="syn-empty-state">
+                                            <span class="ph ph-invoice syn-empty-state-icon"></span>
+                                            <p class="syn-empty-state-text">{{ __('pm::invoice.no_data') }}</p>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforelse
@@ -405,25 +379,8 @@
                     </table>
                 </div>
             </div>
-            <div class="flex gap-2 p-3">
-                <div class="flex-none p-1">
-                    <select
-                        class="shadow-theme-sm rounded-sm p-1"
-                        id="limit"
-                        name="limit"
-                        wire:model.live="limit"
-                    >
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                </div>
-                <div class="pagination-container flex-1 grow">
-                    {{ $this->invoiceList->links() }}
-                </div>
-            </div>
-        </div>
+            <x-synapse-per-page-selector :paginator="$this->invoiceList" />
+        </x-synapse-panel>
     </div>
 
     @php
@@ -432,7 +389,7 @@
     <x-synapse-drawer :title="$advanceTitle">
         <div class="space-y-6">
             <div>
-                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label class="form-label">
                     {{ __('pm::invoice.filter_status') }}
                 </label>
                 <x-synapse-adv-select
@@ -448,7 +405,7 @@
             </div>
 
             <div>
-                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label class="form-label">
                     {{ __('pm::invoice.filter_year') }}
                 </label>
                 <x-synapse-adv-select
@@ -464,7 +421,7 @@
             </div>
 
             <div>
-                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label class="form-label">
                     {{ __('pm::invoice.filter_issuer') }}
                 </label>
                 <x-synapse-adv-select
@@ -476,7 +433,7 @@
             </div>
 
             <div>
-                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label class="form-label">
                     {{ __('pm::invoice.filter_creator') }}
                 </label>
                 <x-synapse-adv-select
@@ -552,7 +509,7 @@
                     const spaceAbove = rect.top;
 
                     // Position vertically (prefer below, use above if not enough space)
-                    // .icon-dropdown is position:fixed, so these are viewport-relative —
+                    // .syn-icon-dropdown is position:fixed, so these are viewport-relative —
                     // do NOT add window.scrollY/scrollX (that's only correct for
                     // position:absolute, document-relative elements). Adding it here
                     // offset the dropdown by the scroll distance, which grew with

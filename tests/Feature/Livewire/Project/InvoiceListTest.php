@@ -275,11 +275,11 @@ test('sorting works correctly', function () {
     expect($invoices->last()->id)->toBe($invoice2->id);
 });
 
-test('pagination works with limit', function () {
+test('pagination works with perPage', function () {
     ProjectInvoice::factory()->count(15)->create();
 
     $component = Livewire::test('pm::project.invoice-list')
-        ->set('limit', 5);
+        ->set('perPage', 5);
 
     expect($component->invoiceList)->toHaveCount(5);
 });

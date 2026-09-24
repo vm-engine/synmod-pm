@@ -16,6 +16,8 @@ class BankAccountService
 
     /**
      * Create a new bank account.
+     *
+     * @param  array<string, mixed>  $bankAccountData
      */
     public function create(array $bankAccountData, ?TemporaryUploadedFile $bankLogo = null): BankAccount
     {
@@ -39,6 +41,8 @@ class BankAccountService
 
     /**
      * Update an existing bank account.
+     *
+     * @param  array<string, mixed>  $bankAccountData
      */
     public function update(BankAccount $bankAccount, array $bankAccountData, ?TemporaryUploadedFile $bankLogo = null): BankAccount
     {

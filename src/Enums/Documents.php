@@ -64,7 +64,7 @@ enum Documents: int
         };
     }
 
-    public function code($lowercase = false): string
+    public function code(bool $lowercase = false): string
     {
         $code = match ($this) {
             Documents::PROPOSAL => '',

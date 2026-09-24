@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace VmEngine\Pm\Http\Controllers;
 
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -50,7 +51,7 @@ class InvoiceController extends Controller
         );
     }
 
-    public function print(Request $request, int $id)
+    public function print(Request $request, int $id): View
     {
         app()->setLocale($this->resolveLang($request));
 

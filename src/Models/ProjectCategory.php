@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Models;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use VmEngine\Pm\Factories\ProjectCategoryFactory;
 use VmEngine\Synapse\Traits\WithDeleteToken;
 use VmEngine\SynAuth\Traits\HasCreator;
@@ -15,7 +15,10 @@ use VmEngine\SynAuth\Traits\HasUpdater;
 class ProjectCategory extends Model
 {
     use HasCreator;
+
+    /** @use HasFactory<ProjectCategoryFactory> */
     use HasFactory;
+
     use HasUpdater;
     use WithDeleteToken;
 
@@ -30,7 +33,7 @@ class ProjectCategory extends Model
     /**
      * Create a new factory instance for the model.
      */
-    protected static function newFactory(): Factory
+    protected static function newFactory(): ProjectCategoryFactory
     {
         return ProjectCategoryFactory::new();
     }
@@ -55,12 +58,18 @@ class ProjectCategory extends Model
         });
     }
 
-    public function projects()
+    /**
+     * @return HasMany<Project, $this>
+     */
+    public function projects(): HasMany
     {
         return $this->hasMany(Project::class);
     }
 
-    public function invoices()
+    /**
+     * @return HasMany<ProjectInvoice, $this>
+     */
+    public function invoices(): HasMany
     {
         return $this->hasMany(ProjectInvoice::class);
     }

@@ -9,48 +9,34 @@
 
     <div class="space-y-5 sm:space-y-6">
         <!-- Header with Search and Add Button -->
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-            <div class="flex items-center justify-between p-5">
-                <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
-                    {{ __('pm::bank_account.list_title') }}
-                </h3>
-                <div class="flex gap-3">
-                    @canAccess('pm.master.bank_account.create')
-                    <button
-                        class="btn primary"
-                        type="button"
-                        @click="$dispatch('open-modal-bank-account-form')"
-                                                    wire:click="$dispatch('reset-bank-account-form')"
-                    >
-                        <span class="fa-solid fa-plus"></span>
-                        {{ __('pm::labels.add') }}
-                    </button>
-                    @endcanAccess
+        <x-synapse-panel :title="__('pm::bank_account.list_title')">
+            <x-slot:toolbar>
+                @canAccess('pm.master.bank_account.create')
+                <button
+                    class="btn primary"
+                    type="button"
+                    @click="$dispatch('open-modal-bank-account-form')"
+                    wire:click="$dispatch('reset-bank-account-form')"
+                >
+                    <span class="ph ph-plus"></span>
+                    {{ __('pm::labels.add') }}
+                </button>
+                @endcanAccess
 
-                    <!-- Search Input -->
-                    <div class="input-group">
-                        <input
-                            class="form-input p-2"
-                            type="text"
-                            placeholder="{{ __('pm::bank_account.search_placeholder') }}"
-                            wire:model.live.debounce="q"
-                        >
-                        <span class="input-group-item right">
-                            <span class="fa-solid fa-search text-gray-400"></span>
-                        </span>
-                    </div>
-                </div>
-            </div>
+                <x-synapse-search-box
+                    :placeholder="__('pm::bank_account.search_placeholder')"
+                    wire:model.live.debounce="q"
+                />
+            </x-slot:toolbar>
 
             <!-- Card Grid -->
-            <div class="border-t border-gray-100 p-5 dark:border-gray-800">
+            <div class="syn-panel-body p-5">
                 @if ($this->accountList->count() > 0)
                     <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                         @foreach ($this->accountList as $account)
-                            <div
-                                class="overflow-hidden rounded-lg border border-gray-200 bg-white transition-shadow hover:shadow-lg dark:border-gray-700 dark:bg-gray-800">
+                            <div class="syn-media-card">
                                 <!-- Bank Logo -->
-                                <div class="h-24 overflow-hidden bg-gray-100 dark:bg-gray-700">
+                                <div class="syn-media-card-img h-24">
                                     @if ($account->bank_logo)
                                         <img
                                             class="h-full w-full object-contain"
@@ -58,28 +44,28 @@
                                             alt="{{ $account->bank_name }}"
                                         >
                                     @else
-                                        <div class="flex h-full w-full items-center justify-center">
-                                            <span class="fa-solid fa-building-columns text-4xl text-gray-400"></span>
+                                        <div class="syn-media-card-placeholder">
+                                            <span class="ph ph-bank"></span>
                                         </div>
                                     @endif
                                 </div>
 
                                 <!-- Card Body -->
-                                <div class="p-4">
-                                    <h4 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
+                                <div class="syn-media-card-body">
+                                    <h4 class="syn-media-card-title">
                                         {{ $account->bank_name }}
                                     </h4>
 
                                     <div class="space-y-2 text-sm">
                                         <div class="flex items-start">
-                                            <span class="fa-solid fa-user mt-0.5 w-5 text-gray-400"></span>
+                                            <span class="ph ph-user mt-0.5 w-5 text-gray-400"></span>
                                             <p class="ml-2 font-medium text-gray-700 dark:text-gray-300">
                                                 {{ $account->name }}
                                             </p>
                                         </div>
 
                                         <div class="flex items-start">
-                                            <span class="fa-solid fa-hashtag mt-0.5 w-5 text-gray-400"></span>
+                                            <span class="ph ph-hash mt-0.5 w-5 text-gray-400"></span>
                                             <p class="ml-2 font-mono text-gray-600 dark:text-gray-400">
                                                 {{ $account->number }}
                                             </p>
@@ -87,22 +73,22 @@
                                     </div>
 
                                     <!-- Action Buttons -->
-                                    <div class="mt-4 flex gap-2 border-t border-gray-200 pt-4 dark:border-gray-700">
+                                    <div class="syn-media-card-actions">
                                         @canAccess('pm.master.bank_account.update')
                                         <button
-                                            class="btn-icon warning btn-sm warning flex-1"
+                                            class="btn-icon warning sm flex-1"
                                             type="button"
                                             @click="$dispatch('open-modal-bank-account-form')"
-                                                    wire:click="$dispatch('load-bank-account', { id: {{ $account->id }} })"
+                                            wire:click="$dispatch('load-bank-account', { id: {{ $account->id }} })"
                                         >
-                                            <span class="fa-solid fa-edit"></span>
+                                            <span class="ph ph-pencil-simple"></span>
                                             {{ __('pm::labels.edit') }}
                                         </button>
                                         @endcanAccess
 
                                         @canAccess('pm.master.bank_account.delete')
                                         <button
-                                            class="btn-icon danger btn-sm danger flex-1"
+                                            class="btn-icon danger sm flex-1"
                                             type="button"
                                             wire:click="$dispatch('confirm-dialog', {
                                                     title: '{{ __('pm::bank_account.delete_title') }}',
@@ -116,7 +102,7 @@
                                                     wireComponent: '{{ $this->getId() }}'
                                                 })"
                                         >
-                                            <span class="fa-solid fa-trash"></span>
+                                            <span class="ph ph-trash"></span>
                                             {{ __('pm::labels.delete') }}
                                         </button>
                                         @endcanAccess
@@ -126,21 +112,19 @@
                         @endforeach
                     </div>
                 @else
-                    <div class="py-12 text-center">
-                        <span class="fa-solid fa-building-columns text-6xl text-gray-300 dark:text-gray-600"></span>
-                        <p class="mt-4 text-gray-500 dark:text-gray-400">
-                            {{ __('pm::bank_account.no_data') }}
-                        </p>
+                    <div class="syn-empty-state">
+                        <span class="ph ph-bank syn-empty-state-icon"></span>
+                        <p class="syn-empty-state-text">{{ __('pm::bank_account.no_data') }}</p>
                     </div>
                 @endif
             </div>
 
             <!-- Pagination -->
             @if ($this->accountList->hasPages())
-                <div class="flex gap-2 border-t border-gray-100 p-3 dark:border-gray-800">
+                <div class="syn-per-page-selector syn-panel-body">
                     <div class="flex-none p-1">
                         <select
-                            class="shadow-theme-sm rounded-sm p-1"
+                            class="syn-per-page-select"
                             wire:model.live="limit"
                         >
                             <option value="6">6</option>
@@ -154,7 +138,7 @@
                     </div>
                 </div>
             @endif
-        </div>
+        </x-synapse-panel>
     </div>
 
     <!-- Bank Account Form Modal -->

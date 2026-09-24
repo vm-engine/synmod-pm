@@ -9,15 +9,21 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use VmEngine\Pm\Factories\ProjectInvoiceFactory;
+use VmEngine\Pm\Models\Concerns\ResolvesUserModel;
 use VmEngine\Synapse\Traits\WithDeleteToken;
+use VmEngine\SynAuth\Models\User;
 use VmEngine\SynAuth\Traits\HasCreator;
 use VmEngine\SynAuth\Traits\HasUpdater;
 
 class ProjectInvoice extends Model
 {
     use HasCreator;
+    /** @use HasFactory<ProjectInvoiceFactory> */
     use HasFactory;
+
     use HasUpdater;
+
+    use ResolvesUserModel;
     use WithDeleteToken;
 
     protected $fillable = [
@@ -104,66 +110,105 @@ class ProjectInvoice extends Model
         return ProjectInvoiceFactory::new();
     }
 
+    /**
+     * @return BelongsTo<Project, $this>
+     */
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
     }
 
+    /**
+     * @return BelongsTo<ProjectCategory, $this>
+     */
     public function projectCategory(): BelongsTo
     {
         return $this->belongsTo(ProjectCategory::class);
     }
 
+    /**
+     * @return BelongsTo<Client, $this>
+     */
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(config('auth.providers.users.model'));
+        return $this->belongsTo(static::userModel());
     }
 
+    /**
+     * @return BelongsTo<ProjectDocument, $this>
+     */
     public function spkDocument(): BelongsTo
     {
         return $this->belongsTo(ProjectDocument::class, 'spk_document_id');
     }
 
+    /**
+     * @return BelongsTo<DocumentIssuer, $this>
+     */
     public function issuer(): BelongsTo
     {
         return $this->belongsTo(DocumentIssuer::class);
     }
 
+    /**
+     * @return BelongsTo<BankAccount, $this>
+     */
     public function bankAccount(): BelongsTo
     {
         return $this->belongsTo(BankAccount::class);
     }
 
+    /**
+     * @return BelongsTo<Signature, $this>
+     */
     public function signature(): BelongsTo
     {
         return $this->belongsTo(Signature::class);
     }
 
+    /**
+     * @return HasMany<ProjectInvoiceItem, $this>
+     */
     public function items(): HasMany
     {
         return $this->hasMany(ProjectInvoiceItem::class);
     }
 
+    /**
+     * @return BelongsTo<ProjectDocument, $this>
+     */
     public function invoiceDocument(): BelongsTo
     {
         return $this->belongsTo(ProjectDocument::class, 'invoice_document_id');
     }
 
+    /**
+     * @return BelongsTo<ProjectDocument, $this>
+     */
     public function receiptDocument(): BelongsTo
     {
         return $this->belongsTo(ProjectDocument::class, 'receipt_document_id');
     }
 
+    /**
+     * @return BelongsTo<ProjectDocument, $this>
+     */
     public function invoiceDocumentEn(): BelongsTo
     {
         return $this->belongsTo(ProjectDocument::class, 'invoice_document_en_id');
     }
 
+    /**
+     * @return BelongsTo<ProjectDocument, $this>
+     */
     public function receiptDocumentEn(): BelongsTo
     {
         return $this->belongsTo(ProjectDocument::class, 'receipt_document_en_id');

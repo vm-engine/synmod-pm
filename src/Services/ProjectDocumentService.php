@@ -13,11 +13,14 @@ use VmEngine\Pm\Enums\Documents;
 use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Pm\Models\ProjectDocument;
+use VmEngine\Pm\Services\Concerns\RecordsActivity;
 use VmEngine\Synapse\Services\Excel\ExcelExporter;
-use VmEngine\SynAuth\Facades\SynAuth;
+use VmEngine\SynAuth\Models\User;
 
 class ProjectDocumentService
 {
+    use RecordsActivity;
+
     /**
      * Upload a new document.
      */
@@ -79,12 +82,10 @@ class ProjectDocumentService
         $deleted = $document->delete();
 
         // Log activity
-        SynAuth::logActivity(
-            Auth::id(),
+        $this->recordActivity(
             'pm.project.'.$document->project_id.'.documents.deleted',
             'User '.Auth::user()->name.' deleted document. Data: '.json_encode($documentData),
             'project.'.$document->project_id.'.documents',
-            'pm',
         );
 
         return $deleted;
@@ -122,12 +123,10 @@ class ProjectDocumentService
         ]);
 
         // Log activity
-        SynAuth::logActivity(
-            Auth::id(),
+        $this->recordActivity(
             'pm.project.'.$project->id.'.documents.restored',
             'User '.Auth::user()->name.' restored document version '.$oldDocument->version.' as version '.($latestVersion + 1),
             'project.'.$project->id.'.documents',
-            'pm',
         );
 
         return $newDocument;
@@ -138,7 +137,7 @@ class ProjectDocumentService
      */
     public function canAccessDocument(Project $project): bool
     {
-        /** @var VmEngine\SynAuth\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
 
         if (! $user) {
@@ -194,6 +193,8 @@ class ProjectDocumentService
 
     /**
      * Export project documents report to Excel.
+     *
+     * @param  array<int, int|string>  $projectCategories
      */
     public function exportToExcel(int $year, ?Documents $documentType = null, array $projectCategories = []): BinaryFileResponse
     {
@@ -228,7 +229,7 @@ class ProjectDocumentService
                 },
                 $clientCol => fn ($project) => $project->client?->company,
                 $projectCol => 'name',
-                $categoryCol => fn ($project) => $project->projectCategory?->name ?? __('pm::report.documents.table.uncategorized'),
+                $categoryCol => fn ($project) => $project->projectCategory->name ?? __('pm::report.documents.table.uncategorized'),
                 $statusCol => fn ($project) => $project->documents->contains(fn ($doc) => $doc->type === Documents::SPK)
                     ? __('pm::report.documents.status.deal')
                     : __('pm::report.documents.status.pending'),
@@ -251,15 +252,15 @@ class ProjectDocumentService
 
     /**
      * Log document activity.
+     *
+     * @param  array<string, mixed>  $data
      */
     private function logActivity(string $action, Project $project, Documents $documentType, array $data): void
     {
-        SynAuth::logActivity(
-            Auth::id(),
+        $this->recordActivity(
             'pm.project.'.$project->id.'.documents.'.$action,
             'User '.Auth::user()->name.' '.$action.' '.$documentType->label().' document. Data: '.json_encode($data),
             'project.'.$project->id.'.documents',
-            'pm',
         );
     }
 }

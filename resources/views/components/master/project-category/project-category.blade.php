@@ -5,13 +5,8 @@
     <x-synapse-confirm-dialog />
 
     <div class="space-y-5 sm:space-y-6">
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-            <div class="flex items-center justify-between p-5">
-                <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
-                    {{ __('pm::project_category.list_title') }}
-                </h3>
-            </div>
-            <div class="border-t border-gray-100 dark:border-gray-800">
+        <x-synapse-panel :title="__('pm::project_category.list_title')">
+            <div class="syn-panel-body">
                 <div class="max-w-full overflow-x-auto">
                     <table
                         class="datatable min-w-full"
@@ -33,7 +28,7 @@
                                 <th>
                                     <p>{{ __('pm::labels.description') }}</p>
                                 </th>
-                                <th class="w-[200px]">
+                                <th class="datatable-col-actions w-[200px]">
                                     <p>{{ __('pm::labels.actions') }}</p>
                                 </th>
                             </tr>
@@ -118,7 +113,7 @@
                                                     type="button"
                                                     wire:click="cancelEdit"
                                                 >
-                                                    <span class="fa-solid fa-xmark"></span>
+                                                    <span class="ph ph-x"></span>
                                                     <span class="tooltip">{{ __('pm::labels.cancel') }}</span>
                                                 </button>
                                             @else
@@ -128,7 +123,7 @@
                                                     type="button"
                                                     wire:click="edit({{ $category->id }})"
                                                 >
-                                                    <span class="fa-solid fa-edit"></span>
+                                                    <span class="ph ph-pencil-simple"></span>
                                                     <span class="tooltip">{{ __('pm::labels.edit') }}</span>
                                                 </button>
                                                 @endcanAccess
@@ -148,7 +143,7 @@
                                                             wireComponent: '{{ $this->getId() }}'
                                                         })"
                                                 >
-                                                    <span class="fa-solid fa-trash"></span>
+                                                    <span class="ph ph-trash"></span>
                                                     <span class="tooltip">{{ __('pm::labels.delete') }}</span>
                                                 </button>
                                                 @endcanAccess
@@ -158,7 +153,7 @@
                                                     type="button"
                                                     wire:click="loadIndexes({{ $category->id }})"
                                                 >
-                                                    <span class="fa-solid fa-list-ol"></span>
+                                                    <span class="ph ph-list-numbers"></span>
                                                     <span
                                                         class="tooltip">{{ __('pm::project_category.category_index') }}</span>
                                                 </button>
@@ -173,17 +168,15 @@
                             @empty
                                 <tr>
                                     <td colspan="5">
-                                        <div class="py-8 text-center">
-                                            <span
-                                                class="fa-solid fa-folder-tree text-4xl text-gray-300 dark:text-gray-600"
-                                            ></span>
-                                            <p class="mt-3 text-gray-500 dark:text-gray-400">
-                                                {{ __('pm::project_category.no_data') }}</p>
+                                        <div class="syn-empty-state">
+                                            <span class="ph ph-tree-structure syn-empty-state-icon"></span>
+                                            <p class="syn-empty-state-text">{{ __('pm::project_category.no_data') }}
+                                            </p>
                                         </div>
                                     </td>
                                 </tr>
                             @endforelse
-                            <tr class="!bg-gray-50/50 dark:!bg-white/[0.02]">
+                            <tr class="syn-row-muted">
                                 <td>
                                     {{ $i }}
                                 </td>
@@ -243,21 +236,26 @@
                     </table>
                 </div>
             </div>
-        </div>
+        </x-synapse-panel>
     </div>
 
     <x-synapse-modal
         name="document-index"
         max-width="3xl"
     >
-        <div class="p-6">
-
-            <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
-                Document Index
-            </h3>
-
-            <form wire:submit.prevent="updateIndexes">
-                <div class="max-h-[700px] overflow-y-auto">
+        <div class="syn-modal-header">
+            <h3 class="syn-modal-title">Document Index</h3>
+            <button
+                class="syn-modal-close"
+                type="button"
+                @click="$dispatch('close-modal-document-index')"
+            >
+                <span class="ph ph-x text-xl"></span>
+            </button>
+        </div>
+        <form wire:submit.prevent="updateIndexes">
+            <div class="syn-modal-body">
+                <div class="max-h-[60vh] overflow-y-auto">
                     <table class="datatable">
                         <thead>
                             <tr>
@@ -312,46 +310,45 @@
                         </tbody>
                     </table>
                 </div>
-
-                {{-- Footer Actions --}}
-                <div class="flex justify-end gap-2 border-t border-gray-200 pt-4 dark:border-gray-700">
-                    <button
-                        class="btn btn-outline"
-                        type="button"
-                        @click="$dispatch('close-modal-document-index')"
-                        wire:loading.attr="disabled"
+            </div>
+            {{-- Footer Actions --}}
+            <div class="syn-modal-footer">
+                <button
+                    class="btn secondary"
+                    type="button"
+                    @click="$dispatch('close-modal-document-index')"
+                    wire:loading.attr="disabled"
+                    wire:target="updateIndexes"
+                >
+                    Cancel
+                </button>
+                <button
+                    class="btn primary"
+                    type="button"
+                    wire:click="updateIndexes"
+                    wire:loading.attr="disabled"
+                    wire:target="updateIndexes"
+                >
+                    <span
+                        class="ph ph-check mr-1"
+                        wire:loading.remove
                         wire:target="updateIndexes"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        class="btn primary"
-                        type="button"
-                        wire:click="updateIndexes"
-                        wire:loading.attr="disabled"
+                    ></span>
+                    <span
+                        class="ph ph-spinner syn-spin mr-1"
+                        wire:loading
                         wire:target="updateIndexes"
-                    >
-                        <span
-                            class="fa-solid fa-check mr-1"
-                            wire:loading.remove
-                            wire:target="updateIndexes"
-                        ></span>
-                        <span
-                            class="fa-solid fa-spinner fa-spin mr-1"
-                            wire:loading
-                            wire:target="updateIndexes"
-                        ></span>
-                        <span
-                            wire:loading.remove
-                            wire:target="updateIndexes"
-                        >Update</span>
-                        <span
-                            wire:loading
-                            wire:target="updateIndexes"
-                        >Updating...</span>
-                    </button>
-                </div>
-            </form>
-        </div>
+                    ></span>
+                    <span
+                        wire:loading.remove
+                        wire:target="updateIndexes"
+                    >Update</span>
+                    <span
+                        wire:loading
+                        wire:target="updateIndexes"
+                    >Updating...</span>
+                </button>
+            </div>
+        </form>
     </x-synapse-modal>
 </div>

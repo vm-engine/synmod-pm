@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Models;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -16,7 +15,10 @@ use VmEngine\SynAuth\Traits\HasUpdater;
 class Division extends Model
 {
     use HasCreator;
+
+    /** @use HasFactory<DivisionFactory> */
     use HasFactory;
+
     use HasUpdater;
     use WithDeleteToken;
 
@@ -30,7 +32,7 @@ class Division extends Model
     /**
      * Create a new factory instance for the model.
      */
-    protected static function newFactory(): Factory
+    protected static function newFactory(): DivisionFactory
     {
         return DivisionFactory::new();
     }
@@ -57,6 +59,8 @@ class Division extends Model
 
     /**
      * Get the sub divisions for this division.
+     *
+     * @return HasMany<SubDivision, $this>
      */
     public function subDivisions(): HasMany
     {
@@ -65,6 +69,8 @@ class Division extends Model
 
     /**
      * Get the projects for this division.
+     *
+     * @return HasMany<Project, $this>
      */
     public function projects(): HasMany
     {

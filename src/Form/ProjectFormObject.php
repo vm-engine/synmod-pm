@@ -29,6 +29,9 @@ class ProjectFormObject extends Form
 
     public ?int $project_category_id = null;
 
+    /**
+     * @var array<int, int|string>
+     */
     public array $sub_division = [];
 
     public ?int $client_id = null;
@@ -83,6 +86,9 @@ class ProjectFormObject extends Form
 
     public ?int $project_manager_id = null;
 
+    /**
+     * @var array<int, int|string>
+     */
     public array $assigned_team = [];
 
     // Technical
@@ -103,6 +109,9 @@ class ProjectFormObject extends Form
 
     public ?int $client_satisfaction = null;
 
+    /**
+     * @var array<int, string>
+     */
     public array $tags = [];
 
     /**
@@ -135,9 +144,9 @@ class ProjectFormObject extends Form
         $this->client_approved_at = $project->client_approved_at?->format('Y-m-d') ?? '';
 
         // Status & Progress
-        $this->status = $project->status?->value ?? ProjectStatus::PROSPECT->value;
+        $this->status = $project->status->value ?? ProjectStatus::PROSPECT->value;
         $this->progress = $project->progress ?? 0;
-        $this->priority = $project->priority?->value ?? ProjectPriority::MEDIUM->value;
+        $this->priority = $project->priority->value ?? ProjectPriority::MEDIUM->value;
         $this->risk_level = $project->risk_level?->value;
 
         // Client Information
@@ -161,7 +170,7 @@ class ProjectFormObject extends Form
         $this->staging_url = $project->staging_url ?? '';
         $this->production_url = $project->production_url ?? '';
         $this->repository_url = $project->repository_url ?? '';
-        $this->server_info = ! empty($project->server_info) ? json_encode($project->server_info) : '';
+        $this->server_info = ! empty($project->server_info) ? json_encode($project->server_info, JSON_THROW_ON_ERROR) : '';
 
         // Quality
         $this->maintenance_type = $project->maintenance_type?->value;
@@ -187,6 +196,8 @@ class ProjectFormObject extends Form
 
     /**
      * Get validation rules.
+     *
+     * @return array<string, mixed>
      */
     public function rules(): array
     {
@@ -258,6 +269,8 @@ class ProjectFormObject extends Form
 
     /**
      * Get custom validation messages.
+     *
+     * @return array<string, string>
      */
     protected function messages(): array
     {
@@ -310,6 +323,8 @@ class ProjectFormObject extends Form
 
     /**
      * Prepare project data array from form fields.
+     *
+     * @return array<string, mixed>
      */
     private function prepareProjectData(): array
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Form;
 
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\Form;
 use VmEngine\Pm\Models\DocumentIssuer;
 use VmEngine\Pm\Services\IssuerService;
@@ -14,6 +15,9 @@ class IssuerFormObject extends Form
 
     public string $name = '';
 
+    /**
+     * @var TemporaryUploadedFile|null
+     */
     public $header_image = null;
 
     public string $tax_id_name = '';
@@ -34,6 +38,9 @@ class IssuerFormObject extends Form
         $this->existing_header_image = $issuer->header_image;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function rules(): array
     {
         return [
@@ -50,6 +57,9 @@ class IssuerFormObject extends Form
         ];
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function messages(): array
     {
         return [

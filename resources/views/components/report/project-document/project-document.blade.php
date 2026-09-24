@@ -13,7 +13,7 @@
         >
             <div class="flex w-full items-center justify-between">
                 <h3 class="card-title">
-                    <span class="fa-solid fa-filter mr-2"></span>
+                    <span class="ph ph-funnel mr-2"></span>
                     {{ __('pm::report.documents.filters.label') }}
                 </h3>
                 <button
@@ -21,7 +21,7 @@
                     type="button"
                 >
                     <span
-                        class="fa-solid fa-chevron-down transition-transform duration-200"
+                        class="ph ph-caret-down transition-transform duration-200"
                         :class="{ 'rotate-180': filtersExpanded }"
                     ></span>
                 </button>
@@ -82,7 +82,7 @@
                         type="button"
                         wire:click="clearFilters"
                     >
-                        <span class="fa-solid fa-filter-circle-xmark mr-1"></span>
+                        <span class="ph ph-funnel-x mr-1"></span>
                         {{ __('pm::report.documents.filters.reset') }}
                     </button>
 
@@ -93,12 +93,12 @@
                         wire:loading.attr="disabled"
                     >
                         <span
-                            class="fa-solid fa-file-excel mr-1"
+                            class="ph ph-file-xls mr-1"
                             wire:loading.remove
                             wire:target="exportToExcel"
                         ></span>
                         <span
-                            class="fa-solid fa-spinner fa-spin mr-1"
+                            class="ph ph-spinner syn-spin mr-1"
                             wire:loading
                             wire:target="exportToExcel"
                         ></span>
@@ -121,14 +121,8 @@
     </div>
 
     <!-- Results Table -->
-    <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-        <div class="flex items-center justify-between p-5">
-            <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
-                <span class="fa-solid fa-file-lines mr-2 text-blue-600 dark:text-blue-400"></span>
-                {{ __('pm::report.documents.title') }}
-            </h3>
-        </div>
-        <div class="border-t border-gray-100 dark:border-gray-800">
+    <x-synapse-panel :title="__('pm::report.documents.title')">
+        <div class="syn-panel-body">
             <div class="max-w-full overflow-x-auto">
                 <table
                     class="datatable min-w-full"
@@ -170,28 +164,41 @@
                                         @foreach ($project->documents as $document)
                                             @php
                                                 $typeName = strtoupper($document->type->name);
-                                                $typeColors = match($typeName) {
-                                                    'PROPOSAL' => 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-                                                    'SPH' => 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-                                                    'SPK' => 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-                                                    'INVOICE' => 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-                                                    default => 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
+                                                $typeColors = match ($typeName) {
+                                                    'PROPOSAL'
+                                                        => 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+                                                    'SPH'
+                                                        => 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+                                                    'SPK'
+                                                        => 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+                                                    'INVOICE'
+                                                        => 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+                                                    default
+                                                        => 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
                                                 };
                                             @endphp
                                             <div class="flex items-start gap-3">
-                                                <span class="inline-flex min-w-[70px] items-center justify-center rounded-md px-2 py-1 text-xs font-bold uppercase tracking-wide {{ $typeColors }}">
+                                                <span
+                                                    class="inline-flex min-w-[70px] items-center justify-center rounded-md px-2 py-1 text-xs font-bold uppercase tracking-wide {{ $typeColors }}"
+                                                >
                                                     {{ $typeName }}
                                                 </span>
                                                 <div class="min-w-0 flex-1">
-                                                    <div class="font-semibold text-gray-900 dark:text-white">{{ $document->number }}</div>
-                                                    <div class="mt-0.5 flex flex-wrap items-center gap-x-3 text-xs text-gray-500 dark:text-gray-400">
+                                                    <div class="font-semibold text-gray-900 dark:text-white">
+                                                        {{ $document->number }}</div>
+                                                    <div
+                                                        class="mt-0.5 flex flex-wrap items-center gap-x-3 text-xs text-gray-500 dark:text-gray-400">
                                                         <span>
-                                                            <span class="fa-solid fa-calendar-days mr-1 text-gray-400 dark:text-gray-500"></span>
+                                                            <span
+                                                                class="ph ph-calendar-blank mr-1 text-gray-400 dark:text-gray-500"
+                                                            ></span>
                                                             {{ $document->created_at->format('j M Y') }}
                                                         </span>
                                                         <span>
-                                                            <span class="fa-solid fa-user mr-1 text-gray-400 dark:text-gray-500"></span>
-                                                            {{ $document->creator->name }}
+                                                            <span
+                                                                class="ph ph-user mr-1 text-gray-400 dark:text-gray-500"
+                                                            ></span>
+                                                            {{ $document->creator?->name ?? __('pm::project_document.unknown') }}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -212,11 +219,11 @@
                                 <td>
                                     <div>
                                         @if ($project->projectCategory)
-                                            <span class="inline-flex items-center rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-medium text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400">
-                                                {{ $project->projectCategory->name }}
-                                            </span>
+                                            <x-synapse-badge
+                                                color="brand">{{ $project->projectCategory->name }}</x-synapse-badge>
                                         @else
-                                            <span class="text-gray-400 italic">{{ __('pm::report.documents.table.uncategorized') }}</span>
+                                            <span
+                                                class="text-gray-400 italic">{{ __('pm::report.documents.table.uncategorized') }}</span>
                                         @endif
                                     </div>
                                 </td>
@@ -224,8 +231,10 @@
                                     <div class="flex justify-center">
                                         @if ($project->hasSPKDocument())
                                             <div class="flex flex-col items-center gap-1">
-                                                <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">
-                                                    <span class="fa-solid fa-circle-check text-lg"></span>
+                                                <span
+                                                    class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                                                >
+                                                    <span class="ph ph-check-circle text-lg"></span>
                                                 </span>
                                                 <span class="text-xs font-semibold text-green-700 dark:text-green-400">
                                                     {{ __('pm::report.documents.status.deal') }}
@@ -233,8 +242,10 @@
                                             </div>
                                         @else
                                             <div class="flex flex-col items-center gap-1">
-                                                <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
-                                                    <span class="fa-solid fa-clock text-lg"></span>
+                                                <span
+                                                    class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400"
+                                                >
+                                                    <span class="ph ph-clock text-lg"></span>
                                                 </span>
                                                 <span class="text-xs font-semibold text-amber-700 dark:text-amber-400">
                                                     {{ __('pm::report.documents.status.pending') }}
@@ -247,9 +258,10 @@
                         @empty
                             <tr>
                                 <td colspan="6">
-                                    <div class="py-12 text-center">
-                                        <span class="fa-solid fa-file-circle-xmark text-5xl text-gray-300 dark:text-gray-600"></span>
-                                        <p class="mt-4 text-gray-500 dark:text-gray-400">{{ __('pm::report.documents.table.no_data') }}</p>
+                                    <div class="syn-empty-state">
+                                        <span class="ph ph-file-x syn-empty-state-icon"></span>
+                                        <p class="syn-empty-state-text">{{ __('pm::report.documents.table.no_data') }}
+                                        </p>
                                     </div>
                                 </td>
                             </tr>
@@ -258,5 +270,5 @@
                 </table>
             </div>
         </div>
-    </div>
+    </x-synapse-panel>
 </div>

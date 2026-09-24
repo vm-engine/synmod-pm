@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Models;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -16,7 +15,10 @@ use VmEngine\SynAuth\Traits\HasUpdater;
 class ClientCategory extends Model
 {
     use HasCreator;
+
+    /** @use HasFactory<ClientCategoryFactory> */
     use HasFactory;
+
     use HasUpdater;
     use WithDeleteToken;
 
@@ -30,13 +32,15 @@ class ClientCategory extends Model
     /**
      * Create a new factory instance for the model.
      */
-    protected static function newFactory(): Factory
+    protected static function newFactory(): ClientCategoryFactory
     {
         return ClientCategoryFactory::new();
     }
 
     /**
      * Get the clients for this category.
+     *
+     * @return HasMany<Client, $this>
      */
     public function clients(): HasMany
     {

@@ -131,7 +131,7 @@
                             placeholder="{{ __('pm::client.social_media_placeholder') }}"
                             wire:model="form.social_media"
                         ></textarea>
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        <p class="form-help">
                             {{ __('pm::client.social_media_help') }}
                         </p>
                         @error('form.social_media')
@@ -162,7 +162,7 @@
                             wire:loading
                             wire:target="form.npwp_image"
                         >
-                            <span class="fa-solid fa-spinner fa-spin mr-1"></span>
+                            <span class="ph ph-spinner syn-spin mr-1"></span>
                             Uploading file...
                         </div>
                     </div>
@@ -209,7 +209,7 @@
                             wire:model="form.name"
                             readonly
                         />
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        <p class="form-help">
                             {{ __('pm::client.name_help') }}
                         </p>
                         @error('form.name')
@@ -235,7 +235,7 @@
                         <label for="email">{{ __('pm::client.email') }}</label>
                         <div class="input-group">
                             <span class="input-group-item left">
-                                <span class="fa-solid fa-envelope"></span>
+                                <span class="ph ph-envelope"></span>
                             </span>
                             <input
                                 class="form-input pl-[62px]! @error('form.email') has-error @enderror"
@@ -259,7 +259,7 @@
                             @class(['has-error' => $errors->has('form.password')])
                         />
                         @if ($form->client)
-                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            <p class="form-help">
                                 {{ __('pm::client.password_edit_help') }}
                             </p>
                         @endif
@@ -290,19 +290,13 @@
                     </div>
 
                     @if ($form->status === 0)
-                        <div class="rounded-md bg-yellow-50 p-4 dark:bg-yellow-900/20">
-                            <div class="flex">
-                                <div class="shrink-0">
-                                    <span class="fa-solid fa-exclamation-triangle text-yellow-400"></span>
-                                </div>
-                                <div class="ml-3">
-                                    <p class="text-sm text-yellow-700 dark:text-yellow-300">
-                                        <strong>{{ __('pm::client.prospect_note_strong') }}</strong>
-                                        {{ __('pm::client.prospect_note') }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                        <x-synapse-alert
+                            type="warning"
+                            :dismissible="false"
+                        >
+                            <strong>{{ __('pm::client.prospect_note_strong') }}</strong>
+                            {{ __('pm::client.prospect_note') }}
+                        </x-synapse-alert>
                     @endif
                 </div>
             </div>
@@ -317,7 +311,7 @@
             wire:click="save"
             wire:loading.attr="disabled"
         >
-            <span class="fa-solid fa-floppy-disk"></span>
+            <span class="ph ph-floppy-disk"></span>
             <span
                 wire:loading.remove
                 wire:target="save"
@@ -332,7 +326,7 @@
             href="{{ backend_route('pm.client.index') }}"
             wire:navigate
         >
-            <span class="fa-solid fa-times"></span> {{ __('pm::client.cancel') }}
+            <span class="ph ph-x"></span> {{ __('pm::client.cancel') }}
         </a>
     </div>
 </div>

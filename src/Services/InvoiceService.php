@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Services;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -13,17 +15,21 @@ use VmEngine\Pm\Enums\Documents;
 use VmEngine\Pm\Exports\InvoiceExportQuery;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Pm\Models\ProjectInvoice;
+use VmEngine\Pm\Services\Concerns\RecordsActivity;
 use VmEngine\Synapse\Models\ExcelExport;
 use VmEngine\Synapse\Services\Excel\ExcelExporter;
 use VmEngine\Synapse\Services\Excel\Transformers\BooleanTransformer;
 use VmEngine\Synapse\Services\Excel\Transformers\DateFormatTransformer;
 use VmEngine\Synapse\Services\Excel\Transformers\DefaultValueTransformer;
-use VmEngine\SynAuth\Facades\SynAuth;
 
 class InvoiceService
 {
+    use RecordsActivity;
+
     /**
      * Create a new invoice.
+     *
+     * @param  array<string, mixed>  $invoiceData
      */
     public function create(Project $project, array $invoiceData): ProjectInvoice
     {
@@ -68,6 +74,8 @@ class InvoiceService
 
     /**
      * Update an existing invoice.
+     *
+     * @param  array<string, mixed>  $invoiceData
      */
     public function update(ProjectInvoice $invoice, array $invoiceData): ProjectInvoice
     {
@@ -97,12 +105,10 @@ class InvoiceService
         $deleted = $invoice->delete();
 
         // Log activity
-        SynAuth::logActivity(
-            Auth::id(),
+        $this->recordActivity(
             'pm.project.'.$project->id.'.invoice.delete',
             'User '.Auth::user()->name.' deleted an invoice. Data: '.json_encode($invoiceData),
             'project.'.$project->id.'.invoice',
-            'pm',
         );
 
         return $deleted;
@@ -166,6 +172,9 @@ class InvoiceService
 
     /**
      * Log invoice activity.
+     *
+     * @param  array<string, mixed>|null  $newData
+     * @param  array<string, mixed>|null  $oldData
      */
     private function logActivity(string $action, Project $project, ProjectInvoice $invoice, ?array $newData = null, ?array $oldData = null): void
     {
@@ -176,17 +185,19 @@ class InvoiceService
             default => 'User '.Auth::user()->name.' performed '.$action.' on invoice.',
         };
 
-        SynAuth::logActivity(
-            Auth::id(),
+        $this->recordActivity(
             'pm.project.'.$project->id.'.invoice.'.$action,
             $message,
             'project.'.$project->id.'.invoice',
-            'pm',
         );
     }
 
     /**
      * Return statistic array
+     *
+     * Money sums come back from the driver as int, float or numeric string.
+     *
+     * @return array{invoice_count: int, receipt_count: int, sum_unpaid: int|float|string, sum_paid: int|float|string, total_invoiced: int|float|string, vat_total: int|float|string}
      */
     public function statistics(int $year): array
     {
@@ -209,6 +220,10 @@ class InvoiceService
 
     /**
      * Get the appropriate SQL expression for extracting year or month from a date column.
+     *
+     * @param  'YEAR'|'MONTH'  $part
+     * @param  literal-string  $column
+     * @return literal-string
      */
     private function dateExtract(string $part, string $column): string
     {
@@ -223,6 +238,9 @@ class InvoiceService
         return "{$part}({$column})";
     }
 
+    /**
+     * @return Builder<ProjectInvoice>
+     */
     private function baseInvoiceQuery(?int $year = null, bool $includeArchived = false): Builder
     {
         $query = ProjectInvoice::query();
@@ -241,8 +259,9 @@ class InvoiceService
     /**
      * @param  int|null  $year  Filter by year (null = all years)
      * @param  int|null  $id  Filter by creator ID
+     * @return EloquentCollection<int, ProjectInvoice>
      */
-    public function getByCreator(?int $year = null, ?int $id = null)
+    public function getByCreator(?int $year = null, ?int $id = null): EloquentCollection
     {
         $query = $this->baseInvoiceQuery($year)
             ->select(
@@ -263,7 +282,10 @@ class InvoiceService
         return $query->get();
     }
 
-    public function getByProject(?int $year = null)
+    /**
+     * @return EloquentCollection<int, ProjectInvoice>
+     */
+    public function getByProject(?int $year = null): EloquentCollection
     {
         return $this->baseInvoiceQuery($year)
             ->select(
@@ -323,8 +345,10 @@ class InvoiceService
 
     /**
      * Get invoices grouped by month.
+     *
+     * @return EloquentCollection<int, ProjectInvoice>
      */
-    public function getByMonth(?int $year = null)
+    public function getByMonth(?int $year = null): EloquentCollection
     {
         $yearExpr = $this->dateExtract('YEAR', 'issue_date');
         $monthExpr = $this->dateExtract('MONTH', 'issue_date');
@@ -352,6 +376,7 @@ class InvoiceService
      * Get paginated invoice list with filters.
      *
      * @param  array<string, mixed>  $filters
+     * @return LengthAwarePaginator<int, ProjectInvoice>
      */
     public function getInvoiceList(array $filters): LengthAwarePaginator
     {
@@ -452,6 +477,10 @@ class InvoiceService
     public function exportToExcel(int $year): ExcelExport
     {
         $userId = Auth::id();
+        if ($userId === null) {
+            throw new AuthenticationException;
+        }
+        $userId = (int) $userId; // guard ids are int|string; pm users have integer keys
         $reference = self::exportReference($year, $userId);
         $outputPath = storage_path('app/exports/invoices-'.$year.'-'.now()->format('YmdHis').'.xlsx');
 

@@ -30,7 +30,7 @@ new class extends Component
 
     public string $filterCreator = '';
 
-    public int $limit = 10;
+    public int $perPage = 10;
 
     public string $sort = 'id';
 
@@ -210,7 +210,7 @@ new class extends Component
 
         return $query
             ->orderBy($this->sort, $this->sortDirection)
-            ->paginate($this->limit)
+            ->paginate($this->perPage)
             ->onEachSide(1);
     }
 

@@ -6,22 +6,30 @@ namespace VmEngine\Pm\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use VmEngine\Pm\Factories\ClientFactory;
+use VmEngine\Pm\Models\Concerns\ResolvesUserModel;
 use VmEngine\Synapse\Traits\WithDeleteToken;
+use VmEngine\SynAuth\Models\User;
 use VmEngine\SynAuth\Traits\HasCreator;
 use VmEngine\SynAuth\Traits\HasUpdater;
 
+/**
+ * @property array<int, int|string>|null $services Service ids (JSON column)
+ */
 class Client extends Model
 {
     use HasCreator;
+
+    /** @use HasFactory<ClientFactory> */
     use HasFactory;
+
     use HasUpdater;
+    use ResolvesUserModel;
     use WithDeleteToken;
 
     // Status constants
@@ -51,7 +59,7 @@ class Client extends Model
     /**
      * Create a new factory instance for the model.
      */
-    protected static function newFactory(): Factory
+    protected static function newFactory(): ClientFactory
     {
         return ClientFactory::new();
     }
@@ -72,6 +80,8 @@ class Client extends Model
 
     /**
      * Get the category for this client.
+     *
+     * @return BelongsTo<ClientCategory, $this>
      */
     public function category(): BelongsTo
     {
@@ -80,14 +90,18 @@ class Client extends Model
 
     /**
      * Get the user that owns this client.
+     *
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(config('auth.providers.users.model'));
+        return $this->belongsTo(static::userModel());
     }
 
     /**
      * Get the projects for this client.
+     *
+     * @return HasMany<Project, $this>
      */
     public function projects(): HasMany
     {
@@ -96,6 +110,8 @@ class Client extends Model
 
     /**
      * Get project categories by this client
+     *
+     * @return HasManyThrough<ProjectCategory, Project, $this>
      */
     public function projectCategories(): HasManyThrough
     {
@@ -104,6 +120,8 @@ class Client extends Model
 
     /**
      * Get the documents for this client.
+     *
+     * @return HasMany<ProjectDocument, $this>
      */
     public function documents(): HasMany
     {
@@ -128,38 +146,52 @@ class Client extends Model
 
     /**
      * Scope a query to only include prospect clients.
+     *
+     * @param  Builder<Client>  $query
+     * @return Builder<Client>
      */
-    public function scopeProspect($query)
+    public function scopeProspect(Builder $query): Builder
     {
         return $query->where('status', self::STATUS_PROSPECT);
     }
 
     /**
      * Scope a query to only include active clients.
+     *
+     * @param  Builder<Client>  $query
+     * @return Builder<Client>
      */
-    public function scopeActiveStatus($query)
+    public function scopeActiveStatus(Builder $query): Builder
     {
         return $query->where('status', self::STATUS_ACTIVE);
     }
 
     /**
      * Scope a query to only include active (not disabled) clients.
+     *
+     * @param  Builder<Client>  $query
+     * @return Builder<Client>
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('active', true);
     }
 
     /**
      * Scope a query to only include inactive (disabled) clients.
+     *
+     * @param  Builder<Client>  $query
+     * @return Builder<Client>
      */
-    public function scopeInactive($query)
+    public function scopeInactive(Builder $query): Builder
     {
         return $query->where('active', false);
     }
 
     /**
      * Scope a query to search across multiple client fields.
+     *
+     * @param  Builder<Client>  $builder
      */
     #[Scope]
     protected function search(Builder $builder, string $q): void
@@ -171,6 +203,9 @@ class Client extends Model
 
     /**
      * Scope a query to filter by services (ANY match).
+     *
+     * @param  Builder<Client>  $builder
+     * @param  array<int, int|string>  $services
      */
     #[Scope]
     protected function byServiceAny(Builder $builder, array $services): void
@@ -188,6 +223,9 @@ class Client extends Model
 
     /**
      * Scope a query to filter by project category (ANY match).
+     *
+     * @param  Builder<Client>  $builder
+     * @param  array<int, int|string>  $categoryIds
      */
     #[Scope]
     protected function byProjectCategoryAny(Builder $builder, array $categoryIds): void

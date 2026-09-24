@@ -24,7 +24,6 @@ class Sph extends Base
     {
         $toDelete = $project->documents()
             ->where('type', '>', Documents::SPH->value)
-            ->get()
             ->pluck('id');
 
         ProjectDocument::destroy($toDelete);

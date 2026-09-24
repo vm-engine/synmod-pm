@@ -6,9 +6,13 @@ namespace VmEngine\Pm\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use VmEngine\Pm\Models\Concerns\ResolvesUserModel;
+use VmEngine\SynAuth\Models\User;
 
 class ApiLog extends Model
 {
+    use ResolvesUserModel;
+
     protected $fillable = [
         'user_id',
         'method',
@@ -33,8 +37,11 @@ class ApiLog extends Model
         ];
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(config('auth.providers.users.model'));
+        return $this->belongsTo(static::userModel());
     }
 }

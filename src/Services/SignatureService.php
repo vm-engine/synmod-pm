@@ -16,6 +16,8 @@ class SignatureService
 
     /**
      * Create a new signature.
+     *
+     * @param  array<string, mixed>  $signatureData
      */
     public function create(array $signatureData, ?TemporaryUploadedFile $file = null): Signature
     {
@@ -39,6 +41,8 @@ class SignatureService
 
     /**
      * Update an existing signature.
+     *
+     * @param  array<string, mixed>  $signatureData
      */
     public function update(Signature $signature, array $signatureData, ?TemporaryUploadedFile $file = null): Signature
     {

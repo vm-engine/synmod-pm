@@ -7,16 +7,20 @@ namespace VmEngine\Pm\Services;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use VmEngine\Pm\Models\DocumentIssuer;
-use VmEngine\SynAuth\Facades\SynAuth;
+use VmEngine\Pm\Services\Concerns\RecordsActivity;
 
 class IssuerService
 {
+    use RecordsActivity;
+
     public function __construct(
         private ImageProcessingService $imageService
     ) {}
 
     /**
      * Create a new document issuer.
+     *
+     * @param  array<string, mixed>  $issuerData
      */
     public function create(array $issuerData, ?TemporaryUploadedFile $headerImage = null): DocumentIssuer
     {
@@ -42,6 +46,8 @@ class IssuerService
 
     /**
      * Update an existing document issuer.
+     *
+     * @param  array<string, mixed>  $issuerData
      */
     public function update(DocumentIssuer $issuer, array $issuerData, ?TemporaryUploadedFile $headerImage = null): DocumentIssuer
     {
@@ -111,6 +117,9 @@ class IssuerService
 
     /**
      * Log issuer activity.
+     *
+     * @param  array<string, mixed>|null  $newData
+     * @param  array<string, mixed>|null  $oldData
      */
     private function logActivity(string $action, DocumentIssuer $issuer, ?array $newData = null, ?array $oldData = null): void
     {
@@ -121,12 +130,10 @@ class IssuerService
             default => 'User '.Auth::user()->name.' performed '.$action.' on issuer.',
         };
 
-        SynAuth::logActivity(
-            Auth::id(),
+        $this->recordActivity(
             'pm.master.issuer.'.$action,
             $message,
             'master.issuer',
-            'pm',
         );
     }
 }

@@ -60,6 +60,8 @@ trait ApiResponse
 
     /**
      * Return an error API response.
+     *
+     * @param  array<string, mixed>|null  $errors
      */
     protected function apiError(int $httpCode, string $serviceCode, string $responseCode, string $message, ?array $errors = null): JsonResponse
     {

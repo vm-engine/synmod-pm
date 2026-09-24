@@ -9,10 +9,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use VmEngine\Pm\Models\Client;
-use VmEngine\SynAuth\Facades\SynAuth;
+use VmEngine\Pm\Services\Concerns\RecordsActivity;
 
 class ClientService
 {
+    use RecordsActivity;
+
     public function __construct(
         private ClientUserService $userService,
         private FileUploadService $fileService
@@ -20,6 +22,9 @@ class ClientService
 
     /**
      * Create a new client with associated user account.
+     *
+     * @param  array<string, mixed>  $clientData
+     * @param  array<string, mixed>  $userData
      */
     public function create(array $clientData, array $userData, ?TemporaryUploadedFile $npwpImage = null): Client
     {
@@ -61,6 +66,9 @@ class ClientService
 
     /**
      * Update an existing client and associated user account.
+     *
+     * @param  array<string, mixed>  $clientData
+     * @param  array<string, mixed>  $userData
      */
     public function update(Client $client, array $clientData, array $userData, ?TemporaryUploadedFile $npwpImage = null): Client
     {
@@ -126,12 +134,10 @@ class ClientService
             $deleted = $client->delete();
 
             // Log activity with the data we saved earlier
-            SynAuth::logActivity(
-                Auth::id(),
+            $this->recordActivity(
                 'pm.client.delete',
                 'User '.Auth::user()->name.' deleted client data. Data: '.json_encode($clientData),
                 'client',
-                'pm',
             );
 
             return $deleted;
@@ -154,12 +160,10 @@ class ClientService
             ]);
 
             // Log activity
-            SynAuth::logActivity(
-                Auth::id(),
+            $this->recordActivity(
                 'pm.client.toggle_active',
                 'User '.Auth::user()->name.' toggled client active status. Client ID: '.$client->id.' Active: '.($client->active ? 'true' : 'false'),
                 'client',
-                'pm',
             );
         });
     }
@@ -168,6 +172,7 @@ class ClientService
      * Get paginated client list with filters.
      *
      * @param  array<string, mixed>  $filters
+     * @return LengthAwarePaginator<int, Client>
      */
     public function getClientList(array $filters): LengthAwarePaginator
     {
@@ -221,6 +226,8 @@ class ClientService
 
     /**
      * Parse social media textarea into array.
+     *
+     * @return array<int, string>
      */
     public function parseSocialMedia(?string $socialMedia): array
     {
@@ -229,7 +236,7 @@ class ClientService
         }
 
         return collect(explode("\n", $socialMedia))
-            ->map('trim')
+            ->map(fn (string $line): string => trim($line))
             ->filter()
             ->values()
             ->toArray();
@@ -237,6 +244,8 @@ class ClientService
 
     /**
      * Log client activity.
+     *
+     * @param  array<string, mixed>|null  $oldData
      */
     private function logActivity(string $action, Client $client, ?array $oldData = null): void
     {
@@ -247,12 +256,10 @@ class ClientService
             default => 'User '.Auth::user()->name.' performed '.$action.' on client.',
         };
 
-        SynAuth::logActivity(
-            Auth::id(),
+        $this->recordActivity(
             'pm.client.'.$action,
             $message,
             'client',
-            'pm',
         );
     }
 }

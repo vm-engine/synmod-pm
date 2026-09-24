@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Models;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,7 +15,10 @@ use VmEngine\SynAuth\Traits\HasUpdater;
 class SubDivision extends Model
 {
     use HasCreator;
+
+    /** @use HasFactory<SubDivisionFactory> */
     use HasFactory;
+
     use HasUpdater;
     use WithDeleteToken;
 
@@ -30,13 +32,15 @@ class SubDivision extends Model
     /**
      * Create a new factory instance for the model.
      */
-    protected static function newFactory(): Factory
+    protected static function newFactory(): SubDivisionFactory
     {
         return SubDivisionFactory::new();
     }
 
     /**
      * Get the division that owns this sub division.
+     *
+     * @return BelongsTo<Division, $this>
      */
     public function division(): BelongsTo
     {

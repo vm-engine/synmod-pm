@@ -18,88 +18,92 @@
 
     {{-- Upload Modal --}}
     @if (!$readonly)
-    <x-synapse-modal name="upload-{{ $this->documentType->code(true) }}">
-        <div class="p-6">
-            <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
-                Upload Document - {{ $title }}
-            </h3>
-
-            <form
-                class="space-y-4"
-                wire:submit.prevent="saveDocument"
-            >
-                {{-- Document Code --}}
-                <div>
-                    <label class="form-label required">Document Code</label>
-                    <input
-                        class="form-input w-full"
-                        type="text"
-                        wire:model="documentCode"
-                        placeholder="e.g., DOC-001, CONTRACT-2025-001"
-                    />
-                    @error('documentCode')
-                        <span class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
-                    @enderror
-                </div>
-
-                {{-- File Input --}}
-                <div>
-                    <label class="form-label required">File</label>
-                    <input
-                        class="form-input w-full"
-                        type="file"
-                        wire:model="file"
-                        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
-                    />
-                    @error('file')
-                        <span class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
-                    @enderror
-                    <div
-                        class="mt-1 text-sm text-blue-600 dark:text-blue-400"
-                        wire:loading
-                        wire:target="file"
-                    >
-                        <span class="fa-solid fa-spinner fa-spin mr-1"></span>
-                        Uploading file...
+        <x-synapse-modal name="upload-{{ $this->documentType->code(true) }}">
+            <div class="syn-modal-header">
+                <h3 class="syn-modal-title">Upload Document - {{ $title }}</h3>
+                <button
+                    class="syn-modal-close"
+                    type="button"
+                    @click="$dispatch('close-modal-upload-{{ $this->documentType->code(true) }}')"
+                >
+                    <span class="ph ph-x text-xl"></span>
+                </button>
+            </div>
+            <form wire:submit.prevent="saveDocument">
+                <div class="syn-modal-body space-y-4">
+                    {{-- Document Code --}}
+                    <div>
+                        <label class="form-label required">Document Code</label>
+                        <input
+                            class="form-input w-full"
+                            type="text"
+                            wire:model="documentCode"
+                            placeholder="e.g., DOC-001, CONTRACT-2025-001"
+                        />
+                        @error('documentCode')
+                            <span class="form-error-message">{{ $message }}</span>
+                        @enderror
                     </div>
-                    @if ($file)
-                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                            Selected: {{ $file->getClientOriginalName() }}
-                        </p>
-                    @endif
-                </div>
 
-                {{-- Notes --}}
-                <div>
-                    <label class="form-label">Notes</label>
-                    <textarea
-                        class="form-input w-full"
-                        wire:model="notes"
-                        rows="3"
-                        placeholder="Add any notes or description about this document..."
-                    ></textarea>
-                    @error('notes')
-                        <span class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
-                    @enderror
-                </div>
+                    {{-- File Input --}}
+                    <div>
+                        <label class="form-label required">File</label>
+                        <input
+                            class="form-input w-full"
+                            type="file"
+                            wire:model="file"
+                            accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                        />
+                        @error('file')
+                            <span class="form-error-message">{{ $message }}</span>
+                        @enderror
+                        <div
+                            class="mt-1 text-sm text-blue-600 dark:text-blue-400"
+                            wire:loading
+                            wire:target="file"
+                        >
+                            <span class="ph ph-spinner syn-spin mr-1"></span>
+                            Uploading file...
+                        </div>
+                        @if ($file)
+                            <p class="form-help">
+                                Selected: {{ $file->getClientOriginalName() }}
+                            </p>
+                        @endif
+                    </div>
 
-                <div>
-                    <label class="form-label">Version</label>
-                    <input
-                        class="form-input w-full"
-                        type="number"
-                        wire:model="version"
-                        min="1"
-                        placeholder="Enter version number..."
-                        readonly
-                        disabled
-                    />
-                </div>
+                    {{-- Notes --}}
+                    <div>
+                        <label class="form-label">Notes</label>
+                        <textarea
+                            class="form-input w-full"
+                            wire:model="notes"
+                            rows="3"
+                            placeholder="Add any notes or description about this document..."
+                        ></textarea>
+                        @error('notes')
+                            <span class="form-error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
 
+                    <div>
+                        <label class="form-label">Version</label>
+                        <input
+                            class="form-input w-full"
+                            type="number"
+                            wire:model="version"
+                            min="1"
+                            placeholder="Enter version number..."
+                            readonly
+                            disabled
+                        />
+                    </div>
+
+                </div>
                 {{-- Footer Actions --}}
-                <div class="flex justify-end gap-2 border-t border-gray-200 pt-4 dark:border-gray-700">
+                <div class="syn-modal-footer">
                     <button
-                        class="btn btn-outline"
+                        class="btn secondary"
                         type="button"
                         @click="$dispatch('close-modal-upload-{{ $this->documentType->code(true) }}')"
                         wire:loading.attr="disabled"
@@ -115,12 +119,12 @@
                         wire:target="saveDocument,file"
                     >
                         <span
-                            class="fa-solid fa-upload mr-1"
+                            class="ph ph-upload-simple mr-1"
                             wire:loading.remove
                             wire:target="saveDocument"
                         ></span>
                         <span
-                            class="fa-solid fa-spinner fa-spin mr-1"
+                            class="ph ph-spinner syn-spin mr-1"
                             wire:loading
                             wire:target="saveDocument"
                         ></span>
@@ -135,7 +139,6 @@
                     </button>
                 </div>
             </form>
-        </div>
-    </x-synapse-modal>
+        </x-synapse-modal>
     @endif
 </div>

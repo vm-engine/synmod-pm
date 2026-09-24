@@ -8,6 +8,8 @@ class Terbilang
 {
     /**
      * Array of Indonesian number words.
+     *
+     * @var array<int, string>
      */
     protected static array $words = [
         '',
@@ -26,6 +28,8 @@ class Terbilang
 
     /**
      * Array of English number words (0-19).
+     *
+     * @var array<int, string>
      */
     protected static array $englishOnes = [
         'Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',
@@ -35,6 +39,8 @@ class Terbilang
 
     /**
      * Array of English tens words, indexed by tens digit (2-9).
+     *
+     * @var array<int, string>
      */
     protected static array $englishTens = [
         '', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety',
@@ -42,6 +48,8 @@ class Terbilang
 
     /**
      * English scale words, indexed by thousand-group position.
+     *
+     * @var array<int, string>
      */
     protected static array $englishScales = ['', 'Thousand', 'Million', 'Billion', 'Trillion'];
 

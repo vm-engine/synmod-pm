@@ -15,7 +15,10 @@ use VmEngine\SynAuth\Traits\HasUpdater;
 class ProjectInvoiceItem extends Model
 {
     use HasCreator;
+
+    /** @use HasFactory<ProjectInvoiceItemFactory> */
     use HasFactory;
+
     use HasUpdater;
     use WithDeleteToken;
 
@@ -49,16 +52,25 @@ class ProjectInvoiceItem extends Model
         return ProjectInvoiceItemFactory::new();
     }
 
+    /**
+     * @return BelongsTo<Project, $this>
+     */
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
     }
 
+    /**
+     * @return BelongsTo<ProjectInvoice, $this>
+     */
     public function projectInvoice(): BelongsTo
     {
         return $this->belongsTo(ProjectInvoice::class);
     }
 
+    /**
+     * @return BelongsTo<Client, $this>
+     */
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);

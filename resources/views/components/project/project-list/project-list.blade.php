@@ -7,46 +7,35 @@
     <!-- Project List -->
     <div class="space-y-5 sm:space-y-6">
 
-        <div class="dark:bg-white/3 rounded-2xl border border-gray-200 bg-white dark:border-gray-800">
-
-            <div class="flex justify-between">
-                <div class="px-5 py-4 sm:px-6 sm:py-5">
-                    <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
-                        {{ __('pm::project.list_title') }}
-                    </h3>
-                </div>
-                <div class="my-auto flex gap-3 px-5">
-                    @canAccess('pm.project.create')
-                    <div>
-                        <a
-                            class="btn primary"
-                            href="{{ backend_route('pm.project.create') }}"
-                            wire:navigate
-                        >
-                            <span class="fa-solid fa-plus"></span>
-                            {{ __('pm::project.add_project') }}
-                        </a>
-                    </div>
-                    @endcanAccess
-                    <div class="input-group">
+        <x-synapse-panel :title="__('pm::project.list_title')">
+            <x-slot:toolbar>
+                @canAccess('pm.project.create')
+                <a
+                    class="btn primary"
+                    href="{{ backend_route('pm.project.create') }}"
+                    wire:navigate
+                >
+                    <span class="ph ph-plus"></span>
+                    {{ __('pm::project.add_project') }}
+                </a>
+                @endcanAccess
+                <x-synapse-search-box
+                    id="q"
+                    name="q"
+                    :placeholder="__('pm::project.search')"
+                    wire:model.live.debounce="q"
+                >
+                    <x-slot:trailing>
                         <button
-                            class="input-group-item right btn"
+                            class="btn"
                             type="button"
                             title="{{ __('pm::project.filter') }}"
                             @click="drawerOpen = true"
-                        ><span class="fa-solid fa-filter"></span></button>
-                        <input
-                            class="form-input p-2"
-                            id="q"
-                            name="q"
-                            type="text"
-                            placeholder="{{ __('pm::project.search') }}"
-                            wire:model.live.debounce="q"
-                        >
-                    </div>
-                </div>
-            </div>
-            <div class="border-t border-gray-100 dark:border-gray-800">
+                        ><span class="ph ph-funnel"></span></button>
+                    </x-slot:trailing>
+                </x-synapse-search-box>
+            </x-slot:toolbar>
+            <div class="syn-panel-body">
                 <!-- Card Grid Layout -->
                 <div class="grid grid-cols-1 gap-4 p-5 md:grid-cols-2 lg:grid-cols-3">
                     @forelse ($this->projectList as $project)
@@ -64,7 +53,7 @@
                                         </h4>
                                         <div
                                             class="mt-1 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                            <span class="fa-solid fa-calendar-alt text-xs"></span>
+                                            <span class="ph ph-calendar-blank text-xs"></span>
                                             <span>{{ $project->year }}</span>
                                         </div>
                                     </div>
@@ -136,7 +125,7 @@
                                 <div class="mb-4 space-y-2">
                                     <div class="flex items-center gap-2">
                                         <span
-                                            class="fa-solid fa-building w-4 text-sm text-gray-500 dark:text-gray-400"></span>
+                                            class="ph ph-buildings w-4 text-sm text-gray-500 dark:text-gray-400"></span>
                                         @if ($project->division)
                                             <button
                                                 class="{{ in_array($project->division_id, $filterDivisions)
@@ -152,8 +141,7 @@
                                         @endif
                                     </div>
                                     <div class="flex items-center gap-2">
-                                        <span
-                                            class="fa-solid fa-user w-4 text-sm text-gray-500 dark:text-gray-400"></span>
+                                        <span class="ph ph-user w-4 text-sm text-gray-500 dark:text-gray-400"></span>
                                         @if ($project->client)
                                             <button
                                                 class="{{ in_array($project->client_id, $filterClients)
@@ -258,7 +246,7 @@
                                         href="{{ backend_route('pm.project.detail', ['id' => $project->id]) }}"
                                         wire:navigate
                                     >
-                                        <span class="fa-solid fa-eye"></span>
+                                        <span class="ph ph-eye"></span>
                                         <span class="tooltip">{{ __('pm::project.view_detail') }}</span>
                                     </a>
                                     @endcanAccess
@@ -268,7 +256,7 @@
                                         href="{{ backend_route('pm.project.edit', ['id' => $project->id]) }}"
                                         wire:navigate
                                     >
-                                        <span class="fa-solid fa-edit"></span>
+                                        <span class="ph ph-pencil-simple"></span>
                                         <span class="tooltip">{{ __('pm::project.edit_project') }}</span>
                                     </a>
                                     @endcanAccess
@@ -288,7 +276,7 @@
                                             wireComponent: '{{ $this->getId() }}'
                                         })"
                                     >
-                                        <span class="fa-solid fa-trash"></span>
+                                        <span class="ph ph-trash"></span>
                                         <span class="tooltip">{{ __('pm::project.delete_project') }}</span>
                                     </button>
                                     @endcanAccess
@@ -296,26 +284,18 @@
                             </div>
                         </div>
                     @empty
-                        <div class="col-span-full py-12 text-center">
-                            <div
-                                class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
-                                <span
-                                    class="fa-solid fa-diagram-project text-3xl text-gray-400 dark:text-gray-600"></span>
-                            </div>
-                            <h3 class="mb-2 text-lg font-medium text-gray-900 dark:text-white">
-                                {{ __('pm::project.no_projects_found') }}
-                            </h3>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">
-                                {{ __('pm::project.try_different_filters') }}
-                            </p>
+                        <div class="syn-empty-state col-span-full">
+                            <span class="ph ph-kanban syn-empty-state-icon"></span>
+                            <p class="syn-empty-state-text font-medium">{{ __('pm::project.no_projects_found') }}</p>
+                            <p class="syn-empty-state-text">{{ __('pm::project.try_different_filters') }}</p>
                         </div>
                     @endforelse
                 </div>
             </div>
-            <div class="flex gap-2 p-3">
+            <div class="syn-per-page-selector">
                 <div class="flex-none p-1">
                     <select
-                        class="shadow-theme-sm rounded-sm p-1"
+                        class="syn-per-page-select"
                         id="limit"
                         name="limit"
                         wire:model.live="limit"
@@ -330,7 +310,7 @@
                     {{ $this->projectList->links() }}
                 </div>
             </div>
-        </div>
+        </x-synapse-panel>
     </div>
 
     @php
@@ -339,7 +319,7 @@
     <x-synapse-drawer :title="$advanceTitle">
         <div class="space-y-6">
             <div>
-                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label class="form-label">
                     {{ __('pm::project.filter_division') }}
                 </label>
                 <x-synapse-adv-select
@@ -352,7 +332,7 @@
             </div>
 
             <div>
-                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label class="form-label">
                     {{ __('pm::project.filter_client') }}
                 </label>
                 <x-synapse-adv-select
@@ -365,7 +345,7 @@
             </div>
 
             <div>
-                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label class="form-label">
                     {{ __('pm::project.filter_project_category') }}
                 </label>
                 <x-synapse-adv-select
@@ -378,7 +358,7 @@
             </div>
 
             <div>
-                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label class="form-label">
                     {{ __('pm::project.filter_status') }}
                 </label>
                 <x-synapse-adv-select
@@ -391,7 +371,7 @@
             </div>
 
             <div>
-                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label class="form-label">
                     {{ __('pm::project.filter_priority') }}
                 </label>
                 <x-synapse-adv-select
@@ -404,7 +384,7 @@
             </div>
 
             <div>
-                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label class="form-label">
                     {{ __('pm::project.filter_year') }}
                 </label>
                 <x-synapse-adv-select
@@ -415,7 +395,7 @@
             </div>
 
             <div>
-                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label class="form-label">
                     {{ __('pm::project.filter_progress') }}
                 </label>
                 <x-synapse-adv-select

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Form;
 
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\Form;
 use VmEngine\Pm\Models\Signature;
 use VmEngine\Pm\Services\SignatureService;
@@ -12,14 +13,29 @@ class SignatureFormObject extends Form
 {
     public ?Signature $signature = null;
 
+    /**
+     * @var string|null
+     */
     public $name = '';
 
+    /**
+     * @var string|null
+     */
     public $position = '';
 
+    /**
+     * @var TemporaryUploadedFile|null
+     */
     public $file = null;
 
+    /**
+     * @var string|null
+     */
     public $existing_file = null;
 
+    /**
+     * @return array<string, mixed>
+     */
     public function rules(): array
     {
         return [
@@ -34,6 +50,9 @@ class SignatureFormObject extends Form
         ];
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function messages(): array
     {
         return [

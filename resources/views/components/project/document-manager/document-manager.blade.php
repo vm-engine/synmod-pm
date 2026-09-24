@@ -17,9 +17,7 @@
     {{-- Filter/Search Bar --}}
     <div class="flex w-full gap-3">
         <div class="min-w-0 flex-1">
-            <input
-                class="form-input w-full"
-                type="text"
+            <x-synapse-search-box
                 placeholder="Search documents..."
                 wire:model.live.debounce.300ms="documentSearch"
             />

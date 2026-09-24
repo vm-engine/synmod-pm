@@ -7,46 +7,35 @@
     <!-- Client List -->
     <div class="space-y-5 sm:space-y-6">
 
-        <div class="dark:bg-white/3 rounded-2xl border border-gray-200 bg-white dark:border-gray-800">
-
-            <div class="flex justify-between">
-                <div class="px-5 py-4 sm:px-6 sm:py-5">
-                    <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
-                        {{ __('pm::client.list_title') }}
-                    </h3>
-                </div>
-                <div class="my-auto flex gap-3 px-5">
-                    @canAccess('pm.client.create')
-                    <div>
-                        <a
-                            class="btn primary"
-                            href="{{ backend_route('pm.client.create') }}"
-                            wire:navigate
-                        >
-                            <span class="fa-solid fa-plus"></span>
-                            {{ __('pm::client.add_client') }}
-                        </a>
-                    </div>
-                    @endcanAccess
-                    <div class="input-group">
+        <x-synapse-panel :title="__('pm::client.list_title')">
+            <x-slot:toolbar>
+                @canAccess('pm.client.create')
+                <a
+                    class="btn primary"
+                    href="{{ backend_route('pm.client.create') }}"
+                    wire:navigate
+                >
+                    <span class="ph ph-plus"></span>
+                    {{ __('pm::client.add_client') }}
+                </a>
+                @endcanAccess
+                <x-synapse-search-box
+                    id="q"
+                    name="q"
+                    :placeholder="__('pm::client.search_placeholder')"
+                    wire:model.live.debounce="q"
+                >
+                    <x-slot:trailing>
                         <button
-                            class="input-group-item right btn"
+                            class="btn"
                             type="button"
                             title="{{ __('pm::client.advanced_filter') }}"
                             @click="drawerOpen = true"
-                        ><span class="fa-solid fa-filter"></span></button>
-                        <input
-                            class="form-input p-2"
-                            id="q"
-                            name="q"
-                            type="text"
-                            placeholder="{{ __('pm::client.search_placeholder') }}"
-                            wire:model.live.debounce="q"
-                        >
-                    </div>
-                </div>
-            </div>
-            <div class="border-t border-gray-100 dark:border-gray-800">
+                        ><span class="ph ph-funnel"></span></button>
+                    </x-slot:trailing>
+                </x-synapse-search-box>
+            </x-slot:toolbar>
+            <div class="syn-panel-body">
                 <div class="max-w-full overflow-x-auto">
                     <table
                         class="datatable min-w-full"
@@ -77,7 +66,7 @@
                                 <th>
                                     <p>{{ __('pm::client.col_active') }}</p>
                                 </th>
-                                <th>
+                                <th class="datatable-col-actions">
                                     <p>{{ __('pm::client.col_actions') }}</p>
                                 </th>
                             </tr>
@@ -90,7 +79,7 @@
                                 <tr wire:key="client-{{ $client->id }}">
                                     <td>
                                         <div class="flex items-center">
-                                            <p>{{ ($this->clientList->currentPage() - 1) * $limit + $i }}</p>
+                                            <p>{{ ($this->clientList->currentPage() - 1) * $perPage + $i }}</p>
                                         </div>
                                     </td>
                                     <td>
@@ -104,7 +93,7 @@
                                                         title="NPWP Image"
                                                         wire:click="showImage({{ $client->id }})"
                                                     >
-                                                        <span class="fa-solid fa-image"></span>
+                                                        <span class="ph ph-image"></span>
                                                     </button>
                                                 @endif
                                             </p>
@@ -121,7 +110,7 @@
                                                     title="{{ __('pm::client.tooltip_filter_category') }}"
                                                     wire:click="filterByCategory({{ $client->category_id }})"
                                                 >
-                                                    <span class="fa-solid fa-folder text-xs"></span>
+                                                    <span class="ph ph-folder text-xs"></span>
                                                     <span>{{ $client->category->name }}</span>
                                                 </button>
                                             @else
@@ -143,13 +132,11 @@
                                         <div class="flex flex-wrap gap-1">
                                             @if ($client->projectCategories->count())
                                                 @foreach ($client->projectCategories as $category)
-                                                    <button
-                                                        class="inline-flex cursor-pointer items-center gap-1 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700 transition-colors dark:bg-blue-900/30 dark:text-blue-300"
-                                                        type="button"
+                                                    <x-synapse-badge
+                                                        color="info"
+                                                        size="sm"
                                                         title="{{ __('pm::client.tooltip_project_category') }}"
-                                                    >
-                                                        <span>{{ $category->name }}</span>
-                                                    </button>
+                                                    >{{ $category->name }}</x-synapse-badge>
                                                 @endforeach
                                             @else
                                                 <span
@@ -160,19 +147,15 @@
                                     <td>
                                         <div class="flex items-center">
                                             @if ($client->status === \VmEngine\Pm\Models\Client::STATUS_PROSPECT)
-                                                <span
-                                                    class="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2.5 py-0.5 text-sm font-medium text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"
-                                                >
-                                                    <span class="fa-solid fa-hourglass-half text-xs"></span>
-                                                    {{ __('pm::client.prospect') }}
-                                                </span>
+                                                <x-synapse-badge
+                                                    color="warning"
+                                                    icon="ph ph-hourglass-medium"
+                                                >{{ __('pm::client.prospect') }}</x-synapse-badge>
                                             @else
-                                                <span
-                                                    class="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-0.5 text-sm font-medium text-green-800 dark:bg-green-900/30 dark:text-green-300"
-                                                >
-                                                    <span class="fa-solid fa-check-circle text-xs"></span>
-                                                    {{ __('pm::client.active') }}
-                                                </span>
+                                                <x-synapse-badge
+                                                    color="success"
+                                                    icon="ph ph-check-circle"
+                                                >{{ __('pm::client.active') }}</x-synapse-badge>
                                             @endif
                                         </div>
                                     </td>
@@ -194,7 +177,7 @@
                                                 href="{{ backend_route('pm.client.edit', ['id' => $client->id]) }}"
                                                 wire:navigate
                                             >
-                                                <span class="fa-solid fa-edit"></span>
+                                                <span class="ph ph-pencil-simple"></span>
                                                 <span class="tooltip">{{ __('pm::client.tooltip_edit') }}</span>
                                             </a>
                                             @endcanAccess
@@ -214,7 +197,7 @@
                                                     wireComponent: '{{ $this->getId() }}'
                                                 })"
                                             >
-                                                <span class="fa-solid fa-trash"></span>
+                                                <span class="ph ph-trash"></span>
                                                 <span class="tooltip">{{ __('pm::client.tooltip_delete') }}</span>
                                             </button>
                                             @endcanAccess
@@ -229,25 +212,8 @@
                     </table>
                 </div>
             </div>
-            <div class="flex gap-2 p-3">
-                <div class="flex-none p-1">
-                    <select
-                        class="shadow-theme-sm rounded-sm p-1"
-                        id="limit"
-                        name="limit"
-                        wire:model.live="limit"
-                    >
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                </div>
-                <div class="pagination-container flex-1 grow">
-                    {{ $this->clientList->links() }}
-                </div>
-            </div>
-        </div>
+            <x-synapse-per-page-selector :paginator="$this->clientList" />
+        </x-synapse-panel>
     </div>
 
     @php
@@ -256,7 +222,7 @@
     <x-synapse-drawer :title="$advanceTitle">
         <div class="space-y-6">
             <div>
-                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label class="form-label">
                     {{ __('pm::client.filter_category') }}
                 </label>
                 <x-synapse-adv-select
@@ -270,7 +236,7 @@
             </div>
 
             <div>
-                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label class="form-label">
                     {{ __('pm::client.filter_project_categories') }}
                 </label>
                 <x-synapse-adv-select
@@ -284,7 +250,7 @@
             </div>
 
             <div>
-                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label class="form-label">
                     {{ __('pm::client.filter_status') }}
                 </label>
                 <x-synapse-adv-select
@@ -299,7 +265,7 @@
             </div>
 
             <div>
-                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label class="form-label">
                     {{ __('pm::client.filter_active_status') }}
                 </label>
                 <x-synapse-adv-select
@@ -316,21 +282,17 @@
     </x-synapse-drawer>
 
     <x-synapse-modal name="npwp-image">
-        <div class="shrink-0 border-b border-gray-200 dark:border-gray-700">
-            <div class="flex items-center justify-between px-5 py-3">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                    NPWP Image
-                </h3>
-                <button
-                    class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                    type="button"
-                    @click="$dispatch('close-modal-npwp-image')"
-                >
-                    <span class="fa-solid fa-times text-xl"></span>
-                </button>
-            </div>
+        <div class="syn-modal-header">
+            <h3 class="syn-modal-title">NPWP Image</h3>
+            <button
+                class="syn-modal-close"
+                type="button"
+                @click="$dispatch('close-modal-npwp-image')"
+            >
+                <span class="ph ph-x text-xl"></span>
+            </button>
         </div>
-        <div class="max-h-[90vh] flex-1 space-y-6 overflow-y-auto p-6">
+        <div class="syn-modal-body max-h-[90vh] overflow-y-auto">
             <img
                 class="h-auto w-full"
                 src="{{ $npwpImage }}"

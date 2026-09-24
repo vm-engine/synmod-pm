@@ -2,20 +2,18 @@
 
 @if (count($documents) === 0)
     {{-- Empty State --}}
-    <div class="px-5 py-8 text-center sm:px-6">
-        <span class="fa-solid fa-files fa-3x mb-3 text-gray-300 dark:text-gray-700"></span>
-        <p class="text-sm text-gray-500 dark:text-gray-500">
-            {{ __('pm::project_document.no_files_uploaded') }}
-        </p>
+    <div class="syn-empty-state">
+        <span class="ph ph-files syn-empty-state-icon"></span>
+        <p class="syn-empty-state-text">{{ __('pm::project_document.no_files_uploaded') }}</p>
         @if (!$readonly)
-        <button
-            class="btn primary btn-sm mt-3"
-            @click="$dispatch('open-modal-upload-{{ $type->code(true) }}')"
-                                                    wire:click="$dispatch('reset-upload-form')"
-        >
-            <span class="fa-solid fa-upload mr-2"></span>
-            {{ __('pm::project_document.upload_first_file') }}
-        </button>
+            <button
+                class="btn primary sm mt-3"
+                @click="$dispatch('open-modal-upload-{{ $type->code(true) }}')"
+                wire:click="$dispatch('reset-upload-form')"
+            >
+                <span class="ph ph-upload-simple mr-2"></span>
+                {{ __('pm::project_document.upload_first_file') }}
+            </button>
         @endif
     </div>
 @else
@@ -31,17 +29,17 @@
                             pathinfo($document->file_info['original_name'] ?? '', PATHINFO_EXTENSION),
                         );
                         $iconClass = match ($extension) {
-                            'pdf' => 'fa-file-pdf text-red-600 dark:text-red-400',
-                            'doc', 'docx' => 'fa-file-word text-blue-600 dark:text-blue-400',
-                            'xls', 'xlsx' => 'fa-file-excel text-green-600 dark:text-green-400',
-                            'ppt', 'pptx' => 'fa-file-powerpoint text-orange-600 dark:text-orange-400',
-                            'zip', 'rar', '7z' => 'fa-file-zipper text-purple-600 dark:text-purple-400',
-                            'jpg', 'jpeg', 'png', 'gif', 'svg' => 'fa-file-image text-pink-600 dark:text-pink-400',
-                            default => 'fa-file text-gray-600 dark:text-gray-400',
+                            'pdf' => 'ph-file-pdf text-red-600 dark:text-red-400',
+                            'doc', 'docx' => 'ph-file-doc text-blue-600 dark:text-blue-400',
+                            'xls', 'xlsx' => 'ph-file-xls text-green-600 dark:text-green-400',
+                            'ppt', 'pptx' => 'ph-file-ppt text-orange-600 dark:text-orange-400',
+                            'zip', 'rar', '7z' => 'ph-file-zip text-purple-600 dark:text-purple-400',
+                            'jpg', 'jpeg', 'png', 'gif', 'svg' => 'ph-file-image text-pink-600 dark:text-pink-400',
+                            default => 'ph-file text-gray-600 dark:text-gray-400',
                         };
                     @endphp
                     <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-50 dark:bg-gray-800">
-                        <span class="fa-regular {{ $iconClass }} text-2xl"></span>
+                        <span class="ph {{ $iconClass }} text-2xl"></span>
                     </div>
 
                     {{-- Quick Actions (Show on Hover) --}}
@@ -51,14 +49,14 @@
                             title="{{ __('pm::labels.download') }}"
                             wire:click="downloadDocument({{ $document->id ?? 0 }})"
                         >
-                            <span class="fa-solid fa-download text-xs"></span>
+                            <span class="ph ph-download-simple text-xs"></span>
                         </button>
                         @if (!$readonly)
-                        <button
-                            class="flex h-7 w-7 items-center justify-center rounded-md bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-500/10 dark:text-red-400"
-                            type="button"
-                            title="{{ __('pm::labels.delete') }}"
-                            wire:click="$dispatch('confirm-dialog', {
+                            <button
+                                class="flex h-7 w-7 items-center justify-center rounded-md bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-500/10 dark:text-red-400"
+                                type="button"
+                                title="{{ __('pm::labels.delete') }}"
+                                wire:click="$dispatch('confirm-dialog', {
                                 title: '{{ __('pm::project_document.delete_file_title') }}',
                                 message: '{{ __('pm::project_document.delete_file_message') }}',
                                 confirmText: '{{ __('pm::labels.delete') }}',
@@ -69,9 +67,9 @@
                                 wireParams: ['{{ $document->delete_token }}'],
                                 wireComponent: '{{ $this->getId() }}'
                             })"
-                        >
-                            <span class="fa-solid fa-trash text-xs"></span>
-                        </button>
+                            >
+                                <span class="ph ph-trash text-xs"></span>
+                            </button>
                         @endif
                     </div>
                 </div>
@@ -95,15 +93,16 @@
                 {{-- Metadata --}}
                 <div class="mt-3 space-y-1 text-xs text-gray-600 dark:text-gray-400">
                     <div class="flex items-center">
-                        <span class="fa-solid fa-calendar mr-2 w-4"></span>
+                        <span class="ph ph-calendar-blank mr-2 w-4"></span>
                         <span>{{ isset($document->created_at) ? $document->created_at->format('M d, Y') : __('pm::project_document.na') }}</span>
                     </div>
                     <div class="flex items-center">
-                        <span class="fa-solid fa-user mr-2 w-4"></span>
-                        <span class="truncate">{{ $document->creator->name ?? __('pm::project_document.unknown') }}</span>
+                        <span class="ph ph-user mr-2 w-4"></span>
+                        <span
+                            class="truncate">{{ $document->creator->name ?? __('pm::project_document.unknown') }}</span>
                     </div>
                     <div class="flex items-center">
-                        <span class="fa-solid fa-hard-drive mr-2 w-4"></span>
+                        <span class="ph ph-hard-drive mr-2 w-4"></span>
                         <span>{{ human_filesize($document->file_info['size'] ?? 0) }}</span>
                     </div>
                 </div>
@@ -120,10 +119,10 @@
 
                 {{-- Primary Action Button --}}
                 {{-- <button
-                    class="btn primary btn-sm mt-3 w-full"
+                    class="btn primary sm mt-3 w-full"
                     wire:click="viewDocument({{ $document->id ?? 0 }})"
                 >
-                    <span class="fa-solid fa-eye mr-1"></span>
+                    <span class="ph ph-eye mr-1"></span>
                     View Details
                 </button> --}}
             </div>
@@ -131,16 +130,16 @@
 
         {{-- Add New File Card --}}
         @if (!$readonly)
-        <button
-            class="flex min-h-[200px] flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 transition-colors hover:border-blue-400 hover:bg-blue-50/50 dark:border-gray-700 dark:bg-gray-800/30 dark:hover:border-blue-500 dark:hover:bg-blue-500/5"
-            @click="$dispatch('open-modal-upload-{{ $type->code(true) }}')"
-                                                    wire:click="$dispatch('reset-upload-form')"
-        >
-            <span class="fa-solid fa-plus text-3xl text-gray-400 dark:text-gray-600"></span>
-            <span class="mt-2 text-sm font-medium text-gray-600 dark:text-gray-400">
-                {{ __('pm::project_document.add_new_file') }}
-            </span>
-        </button>
+            <button
+                class="flex min-h-[200px] flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 transition-colors hover:border-blue-400 hover:bg-blue-50/50 dark:border-gray-700 dark:bg-gray-800/30 dark:hover:border-blue-500 dark:hover:bg-blue-500/5"
+                @click="$dispatch('open-modal-upload-{{ $type->code(true) }}')"
+                wire:click="$dispatch('reset-upload-form')"
+            >
+                <span class="ph ph-plus text-3xl text-gray-400 dark:text-gray-600"></span>
+                <span class="mt-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+                    {{ __('pm::project_document.add_new_file') }}
+                </span>
+            </button>
         @endif
     </div>
 @endif

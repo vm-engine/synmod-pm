@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Form;
 
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\Form;
 use VmEngine\Pm\Models\BankAccount;
 use VmEngine\Pm\Services\BankAccountService;
@@ -12,18 +13,39 @@ class BankAccountFormObject extends Form
 {
     public ?BankAccount $bankAccount = null;
 
+    /**
+     * @var string|null
+     */
     public $name = '';
 
+    /**
+     * @var string|null
+     */
     public $number = '';
 
+    /**
+     * @var string|null
+     */
     public $bank_name = '';
 
+    /**
+     * @var string|null
+     */
     public $swift_code = '';
 
+    /**
+     * @var TemporaryUploadedFile|null
+     */
     public $bank_logo = null;
 
+    /**
+     * @var string|null
+     */
     public $existing_bank_logo = null;
 
+    /**
+     * @return array<string, mixed>
+     */
     public function rules(): array
     {
         return [
@@ -40,6 +62,9 @@ class BankAccountFormObject extends Form
         ];
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function messages(): array
     {
         return [

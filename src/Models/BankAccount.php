@@ -15,7 +15,10 @@ use VmEngine\SynAuth\Traits\HasUpdater;
 class BankAccount extends Model
 {
     use HasCreator;
+
+    /** @use HasFactory<BankAccountFactory> */
     use HasFactory;
+
     use HasUpdater;
     use WithDeleteToken;
 

@@ -131,6 +131,9 @@ class InvoiceFormObject extends Form
         $this->signature_id = $invoice->signature_id;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function rules(): array
     {
         return [
@@ -157,6 +160,9 @@ class InvoiceFormObject extends Form
         ];
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function messages(): array
     {
         return [

@@ -10,12 +10,16 @@ use Illuminate\Support\Facades\DB;
 use VmEngine\Pm\Enums\Documents;
 use VmEngine\Pm\Models\Client;
 use VmEngine\Pm\Models\Project;
-use VmEngine\SynAuth\Facades\SynAuth;
+use VmEngine\Pm\Services\Concerns\RecordsActivity;
 
 class ProjectService
 {
+    use RecordsActivity;
+
     /**
      * Create a new project.
+     *
+     * @param  array<string, mixed>  $projectData
      */
     public function create(array $projectData): Project
     {
@@ -40,6 +44,8 @@ class ProjectService
 
     /**
      * Update an existing project.
+     *
+     * @param  array<string, mixed>  $projectData
      */
     public function update(Project $project, array $projectData): Project
     {
@@ -75,12 +81,10 @@ class ProjectService
             $deleted = $project->delete();
 
             // Log activity
-            SynAuth::logActivity(
-                Auth::id(),
+            $this->recordActivity(
                 'pm.project.'.$project->id.'.delete',
                 'User '.Auth::user()->name.' deleted project. Data: '.json_encode($projectData),
                 'project.'.$project->id,
-                'pm',
             );
 
             return $deleted;
@@ -113,6 +117,8 @@ class ProjectService
 
     /**
      * Parse server info JSON string into array.
+     *
+     * @return array<string, mixed>
      */
     public function parseServerInfo(?string $serverInfo): array
     {
@@ -141,6 +147,9 @@ class ProjectService
 
     /**
      * Log project activity.
+     *
+     * @param  array<string, mixed>|null  $newData
+     * @param  array<string, mixed>|null  $oldData
      */
     private function logActivity(string $action, Project $project, ?array $newData = null, ?array $oldData = null): void
     {
@@ -151,12 +160,10 @@ class ProjectService
             default => 'User '.Auth::user()->name.' performed '.$action.' on project.',
         };
 
-        SynAuth::logActivity(
-            Auth::id(),
+        $this->recordActivity(
             'pm.project.'.$project->id.'.'.$action,
             $message,
             'project.'.$project->id,
-            'pm',
         );
     }
 }
