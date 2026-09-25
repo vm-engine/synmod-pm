@@ -6,7 +6,7 @@ namespace VmEngine\Pm\Services;
 
 class CurrencyFormatter
 {
-    /** @var array<string, array{symbol:string,decimals:int,thousands:string,decimal:string,taxable:bool,name:string,name_plural:string}> */
+    /** @var array<string, array{symbol:string,decimals:int,thousands:string,decimal:string,taxable:bool,name?:string,name_plural?:string}> */
     private array $currencies;
 
     public function __construct()
@@ -49,7 +49,7 @@ class CurrencyFormatter
     }
 
     /**
-     * @return array{symbol:string,decimals:int,thousands:string,decimal:string,taxable:bool,name:string,name_plural:string}
+     * @return array{symbol:string,decimals:int,thousands:string,decimal:string,taxable:bool,name?:string,name_plural?:string}
      */
     public function definition(string $code): array
     {

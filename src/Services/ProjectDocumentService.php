@@ -137,10 +137,9 @@ class ProjectDocumentService
      */
     public function canAccessDocument(Project $project): bool
     {
-        /** @var User $user */
         $user = Auth::user();
 
-        if (! $user) {
+        if (! $user instanceof User) {
             return false;
         }
 

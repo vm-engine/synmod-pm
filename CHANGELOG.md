@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [0.9.0] - Unreleased
 
+### Changed
+- **PHPStan level 7 with no ignore list.** Removed all blanket `ignoreErrors` patterns: every model now carries `@property` docblocks generated from the schema and casts, and the API resources declare `@mixin` of their model.
+- `ClientUserService::createUser()` returns `User`; `apiStatistics()` reads aggregates via `toBase()`; `CurrencyFormatter` treats `name`/`name_plural` as optional config keys.
+
+### Fixed
+- `Bast`/`Spk` document handlers compared the enum-cast `Project::$status` against raw ints (`Bast`'s check was always true) and assigned ints; they now compare and assign `ProjectStatus` cases.
+- `canAccessDocument()` in `DocumentController` and `ProjectDocumentService` narrow the user with `instanceof User` instead of a misleading `@var`.
+
 ### Security
 - Removed the unlinked scaffold index page (`GET /apps/pm`, route `backend.pm.index`, view `livewire/index.blade.php`), which rendered `@dump(config('database.connections'))` — database credentials — to any user with `pm.manage`.
 

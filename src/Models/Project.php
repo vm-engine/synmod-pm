@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 use VmEngine\Pm\Enums\Documents;
 use VmEngine\Pm\Enums\MaintenanceType;
 use VmEngine\Pm\Enums\ProjectPriority;
@@ -23,6 +24,54 @@ use VmEngine\SynAuth\Models\User;
 use VmEngine\SynAuth\Traits\HasCreator;
 use VmEngine\SynAuth\Traits\HasUpdater;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property int $division_id
+ * @property string $name
+ * @property string|null $description
+ * @property int $year
+ * @property array<array-key, mixed>|null $sub_division
+ * @property SalesSources $source_of_sales
+ * @property string|null $url
+ * @property int $old_status
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property int|null $created_by
+ * @property int|null $updated_by
+ * @property string|null $nominal
+ * @property int|null $client_id
+ * @property array<array-key, mixed>|null $services
+ * @property int $progress
+ * @property string|null $client_pic
+ * @property string|null $client_pic_phone
+ * @property Carbon|null $project_start
+ * @property Carbon|null $project_end
+ * @property string|null $manager
+ * @property string|null $budget
+ * @property string|null $down_payment
+ * @property int $total_terms
+ * @property string|null $payment_terms
+ * @property Carbon|null $contract_signed_at
+ * @property Carbon|null $client_approved_at
+ * @property ProjectPriority $priority
+ * @property RiskLevel|null $risk_level
+ * @property int|null $project_manager_id
+ * @property array<array-key, mixed>|null $assigned_team
+ * @property array<array-key, mixed>|null $tags
+ * @property Carbon|null $planned_delivery_date
+ * @property Carbon|null $actual_delivery_date
+ * @property Carbon|null $warranty_end_date
+ * @property string|null $staging_url
+ * @property string|null $production_url
+ * @property string|null $repository_url
+ * @property array<array-key, mixed>|null $server_info
+ * @property MaintenanceType|null $maintenance_type
+ * @property int|null $quality_score
+ * @property int|null $client_satisfaction
+ * @property ProjectStatus $status
+ * @property int|null $project_category_id
+ */
 class Project extends Model
 {
     use HasCreator;

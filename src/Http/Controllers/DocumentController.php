@@ -76,10 +76,9 @@ class DocumentController extends Controller
      */
     protected function canAccessDocument(ProjectDocument $document): bool
     {
-        /** @var User $user */
         $user = Auth::user();
 
-        if (! $user) {
+        if (! $user instanceof User) {
             return false;
         }
 

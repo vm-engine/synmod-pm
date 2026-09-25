@@ -325,7 +325,7 @@ class InvoiceService
             SUM(CASE WHEN is_paid = 1 THEN vat_amount_idr ELSE 0 END) as paid_vat,
             SUM(CASE WHEN is_paid = 0 THEN amount_idr ELSE 0 END) as unpaid_amount,
             SUM(CASE WHEN is_paid = 1 THEN amount_idr ELSE 0 END) as paid_amount
-        ')->first();
+        ')->toBase()->first();
 
         return [
             'total_invoice' => (int) $stats->total_invoice,

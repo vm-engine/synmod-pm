@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Carbon;
 use VmEngine\Pm\Factories\ClientFactory;
 use VmEngine\Pm\Models\Concerns\ResolvesUserModel;
 use VmEngine\Synapse\Traits\WithDeleteToken;
@@ -20,6 +21,24 @@ use VmEngine\SynAuth\Traits\HasUpdater;
 
 /**
  * @property array<int, int|string>|null $services Service ids (JSON column)
+ * @property int $id
+ * @property int $user_id
+ * @property int|null $client_category_id
+ * @property string|null $company
+ * @property string|null $address
+ * @property string|null $city
+ * @property string|null $director
+ * @property string|null $pic
+ * @property string|null $phone
+ * @property array<array-key, mixed>|null $social_media
+ * @property int $status
+ * @property bool $active
+ * @property bool $is_proposal
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property int|null $created_by
+ * @property int|null $updated_by
+ * @property string|null $npwp_image
  */
 class Client extends Model
 {

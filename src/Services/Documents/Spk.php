@@ -18,8 +18,8 @@ class Spk extends Base
 
     public function uploaded(Project $project, Documents $document): void
     {
-        if ($project->status == ProjectStatus::PROSPECT) {
-            $project->status = ProjectStatus::PLANNING->value;
+        if ($project->status === ProjectStatus::PROSPECT) {
+            $project->status = ProjectStatus::PLANNING;
             $project->save();
         }
 

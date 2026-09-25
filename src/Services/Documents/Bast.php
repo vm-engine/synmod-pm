@@ -17,8 +17,8 @@ class Bast extends Base
 
     public function uploaded(Project $project, Documents $document): void
     {
-        if ($project->status != ProjectStatus::COMPLETED->value) {
-            $project->status = ProjectStatus::COMPLETED->value;
+        if ($project->status !== ProjectStatus::COMPLETED) {
+            $project->status = ProjectStatus::COMPLETED;
             $project->save();
         }
     }

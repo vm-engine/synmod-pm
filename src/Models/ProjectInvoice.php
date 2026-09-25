@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 use VmEngine\Pm\Factories\ProjectInvoiceFactory;
 use VmEngine\Pm\Models\Concerns\ResolvesUserModel;
 use VmEngine\Synapse\Traits\WithDeleteToken;
@@ -15,14 +16,67 @@ use VmEngine\SynAuth\Models\User;
 use VmEngine\SynAuth\Traits\HasCreator;
 use VmEngine\SynAuth\Traits\HasUpdater;
 
+/**
+ * @property int $id
+ * @property int $project_id
+ * @property int $project_category_id
+ * @property int $client_id
+ * @property int $user_id
+ * @property string $invoice_number
+ * @property int|null $spk_document_id
+ * @property Carbon $issue_date
+ * @property Carbon|null $due_date
+ * @property string $recipient
+ * @property string $address
+ * @property string $attention
+ * @property string|null $notes
+ * @property string $amount
+ * @property bool $include_vat
+ * @property string $vat_percentage
+ * @property string $vat_amount
+ * @property bool $include_discount
+ * @property string|null $discount_percentage
+ * @property string|null $discount_amount
+ * @property bool $include_dpp
+ * @property string|null $dpp_amount
+ * @property string $total_amount
+ * @property int $issuer_id
+ * @property int|null $bank_account_id
+ * @property bool $has_signature
+ * @property int|null $signature_id
+ * @property int|null $invoice_document_id
+ * @property int $created_by
+ * @property int|null $updated_by
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property string|null $receipt_number
+ * @property string|null $receipt_amount_text
+ * @property int|null $receipt_document_id
+ * @property Carbon|null $paid_at
+ * @property string|null $payment_notes
+ * @property string|null $payment_proof
+ * @property bool $is_paid
+ * @property int $archived
+ * @property string $currency
+ * @property bool $is_external_spk
+ * @property string|null $spk_number
+ * @property int|null $invoice_document_en_id
+ * @property int|null $receipt_document_en_id
+ * @property string $exchange_rate
+ * @property string $amount_idr
+ * @property string $vat_amount_idr
+ * @property string $dpp_amount_idr
+ * @property string $discount_amount_idr
+ * @property string $total_amount_idr
+ */
 class ProjectInvoice extends Model
 {
     use HasCreator;
+
     /** @use HasFactory<ProjectInvoiceFactory> */
     use HasFactory;
 
     use HasUpdater;
-
     use ResolvesUserModel;
     use WithDeleteToken;
 

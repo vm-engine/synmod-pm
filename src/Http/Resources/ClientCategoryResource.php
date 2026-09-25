@@ -6,7 +6,11 @@ namespace VmEngine\Pm\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use VmEngine\Pm\Models\ClientCategory;
 
+/**
+ * @mixin ClientCategory
+ */
 class ClientCategoryResource extends JsonResource
 {
     /**

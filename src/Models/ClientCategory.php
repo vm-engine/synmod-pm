@@ -7,11 +7,21 @@ namespace VmEngine\Pm\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 use VmEngine\Pm\Factories\ClientCategoryFactory;
 use VmEngine\Synapse\Traits\WithDeleteToken;
 use VmEngine\SynAuth\Traits\HasCreator;
 use VmEngine\SynAuth\Traits\HasUpdater;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string|null $description
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property int $created_by
+ * @property int|null $updated_by
+ */
 class ClientCategory extends Model
 {
     use HasCreator;

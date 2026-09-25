@@ -121,7 +121,7 @@ class InvoiceFormObject extends Form
         $this->invoice_number = $invoice->invoice_number;
         $this->recipient = $invoice->recipient ?? '';
         $this->address = $invoice->address ?? '';
-        $this->issue_date = $invoice->issue_date?->format('Y-m-d');
+        $this->issue_date = $invoice->issue_date->format('Y-m-d');
         $this->due_date = $invoice->due_date?->format('Y-m-d');
         $this->attention = $invoice->attention ?? '';
         $this->notes = $invoice->notes ?? '';

@@ -132,7 +132,7 @@ class ProjectFormObject extends Form
 
         // Services & Sales
         // $this->services = $project->services ?? [];
-        $this->source_of_sales = $project->source_of_sales?->value;
+        $this->source_of_sales = $project->source_of_sales->value;
 
         // Financial - format for display with 2 decimals (will be cleaned on update/save)
         $this->nominal = $project->nominal ? number_format((float) $project->nominal, 2, ',', '.') : '';

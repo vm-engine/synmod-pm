@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use VmEngine\Pm\Enums\Documents;
 use VmEngine\Pm\Factories\ProjectDocumentFactory;
@@ -17,6 +18,21 @@ use VmEngine\Synapse\Traits\WithDeleteToken;
 use VmEngine\SynAuth\Models\User;
 use VmEngine\SynAuth\Traits\HasCreator;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property int $client_id
+ * @property int $project_id
+ * @property Documents $type
+ * @property string $number
+ * @property string|null $notes
+ * @property string $file_path
+ * @property array<array-key, mixed>|null $file_info
+ * @property int $version
+ * @property int|null $created_by
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ */
 class ProjectDocument extends Model
 {
     use HasCreator;

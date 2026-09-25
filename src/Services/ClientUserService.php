@@ -7,6 +7,7 @@ namespace VmEngine\Pm\Services;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 use VmEngine\Pm\Models\Client;
+use VmEngine\SynAuth\Models\User;
 
 class ClientUserService
 {
@@ -15,8 +16,9 @@ class ClientUserService
      *
      * @param  array<string, mixed>  $userData
      */
-    public function createUser(array $userData, int $status, bool $active): Model
+    public function createUser(array $userData, int $status, bool $active): User
     {
+        /** @var class-string<User> $UserModel */
         $UserModel = config('auth.providers.users.model');
 
         // Determine user active status based on client status and active flag
@@ -68,7 +70,7 @@ class ClientUserService
     /**
      * Assign client role to a user.
      */
-    private function assignClientRole(Model $user): void
+    private function assignClientRole(User $user): void
     {
         $clientRoleId = dbconf('pm.client_role_id');
         if ($clientRoleId && ! $user->roles()->where('role_id', $clientRoleId)->exists()) {

@@ -6,7 +6,11 @@ namespace VmEngine\Pm\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use VmEngine\Pm\Models\ProjectInvoice;
 
+/**
+ * @mixin ProjectInvoice
+ */
 class InvoiceResource extends JsonResource
 {
     /**
@@ -17,7 +21,7 @@ class InvoiceResource extends JsonResource
         return [
             'id' => $this->id,
             'invoice_number' => $this->invoice_number,
-            'issue_date' => $this->issue_date?->format('Y-m-d'),
+            'issue_date' => $this->issue_date->format('Y-m-d'),
             'due_date' => $this->due_date?->format('Y-m-d'),
             'recipient' => $this->recipient,
             'currency' => $this->currency,
