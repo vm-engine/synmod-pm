@@ -13,7 +13,7 @@ beforeEach(function () {
 });
 
 test('command exits successfully when no files exist', function () {
-    $this->artisan('mod-pm:migrate-project-uploads')
+    $this->artisan('pm:migrate-project-uploads')
         ->expectsOutput('✅ No project files found in public storage. Nothing to migrate.')
         ->assertExitCode(0);
 });
@@ -21,7 +21,7 @@ test('command exits successfully when no files exist', function () {
 test('command exits successfully when directory exists but is empty', function () {
     Storage::disk('public')->makeDirectory('projects');
 
-    $this->artisan('mod-pm:migrate-project-uploads')
+    $this->artisan('pm:migrate-project-uploads')
         ->expectsOutput('✅ No files found in public storage. Nothing to migrate.')
         ->assertExitCode(0);
 });
@@ -31,7 +31,7 @@ test('command migrates files from public to local storage', function () {
     Storage::disk('public')->put('projects/test1.pdf', 'content1');
     Storage::disk('public')->put('projects/subfolder/test2.pdf', 'content2');
 
-    $this->artisan('mod-pm:migrate-project-uploads')
+    $this->artisan('pm:migrate-project-uploads')
         ->assertExitCode(0);
 
     // Verify files were copied to local
@@ -48,7 +48,7 @@ test('command migrates files from public to local storage', function () {
 test('command with keep-original option keeps files in public storage', function () {
     Storage::disk('public')->put('projects/test.pdf', 'content');
 
-    $this->artisan('mod-pm:migrate-project-uploads', ['--keep-original' => true])
+    $this->artisan('pm:migrate-project-uploads', ['--keep-original' => true])
         ->assertExitCode(0);
 
     // Verify file exists in both storages
@@ -59,7 +59,7 @@ test('command with keep-original option keeps files in public storage', function
 test('command with dry-run does not migrate files', function () {
     Storage::disk('public')->put('projects/test.pdf', 'content');
 
-    $this->artisan('mod-pm:migrate-project-uploads', ['--dry-run' => true])
+    $this->artisan('pm:migrate-project-uploads', ['--dry-run' => true])
         ->expectsOutput('🔍 Running in DRY RUN mode - no files will be moved')
         ->expectsOutput('💡 Run without --dry-run to actually migrate the files.')
         ->assertExitCode(0);
@@ -77,7 +77,7 @@ test('command skips files that already exist in local storage', function () {
     // Create file only in public
     Storage::disk('public')->put('projects/test2.pdf', 'content2');
 
-    $this->artisan('mod-pm:migrate-project-uploads')
+    $this->artisan('pm:migrate-project-uploads')
         ->assertExitCode(0);
 
     // test1.pdf should remain unchanged in local (not overwritten)
@@ -96,7 +96,7 @@ test('command displays correct migration summary', function () {
     // File already exists in local
     Storage::disk('local')->put('projects/file1.pdf', 'existing');
 
-    $this->artisan('mod-pm:migrate-project-uploads')
+    $this->artisan('pm:migrate-project-uploads')
         ->expectsOutputToContain('📊 Migration Summary:')
         ->expectsOutputToContain('Migrated')
         ->expectsOutputToContain('Already in local')
@@ -107,7 +107,7 @@ test('command shows total file count', function () {
     Storage::disk('public')->put('projects/file1.pdf', 'content1');
     Storage::disk('public')->put('projects/file2.pdf', 'content2');
 
-    $this->artisan('mod-pm:migrate-project-uploads')
+    $this->artisan('pm:migrate-project-uploads')
         ->expectsOutput('Found 2 file(s) to migrate.')
         ->assertExitCode(0);
 });
@@ -115,7 +115,7 @@ test('command shows total file count', function () {
 test('command with dry-run shows would be migrated message', function () {
     Storage::disk('public')->put('projects/test.pdf', 'content');
 
-    $this->artisan('mod-pm:migrate-project-uploads', ['--dry-run' => true])
+    $this->artisan('pm:migrate-project-uploads', ['--dry-run' => true])
         ->expectsOutputToContain('(would be migrated)')
         ->assertExitCode(0);
 });
@@ -123,7 +123,7 @@ test('command with dry-run shows would be migrated message', function () {
 test('command with keep-original in dry-run mode does not show deletion warning', function () {
     Storage::disk('public')->put('projects/test.pdf', 'content');
 
-    $output = $this->artisan('mod-pm:migrate-project-uploads', [
+    $output = $this->artisan('pm:migrate-project-uploads', [
         '--dry-run' => true,
         '--keep-original' => true,
     ]);
@@ -135,7 +135,7 @@ test('command with keep-original in dry-run mode does not show deletion warning'
 test('command shows warning when originals are kept', function () {
     Storage::disk('public')->put('projects/test.pdf', 'content');
 
-    $this->artisan('mod-pm:migrate-project-uploads', ['--keep-original' => true])
+    $this->artisan('pm:migrate-project-uploads', ['--keep-original' => true])
         ->expectsOutput('⚠️  Original files are still in public storage.')
         ->assertExitCode(0);
 });
@@ -143,7 +143,7 @@ test('command shows warning when originals are kept', function () {
 test('command shows deletion confirmation when originals are deleted', function () {
     Storage::disk('public')->put('projects/test.pdf', 'content');
 
-    $this->artisan('mod-pm:migrate-project-uploads')
+    $this->artisan('pm:migrate-project-uploads')
         ->expectsOutput('🗑️  Original files have been deleted from public storage.')
         ->assertExitCode(0);
 });
@@ -154,7 +154,7 @@ test('command migrates files recursively', function () {
     Storage::disk('public')->put('projects/level1/level2/file2.pdf', 'content2');
     Storage::disk('public')->put('projects/level1/level2/level3/file3.pdf', 'content3');
 
-    $this->artisan('mod-pm:migrate-project-uploads')
+    $this->artisan('pm:migrate-project-uploads')
         ->assertExitCode(0);
 
     // Verify all nested files were migrated
@@ -167,7 +167,7 @@ test('command preserves file structure', function () {
     Storage::disk('public')->put('projects/invoices/2024/invoice1.pdf', 'content1');
     Storage::disk('public')->put('projects/receipts/2024/receipt1.pdf', 'content2');
 
-    $this->artisan('mod-pm:migrate-project-uploads')
+    $this->artisan('pm:migrate-project-uploads')
         ->assertExitCode(0);
 
     // Verify directory structure is preserved
@@ -181,7 +181,7 @@ test('command handles multiple file types', function () {
     Storage::disk('public')->put('projects/document.docx', 'docx content');
     Storage::disk('public')->put('projects/spreadsheet.xlsx', 'xlsx content');
 
-    $this->artisan('mod-pm:migrate-project-uploads')
+    $this->artisan('pm:migrate-project-uploads')
         ->assertExitCode(0);
 
     // Verify all file types were migrated
@@ -194,7 +194,7 @@ test('command handles multiple file types', function () {
 test('command with dry-run shows keep-original hint', function () {
     Storage::disk('public')->put('projects/test.pdf', 'content');
 
-    $this->artisan('mod-pm:migrate-project-uploads', ['--dry-run' => true])
+    $this->artisan('pm:migrate-project-uploads', ['--dry-run' => true])
         ->expectsOutput('💡 Files will be deleted from public storage after migration.')
         ->expectsOutput('💡 Add --keep-original to keep files in public storage after migration.')
         ->assertExitCode(0);
@@ -211,7 +211,7 @@ test('command counts skipped files correctly', function () {
     // Create 1 file only in public
     Storage::disk('public')->put('projects/file3.pdf', 'public3');
 
-    $this->artisan('mod-pm:migrate-project-uploads')
+    $this->artisan('pm:migrate-project-uploads')
         ->assertExitCode(0);
 
     // Verify original local files weren't overwritten
@@ -225,7 +225,7 @@ test('command counts skipped files correctly', function () {
 test('command displays success message after migration', function () {
     Storage::disk('public')->put('projects/test.pdf', 'content');
 
-    $this->artisan('mod-pm:migrate-project-uploads')
+    $this->artisan('pm:migrate-project-uploads')
         ->expectsOutputToContain('✅ Successfully migrated')
         ->assertExitCode(0);
 });

@@ -26,9 +26,9 @@ For internal modules, the module is auto-discovered.
 ### Client Management
 - **Client CRUD**: Complete client management with auto user account creation
 - **Client Categories**: Organize clients by categories
-- **Services Tracking**: Multi-select service assignments (Design, Development, SEO, etc.)
+- **Services Tracking** (soft-deprecated): the legacy `services` field is kept in the DB and API, but the internal UI now uses project categories instead
 - **Status Management**: Prospect vs Active client status with visual indicators
-- **Advanced Filtering**: Filter by category, services, status, and active state with session-based state persistence (navigating back restores filters)
+- **Advanced Filtering**: Filter by client category, project category, status, and active state with session-based state persistence (navigating back restores filters)
 - **User Integration**: Auto-creates user accounts with role assignment on client creation
 - **Active Status Sync**: Client active status syncs with user account status
 - **Business Logic**:
@@ -41,6 +41,7 @@ For internal modules, the module is auto-discovered.
 - **Document Management**: Upload and track project documents (PROPOSAL, SPH, SPK, INVOICE)
   - File upload bug fixed for Livewire v4 (metadata collected before `store()`)
 - **Sub-Division Assignment**: JSON-based sub-division array for flexible assignment
+- **Project Category**: the project form, list filter ("Filter by Project Category") and detail page use project category; the legacy `services` field is disabled in the form but not removed
 
 ### Invoice Management
 - **Invoice CRUD**: Full invoice management with receipt tracking
@@ -76,10 +77,11 @@ Read-only API endpoints for external integrations needing client data and its re
 
 | Endpoint | Description |
 |----------|--------------|
-| `GET /api/pm/client/list` | Paginated client list with filters (category, status, active, services, search) and sorting |
+| `GET /api/pm/client/list` | Paginated client list with filters (category, status, active, services, project category, search) and sorting |
 | `GET /api/pm/client/{id}` | Client detail, including resolved category and service labels |
 | `GET /api/pm/client-category/list` | Paginated client category list with name search |
 | `GET /api/pm/service/list` | Static list of all available services (id + label), backed by the `Services` enum |
+| `GET /api/pm/project-category/list` | Unpaginated project category list, search by name/code (permission `pm.master.project_category.read`) |
 
 **List filters (`/client/list`):**
 
@@ -88,13 +90,14 @@ Read-only API endpoints for external integrations needing client data and its re
 | `client_category_id` | Filter by client category ID |
 | `status` | `0` = prospect, `1` = active |
 | `active` | Boolean — client's active flag |
-| `services[]` | Array of service IDs — any-match |
+| `services[]` | Array of service IDs — any-match (legacy) |
+| `project_category[]` | Array of project category IDs — any-match (combines with `services[]`) |
 | `q` | Search across company, address, city, director, pic |
 | `sort_by` | `company`, `status`, `active`, or `created_at` (default: `created_at`) |
 | `sort_desc` | `1` = descending (default), `0` = ascending |
 | `page`, `limit` | Pagination (`limit` max 100, default 20) |
 
-All endpoints require authentication via `auth:sanctum` and the `pm.client.read` permission. Supports the same two authentication methods as the Invoice API (permanent H2H tokens or login flow).
+All endpoints require authentication via `auth:sanctum` and the `pm.client.read` permission (the project-category list uses `pm.master.project_category.read`). Supports the same two authentication methods as the Invoice API (permanent H2H tokens or login flow).
 
 A Postman collection (`postman/PM_Client_API.postman_collection.json`) and environment (`postman/PM_Client_API.postman_environment.json`) are included for easy testing. A standalone smoke-test script is also available at `scripts/test-client-api.php` (plain PHP + `ext-curl`, no framework bootstrap required) — authenticate with a permanent API token (Auth > API Users) and run it against a live instance with:
 
@@ -120,16 +123,16 @@ Synchronize all client user active status based on client status and active flag
 
 ```bash
 # Basic sync
-php artisan mod-pm:sync-client-user-status
+php artisan pm:sync-client-user-status
 
 # With detailed output
-php artisan mod-pm:sync-client-user-status --show-details
+php artisan pm:sync-client-user-status --show-details
 
 # Force update all users
-php artisan mod-pm:sync-client-user-status --force
+php artisan pm:sync-client-user-status --force
 
 # Both detailed and force
-php artisan mod-pm:sync-client-user-status --force --show-details
+php artisan pm:sync-client-user-status --force --show-details
 ```
 
 ### Migrate Old Data
@@ -137,13 +140,13 @@ Migrate data from legacy database to current schema:
 
 ```bash
 # Basic migration
-php artisan mod-pm:migrate-old {source_connection}
+php artisan pm:migrate-old {source_connection}
 
 # Skip missing foreign key references
-php artisan mod-pm:migrate-old {source_connection} --skip-missing
+php artisan pm:migrate-old {source_connection} --skip-missing
 
 # Example
-php artisan mod-pm:migrate-old mysql_old --skip-missing
+php artisan pm:migrate-old mysql_old --skip-missing
 ```
 
 See [MIGRATION.md](MIGRATION.md) for detailed migration guide and troubleshooting.
@@ -152,7 +155,7 @@ See [MIGRATION.md](MIGRATION.md) for detailed migration guide and troubleshootin
 
 - Laravel 12+
 - Livewire v4
-- vm-engine/synapse ^2.0
+- vm-engine/synapse ^3.0 (views use `<x-synapse-adv-select>`, the per-page selector and the CSP-safe Alpine build)
 - vm-engine/synapps-auth ^2.0
 
 ## License

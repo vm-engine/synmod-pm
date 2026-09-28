@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Support\Facades\Route;
 use VmEngine\Pm\Http\Controllers\DocumentController;
 use VmEngine\Pm\Http\Controllers\InvoiceController;

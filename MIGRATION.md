@@ -48,7 +48,7 @@ OLD_DB_PASSWORD=your_password
 Execute the migration command:
 
 ```bash
-php artisan mod-pm:migrate-old old_member
+php artisan pm:migrate-old old_member
 ```
 
 The command will:
@@ -231,7 +231,7 @@ php artisan tinker
 >>> \VmEngine\Pm\Models\Division::truncate()
 
 # Then re-run migration
-php artisan mod-pm:migrate-old old_member
+php artisan pm:migrate-old old_member
 ```
 
 ## Notes

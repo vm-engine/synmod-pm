@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace VmEngine\Pm\Console\Commands;
 
 use Illuminate\Console\Command;
@@ -11,7 +13,14 @@ class ResetIndexCommand extends Command
     /**
      * The name and signature of the console command.
      */
-    protected $signature = 'mod-pm:reset-index';
+    protected $signature = 'pm:reset-index';
+
+    /**
+     * Deprecated pre-3.x name, kept so existing scripts keep working.
+     *
+     * @var array<int, string>
+     */
+    protected $aliases = ['mod-pm:reset-index'];
 
     /**
      * The console command description.

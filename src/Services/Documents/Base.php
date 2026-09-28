@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace VmEngine\Pm\Services\Documents;
 
 use VmEngine\Pm\Enums\Documents;
@@ -16,9 +18,10 @@ abstract class Base
         // Ensure relationships are loaded
         $project->loadMissing(['client', 'projectCategory']);
 
-        $format = dbconf('pm.documents.'.($document->code(true) ?: $document->name).'.number_format', '');
+        // dbconf() values come back from a string column — cast before they reach typed code
+        $format = (string) dbconf('pm.documents.'.($document->code(true) ?: $document->name).'.number_format', '');
         $cnc = $project->client->status == Client::STATUS_PROSPECT && $document->hasNCIndex() ? 'NC' : 'C';
-        $index = dbconf('pm.documents.'.$project->category?->code.'.'.($document->code() ?: $document->name).'.next_'.strtolower($cnc).'_index', 1);
+        $index = (int) dbconf('pm.documents.'.$project->category?->code.'.'.($document->code() ?: $document->name).'.next_'.strtolower($cnc).'_index', 1);
 
         return $this->replaceFormat($format, $cnc, $index, $project, $document);
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'tabs' => [
         'doc_no_format' => 'Document Number Format',

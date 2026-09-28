@@ -1,6 +1,8 @@
 # Strict Types Plan — synmod-pm
 
-Same pattern as `packages/synapse` (done — see that package's `phpstan.neon`, now level 6, 0 errors, 503 tests green). Not implemented here yet — inventory only.
+> **Status (2026-09-27): done.** Every tracked PHP file declares `strict_types`, and the package's `phpstan.neon` passes level 7 with no ignore list. Strict mode surfaced one real bug: `Documents\Base::generateDocumentNumber()` passed `dbconf()` strings into typed parameters; they are now cast. Kept for history.
+
+Same pattern as `packages/synapse` (see that package's `phpstan.neon`, now level 7).
 
 ## Scope
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace VmEngine\Pm\Services\Documents;
 
 use Illuminate\Container\Attributes\Singleton;

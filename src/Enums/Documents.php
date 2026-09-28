@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace VmEngine\Pm\Enums;
 
 use VmEngine\Pm\Services\Documents\AccountInformation;

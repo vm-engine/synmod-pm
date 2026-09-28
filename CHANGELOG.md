@@ -4,30 +4,26 @@ All notable changes to this project will be documented in this file.
 
 ## [0.9.0] - Unreleased
 
-### Changed
-- **PHPStan level 7 with no ignore list.** Removed all blanket `ignoreErrors` patterns: every model now carries `@property` docblocks generated from the schema and casts, and the API resources declare `@mixin` of their model.
-- `ClientUserService::createUser()` returns `User`; `apiStatistics()` reads aggregates via `toBase()`; `CurrencyFormatter` treats `name`/`name_plural` as optional config keys.
-
-### Fixed
-- `Bast`/`Spk` document handlers compared the enum-cast `Project::$status` against raw ints (`Bast`'s check was always true) and assigned ints; they now compare and assign `ProjectStatus` cases.
-- `canAccessDocument()` in `DocumentController` and `ProjectDocumentService` narrow the user with `instanceof User` instead of a misleading `@var`.
-
-### Security
-- Removed the unlinked scaffold index page (`GET /apps/pm`, route `backend.pm.index`, view `livewire/index.blade.php`), which rendered `@dump(config('database.connections'))` — database credentials — to any user with `pm.manage`.
-
 ### Added
 - New unpaginated `GET /api/pm/project-category/list` API endpoint (search by name/code, permission `pm.master.project_category.read`).
 - `project_category` filter param on the Client API list endpoint (`GET /api/pm/client/list`), additive to the existing `services` filter.
 - `Client::byProjectCategoryAny()` and `Project::byProjectCategoryAny()` query scopes.
 
 ### Changed
+- **Commands renamed** from `mod-pm:*` to `pm:*` (`reset-index`, `sync-client-user-status`, `recalculate-invoice-conversions`, `import-projects`, `migrate-old`, `migrate-project-uploads`). Old names still work as deprecated aliases; the yearly scheduler entry now uses `pm:reset-index`.
+- `declare(strict_types=1)` added to the remaining 58 files (document handlers, enums, a console command, migrations, lang, routes, a test) — every PHP file in the package is now strict.
+- **Requires `vm-engine/synapse` ^3.0** (was `^2.2|^3.0`) and allows `vm-engine/synapps-auth` ^3.0.
+- **PHPStan level 7 with no ignore list.** Removed all blanket `ignoreErrors` patterns: every model now carries `@property` docblocks generated from the schema and casts, and the API resources declare `@mixin` of their model.
+- `ClientUserService::createUser()` returns `User`; `apiStatistics()` reads aggregates via `toBase()`; `CurrencyFormatter` treats `name`/`name_plural` as optional config keys.
 - Internal client list UI (advanced-filter drawer, table column, filter state) now filters/displays by project category instead of the legacy `services` field. The `services` DB column, model casts/fillable, and `Services` enum are untouched — this is a UI-level migration, not a removal.
 - Internal project form, list filter, and detail view now use project category instead of the legacy `services` field: the form's services field is disabled, the list's "Filter by Services" is now "Filter by Project Category" (also fixing a pre-existing placeholder copy-paste bug), and the detail page shows project category instead of services badges. `Project.services` DB column, model casts/fillable, and `Services` enum remain untouched.
-- **Requires `vm-engine/synapse` ^2.2|^3.0** — supports synapse's new default CSP-safe Alpine.js build.
 - **Semantic CSS migration (phase 1)** of 23 list/form/master/document views onto synapse components (`<x-synapse-panel>`, `-search-box`, `-per-page-selector`, `-badge`, `-alert`) and semantic classes (`.syn-modal-*`, `.syn-empty-state*`, `.syn-media-card*`, `.form-label`, `.form-help`, …); inline utility tokens −49% across those views. Literal FontAwesome icons in them swapped to Phosphor. Accepted visual drift: unified empty states, `.form-label` drawer labels, document groups render as collapsible synapse panels. See `docs/SEMANTIC_CSS_PLAN.md`.
 - `client-list` / `invoice-list`: `$limit` → `$perPage` (now uses `<x-synapse-per-page-selector>`, options 10/15/25/50). Card-grid lists keep `$limit`.
 
 ### Fixed
+- Document numbering read the next index and number format from `dbconf()`, whose values come back from a string column, and passed them unconverted into `int`/`string` parameters — a TypeError once the package became strict. They are now cast (`(int)` / `(string)`), with a regression test.
+- `Bast`/`Spk` document handlers compared the enum-cast `Project::$status` against raw ints (`Bast`'s check was always true) and assigned ints; they now compare and assign `ProjectStatus` cases.
+- `canAccessDocument()` in `DocumentController` and `ProjectDocumentService` narrow the user with `instanceof User` instead of a misleading `@var`.
 - **PHPStan level 7 clean with no baseline** (was 250 errors + a stale baseline hiding 17 more). Real bugs fixed along the way: `strlen(false)` TypeError in `ApiLogger` for streamed responses; `strtotime()` failure TypeError in `MigrateOldDataCommand::extractYearFromCode()` (now a clear exception); unchecked `false` from `store()`/`storeAs()`/`getimagesize()`/`imagecreatefrom*()`/`file_get_contents()` in the image/NPWP upload services (now throw instead of persisting `false` as a path) plus 0px target sizes; `MigrateProjectUploadsCommand` wrote `null` when the source was unreadable (now verifies via `put()`'s result); two `@var` tags with a missing leading `\` that resolved to a non-existent class; `json_encode` of server info now `JSON_THROW_ON_ERROR`. Activity logging centralised in a `RecordsActivity` trait; user relations resolve through a typed `ResolvesUserModel::userModel()` (still from `auth.providers.users.model`). `InvoiceService::exportToExcel()` now throws `AuthenticationException` for guests instead of building a `…-0` export reference.
 - Invoice row "more" menu is positioned and styled again (`.syn-icon-dropdown`; the old `.icon-dropdown` CSS was never ported to v3).
 - Dead `btn-sm` / `btn-outline` classes replaced with `.btn.sm` / `.btn.secondary`.
@@ -36,6 +32,9 @@ All notable changes to this project will be documented in this file.
 - Project Category "Document Index" modal fits the viewport again (table scroll capped at `60vh`).
 - **CSP-safe Alpine.js compatibility.** `client-form`, `document-multiple-files-list`, `document-revision-list`, `bank-account-form`, `bank-account-list`, `issuer-list`, `signature-list`, `project-category`, `activity`, `invoice-detail`, and `invoice-list` migrated off inline `x-data="{ ... }"` object literals and multi-statement `@click`/`x-on:*` expressions (including `if (...)` statements and split Alpine/Livewire dispatch chains) to the `Alpine.data()` registry pattern, required by `vm-engine/synapse` ^3.0's new default CSP-safe Alpine build.
 - Migrated the remaining `<x-synapse-select>` usages (removed from `vm-engine/synapse` v3.0) to `<x-synapse-adv-select>` in `client-list`, `client-form`, `invoice-list`, and `project-list` — these views were throwing unknown-component errors. `ClientForm::categories()` reshaped to the value/label array format the new component requires; `InvoiceList::availableYears()`/`ProjectList::years()`/`progressRanges()` left untouched, reshaped only at the Blade call site.
+
+### Security
+- Removed the unlinked scaffold index page (`GET /apps/pm`, route `backend.pm.index`, view `livewire/index.blade.php`), which rendered `@dump(config('database.connections'))` — database credentials — to any user with `pm.manage`.
 
 ## [0.8.9] - 2026-07-23
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'detail_title' => 'Receipt Detail',
     'generate' => 'Generate Receipt',

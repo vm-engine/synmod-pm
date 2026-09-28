@@ -69,27 +69,27 @@ pest tests/Feature/                # Run specific directory
 
 ```bash
 # Migrate data from old database to new schema
-php artisan mod-pm:migrate-old {source_connection} [--skip-missing]
+php artisan pm:migrate-old {source_connection} [--skip-missing]
 
 # Example:
-php artisan mod-pm:migrate-old mysql_old
-php artisan mod-pm:migrate-old mysql_old --skip-missing
+php artisan pm:migrate-old mysql_old
+php artisan pm:migrate-old mysql_old --skip-missing
 ```
 
 ### Client User Status Sync
 
 ```bash
 # Sync all client user active status
-php artisan mod-pm:sync-client-user-status
+php artisan pm:sync-client-user-status
 
 # With detailed output for each client
-php artisan mod-pm:sync-client-user-status --show-details
+php artisan pm:sync-client-user-status --show-details
 
 # Force update all users regardless of current status
-php artisan mod-pm:sync-client-user-status --force
+php artisan pm:sync-client-user-status --force
 
 # Both detailed output and force update
-php artisan mod-pm:sync-client-user-status --force --show-details
+php artisan pm:sync-client-user-status --force --show-details
 ```
 
 ### Module Discovery (in parent Laravel app)
@@ -199,7 +199,7 @@ The Client CRUD implementation follows Laravel Synapse's standalone page pattern
 **Filtering:**
 
 -   Client categories (multi-select)
--   Services (multi-select ANY match using `whereJsonContains`)
+-   Project categories (multi-select ANY match, `Client::byProjectCategoryAny()`) — replaced the Services filter in the UI; `services` column/cast/enum are kept (soft-deprecated) and still filterable via the API
 -   Status (prospect/active)
 -   Active status (boolean)
 -   Full-text search across: company, address, city, director, pic

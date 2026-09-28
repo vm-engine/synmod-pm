@@ -10,12 +10,19 @@ use VmEngine\Pm\Services\InvoiceConversionService;
 
 class RecalculateInvoiceConversionsCommand extends Command
 {
-    protected $signature = 'mod-pm:recalculate-invoice-conversions
+    protected $signature = 'pm:recalculate-invoice-conversions
                             {--dry-run : Show what would change without saving}
                             {--rate= : Uniform historical IDR exchange rate applied to all non-IDR invoices in this run}
                             {--use-saved-rate : Recompute _idr fields from the exchange_rate already stored on each invoice, instead of a uniform --rate}
                             {--missing-only : Only process invoices whose _idr fields have not been populated yet}
                             {--year= : Optionally limit to invoices issued in a specific year}';
+
+    /**
+     * Deprecated pre-3.x name, kept so existing scripts keep working.
+     *
+     * @var array<int, string>
+     */
+    protected $aliases = ['mod-pm:recalculate-invoice-conversions'];
 
     protected $description = 'Backfill/resync exchange_rate and IDR-converted amount fields on existing invoices';
 

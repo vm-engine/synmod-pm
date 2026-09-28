@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'title' => 'Bank Account Management',
     'list_title' => 'Bank Accounts',

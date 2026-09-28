@@ -25,9 +25,16 @@ class MigrateOldDataCommand extends Command
     /**
      * The name and signature of the console command.
      */
-    protected $signature = 'mod-pm:migrate-old
+    protected $signature = 'pm:migrate-old
                             {source : Source database connection name}
                             {--skip-missing : Skip records with missing foreign key references}';
+
+    /**
+     * Deprecated pre-3.x name, kept so existing scripts keep working.
+     *
+     * @var array<int, string>
+     */
+    protected $aliases = ['mod-pm:migrate-old'];
 
     /**
      * The console command description.

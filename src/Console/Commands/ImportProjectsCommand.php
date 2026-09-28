@@ -17,11 +17,18 @@ class ImportProjectsCommand extends Command
     /**
      * The name and signature of the console command.
      */
-    protected $signature = 'mod-pm:import-projects
+    protected $signature = 'pm:import-projects
                             {filename : Path to the CSV file to import}
                             {--username= : Username for created_by field (defaults to first Developer user)}
                             {--division= : Division ID (defaults to first division)}
                             {--dry-run : Preview what would be imported without inserting data}';
+
+    /**
+     * Deprecated pre-3.x name, kept so existing scripts keep working.
+     *
+     * @var array<int, string>
+     */
+    protected $aliases = ['mod-pm:import-projects'];
 
     /**
      * The console command description.

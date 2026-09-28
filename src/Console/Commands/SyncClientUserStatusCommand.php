@@ -12,9 +12,16 @@ class SyncClientUserStatusCommand extends Command
     /**
      * The name and signature of the console command.
      */
-    protected $signature = 'mod-pm:sync-client-user-status
+    protected $signature = 'pm:sync-client-user-status
                             {--force : Force update all users regardless of current status}
                             {--show-details : Show detailed information for each client}';
+
+    /**
+     * Deprecated pre-3.x name, kept so existing scripts keep working.
+     *
+     * @var array<int, string>
+     */
+    protected $aliases = ['mod-pm:sync-client-user-status'];
 
     /**
      * The console command description.

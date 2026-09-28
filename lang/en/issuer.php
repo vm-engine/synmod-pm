@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'title' => 'Document Issuer Management',
     'list_title' => 'Document Issuers',

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'division_created_successfully' => 'Division created successfully.',
     'division_updated_successfully' => 'Division updated successfully.',

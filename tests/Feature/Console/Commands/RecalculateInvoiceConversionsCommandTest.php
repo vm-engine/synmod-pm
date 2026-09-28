@@ -12,7 +12,7 @@ test('succeeds without --rate when only IDR invoices exist', function () {
         'currency' => 'IDR', 'total_amount' => 500000, 'total_amount_idr' => 0,
     ]);
 
-    $this->artisan('mod-pm:recalculate-invoice-conversions')
+    $this->artisan('pm:recalculate-invoice-conversions')
         ->assertExitCode(0);
 
     $invoice->refresh();
@@ -24,7 +24,7 @@ test('fails fast with zero writes when non-IDR invoices exist and neither --rate
     $idr = ProjectInvoice::factory()->create(['currency' => 'IDR', 'total_amount' => 500000, 'total_amount_idr' => 0]);
     $usd = ProjectInvoice::factory()->create(['currency' => 'USD', 'total_amount' => 100, 'total_amount_idr' => 0, 'exchange_rate' => 1]);
 
-    $this->artisan('mod-pm:recalculate-invoice-conversions')
+    $this->artisan('pm:recalculate-invoice-conversions')
         ->assertExitCode(1);
 
     expect((float) $idr->fresh()->total_amount_idr)->toBe(0.0);
@@ -32,7 +32,7 @@ test('fails fast with zero writes when non-IDR invoices exist and neither --rate
 });
 
 test('fails when --rate and --use-saved-rate are passed together', function () {
-    $this->artisan('mod-pm:recalculate-invoice-conversions', ['--rate' => '16000', '--use-saved-rate' => true])
+    $this->artisan('pm:recalculate-invoice-conversions', ['--rate' => '16000', '--use-saved-rate' => true])
         ->assertExitCode(1);
 });
 
@@ -44,7 +44,7 @@ test('applies uniform --rate to non-IDR invoices and rate 1 to IDR invoices', fu
         'currency' => 'USD', 'total_amount' => 100, 'amount' => 100, 'total_amount_idr' => 0, 'exchange_rate' => 1,
     ]);
 
-    $this->artisan('mod-pm:recalculate-invoice-conversions', ['--rate' => '16000'])
+    $this->artisan('pm:recalculate-invoice-conversions', ['--rate' => '16000'])
         ->assertExitCode(0);
 
     expect((float) $idr->fresh()->exchange_rate)->toBe(1.0);
@@ -57,7 +57,7 @@ test('rejects zero, negative, and non-numeric --rate with no writes', function (
     $usd = ProjectInvoice::factory()->create(['currency' => 'USD', 'total_amount' => 100, 'total_amount_idr' => 0, 'exchange_rate' => 1]);
 
     foreach (['0', '-5', 'abc'] as $badRate) {
-        $this->artisan('mod-pm:recalculate-invoice-conversions', ['--rate' => $badRate])
+        $this->artisan('pm:recalculate-invoice-conversions', ['--rate' => $badRate])
             ->assertExitCode(1);
     }
 
@@ -69,7 +69,7 @@ test('--dry-run prints a summary but persists nothing', function () {
         'currency' => 'USD', 'total_amount' => 100, 'total_amount_idr' => 0, 'exchange_rate' => 1,
     ]);
 
-    $this->artisan('mod-pm:recalculate-invoice-conversions', ['--rate' => '16000', '--dry-run' => true])
+    $this->artisan('pm:recalculate-invoice-conversions', ['--rate' => '16000', '--dry-run' => true])
         ->assertExitCode(0);
 
     expect((float) $usd->fresh()->exchange_rate)->toBe(1.0);
@@ -84,7 +84,7 @@ test('--year filter only touches invoices issued in that year', function () {
         'currency' => 'IDR', 'issue_date' => '2024-06-01', 'total_amount' => 700000, 'total_amount_idr' => 0,
     ]);
 
-    $this->artisan('mod-pm:recalculate-invoice-conversions', ['--year' => '2025'])
+    $this->artisan('pm:recalculate-invoice-conversions', ['--year' => '2025'])
         ->assertExitCode(0);
 
     expect((float) $inYear->fresh()->total_amount_idr)->toBe(500000.0);
@@ -97,7 +97,7 @@ test('--use-saved-rate resyncs _idr fields from each invoice own stored exchange
         'exchange_rate' => 15750, 'total_amount_idr' => 0,
     ]);
 
-    $this->artisan('mod-pm:recalculate-invoice-conversions', ['--use-saved-rate' => true])
+    $this->artisan('pm:recalculate-invoice-conversions', ['--use-saved-rate' => true])
         ->assertExitCode(0);
 
     $usd->refresh();
@@ -115,7 +115,7 @@ test('--missing-only skips already-converted rows, including manually-corrected 
         'exchange_rate' => 1, 'total_amount_idr' => 0, 'amount_idr' => 0,
     ]);
 
-    $this->artisan('mod-pm:recalculate-invoice-conversions', ['--rate' => '16000', '--missing-only' => true])
+    $this->artisan('pm:recalculate-invoice-conversions', ['--rate' => '16000', '--missing-only' => true])
         ->assertExitCode(0);
 
     // Untouched: exact same rate and _idr values as before the run.

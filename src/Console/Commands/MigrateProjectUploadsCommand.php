@@ -14,9 +14,16 @@ class MigrateProjectUploadsCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'mod-pm:migrate-project-uploads
+    protected $signature = 'pm:migrate-project-uploads
                             {--dry-run : Show what would be migrated without actually migrating}
                             {--keep-original : Keep files in public disk after migration}';
+
+    /**
+     * Deprecated pre-3.x name, kept so existing scripts keep working.
+     *
+     * @var array<int, string>
+     */
+    protected $aliases = ['mod-pm:migrate-project-uploads'];
 
     /**
      * The console command description.
