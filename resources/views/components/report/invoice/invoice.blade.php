@@ -260,7 +260,7 @@
                                     </td>
                                     <td>
                                         <div class="font-medium">
-                                            {{ $invoiceByCreator->creator->name }}
+                                            {{ $invoiceByCreator->creator?->name ?? __('pm::report.invoice.unknown_creator') }}
                                         </div>
                                     </td>
                                     <td class="text-right">

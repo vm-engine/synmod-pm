@@ -38,6 +38,7 @@ return [
         'invoice_amount' => 'Invoice Amount',
         'invoices' => 'invoices',
         'no_data' => 'No data available for the selected year',
+        'unknown_creator' => 'Unknown user',
         'stats' => [
             'total_invoices' => 'Total Invoices',
             'total_unpaid' => 'Total Unpaid Amount',
