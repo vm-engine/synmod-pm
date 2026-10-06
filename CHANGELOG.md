@@ -2,7 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.9.0] - Unreleased
+## [0.9.0] - 2026-10-06
+
+**Breaking:**
+- Requires `vm-engine/synapse` ^3.0 and `vm-engine/synapps-auth` ^3.0. Stay on 0.8.x for Synapse 2.x.
+- Commands renamed `mod-pm:*` → `pm:*` (old names still work as deprecated aliases).
+- `client-list` / `invoice-list`: `$limit` → `$perPage` — update subclasses or links that set `limit`.
+- Client/project UI filters and displays by project category instead of the legacy `services` field.
+- Published/overridden views must be re-published (semantic CSS, `adv-select`, CSP-safe Alpine).
 
 ### Added
 - New unpaginated `GET /api/pm/project-category/list` API endpoint (search by name/code, permission `pm.master.project_category.read`).
@@ -12,7 +19,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - **Commands renamed** from `mod-pm:*` to `pm:*` (`reset-index`, `sync-client-user-status`, `recalculate-invoice-conversions`, `import-projects`, `migrate-old`, `migrate-project-uploads`). Old names still work as deprecated aliases; the yearly scheduler entry now uses `pm:reset-index`.
 - `declare(strict_types=1)` added to the remaining 58 files (document handlers, enums, a console command, migrations, lang, routes, a test) — every PHP file in the package is now strict.
-- **Requires `vm-engine/synapse` ^3.0** (was `^2.2|^3.0`) and allows `vm-engine/synapps-auth` ^3.0.
+- **Requires `vm-engine/synapse` ^3.0** (was `^2.2|^3.0`) and `vm-engine/synapps-auth` ^3.0 (was `^2.0`).
 - **PHPStan level 7 with no ignore list.** Removed all blanket `ignoreErrors` patterns: every model now carries `@property` docblocks generated from the schema and casts, and the API resources declare `@mixin` of their model.
 - `ClientUserService::createUser()` returns `User`; `apiStatistics()` reads aggregates via `toBase()`; `CurrencyFormatter` treats `name`/`name_plural` as optional config keys.
 - Internal client list UI (advanced-filter drawer, table column, filter state) now filters/displays by project category instead of the legacy `services` field. The `services` DB column, model casts/fillable, and `Services` enum are untouched — this is a UI-level migration, not a removal.
@@ -29,6 +36,7 @@ All notable changes to this project will be documented in this file.
 - Dead `btn-sm` / `btn-outline` classes replaced with `.btn.sm` / `.btn.secondary`.
 - Removed leftover "Debug info" output (division id / sub-division count) from the project form.
 - Project Document report no longer 500s when a document's uploader was deleted (`created_by` is `ON DELETE SET NULL`); shows "Unknown" like the document lists do.
+- Invoice report no longer 500s when an invoice's `created_by` points to a missing user row (data imported without FK checks); shows "Unknown user". Soft-deleted creators keep their name.
 - Project Category "Document Index" modal fits the viewport again (table scroll capped at `60vh`).
 - **CSP-safe Alpine.js compatibility.** `client-form`, `document-multiple-files-list`, `document-revision-list`, `bank-account-form`, `bank-account-list`, `issuer-list`, `signature-list`, `project-category`, `activity`, `invoice-detail`, and `invoice-list` migrated off inline `x-data="{ ... }"` object literals and multi-statement `@click`/`x-on:*` expressions (including `if (...)` statements and split Alpine/Livewire dispatch chains) to the `Alpine.data()` registry pattern, required by `vm-engine/synapse` ^3.0's new default CSP-safe Alpine build.
 - Migrated the remaining `<x-synapse-select>` usages (removed from `vm-engine/synapse` v3.0) to `<x-synapse-adv-select>` in `client-list`, `client-form`, `invoice-list`, and `project-list` — these views were throwing unknown-component errors. `ClientForm::categories()` reshaped to the value/label array format the new component requires; `InvoiceList::availableYears()`/`ProjectList::years()`/`progressRanges()` left untouched, reshaped only at the Blade call site.
