@@ -110,7 +110,7 @@ function showResponse(array $response): void
  * @param  array<string, string>  $headers
  * @return array{status: int, body: string, json: mixed}
  */
-function request(string $method, string $url, array $headers = [], ?string $jsonBody = null): array
+function apiRequest(string $method, string $url, array $headers = [], ?string $jsonBody = null): array
 {
     $ch = curl_init($url);
 
@@ -161,7 +161,7 @@ $authHeader = ['Authorization' => "Bearer {$apiToken}"];
 // ---------------------------------------------------------------------------
 echo "-- Auth --\n";
 
-$authCheck = request('GET', "{$baseUrl}/api/pm/client/list?limit=1", $authHeader);
+$authCheck = apiRequest('GET', "{$baseUrl}/api/pm/client/list?limit=1", $authHeader);
 showResponse($authCheck);
 
 if ($authCheck['status'] === 200) {
@@ -179,7 +179,7 @@ echo "\n-- Client List --\n";
 
 $firstClientId = null;
 
-$list = request('GET', "{$baseUrl}/api/pm/client/list?limit=5", $authHeader);
+$list = apiRequest('GET', "{$baseUrl}/api/pm/client/list?limit=5", $authHeader);
 showResponse($list);
 
 if ($list['status'] === 200) {
@@ -198,7 +198,7 @@ if ($list['status'] === 200) {
     fail("GET /client/list returned HTTP {$list['status']}: {$list['body']}");
 }
 
-$invalidSort = request('GET', "{$baseUrl}/api/pm/client/list?sort_by=invalid_column", $authHeader);
+$invalidSort = apiRequest('GET', "{$baseUrl}/api/pm/client/list?sort_by=invalid_column", $authHeader);
 showResponse($invalidSort);
 
 if ($invalidSort['status'] === 422) {
@@ -213,7 +213,7 @@ if ($invalidSort['status'] === 422) {
 echo "\n-- Client Detail --\n";
 
 if ($firstClientId !== null) {
-    $detail = request('GET', "{$baseUrl}/api/pm/client/{$firstClientId}", $authHeader);
+    $detail = apiRequest('GET', "{$baseUrl}/api/pm/client/{$firstClientId}", $authHeader);
     showResponse($detail);
 
     if ($detail['status'] === 200) {
@@ -233,7 +233,7 @@ if ($firstClientId !== null) {
     echo "  SKIP - no clients found; skipping detail success check (seed data first for full coverage)\n";
 }
 
-$missing = request('GET', "{$baseUrl}/api/pm/client/999999999", $authHeader);
+$missing = apiRequest('GET', "{$baseUrl}/api/pm/client/999999999", $authHeader);
 showResponse($missing);
 
 if ($missing['status'] === 404) {
@@ -247,7 +247,7 @@ if ($missing['status'] === 404) {
 // ---------------------------------------------------------------------------
 echo "\n-- Client Categories --\n";
 
-$categories = request('GET', "{$baseUrl}/api/pm/client-category/list", $authHeader);
+$categories = apiRequest('GET', "{$baseUrl}/api/pm/client-category/list", $authHeader);
 showResponse($categories);
 
 if ($categories['status'] === 200) {
@@ -270,7 +270,7 @@ if ($categories['status'] === 200) {
 // ---------------------------------------------------------------------------
 echo "\n-- Services --\n";
 
-$services = request('GET', "{$baseUrl}/api/pm/service/list", $authHeader);
+$services = apiRequest('GET', "{$baseUrl}/api/pm/service/list", $authHeader);
 showResponse($services);
 
 if ($services['status'] === 200) {
@@ -292,7 +292,7 @@ if ($services['status'] === 200) {
 // ---------------------------------------------------------------------------
 echo "\n-- Auth Failure Paths --\n";
 
-$noAuth = request('GET', "{$baseUrl}/api/pm/client/list", []);
+$noAuth = apiRequest('GET', "{$baseUrl}/api/pm/client/list", []);
 showResponse($noAuth);
 
 if ($noAuth['status'] === 401) {
@@ -301,7 +301,7 @@ if ($noAuth['status'] === 401) {
     fail("GET /client/list without token expected 401, got {$noAuth['status']}: {$noAuth['body']}");
 }
 
-$badAuth = request('GET', "{$baseUrl}/api/pm/client/list", ['Authorization' => 'Bearer invalid-token-value']);
+$badAuth = apiRequest('GET', "{$baseUrl}/api/pm/client/list", ['Authorization' => 'Bearer invalid-token-value']);
 showResponse($badAuth);
 
 if ($badAuth['status'] === 401) {
