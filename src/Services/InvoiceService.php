@@ -21,6 +21,7 @@ use VmEngine\Synapse\Services\Excel\ExcelExporter;
 use VmEngine\Synapse\Services\Excel\Transformers\BooleanTransformer;
 use VmEngine\Synapse\Services\Excel\Transformers\DateFormatTransformer;
 use VmEngine\Synapse\Services\Excel\Transformers\DefaultValueTransformer;
+use VmEngine\SynAuth\Models\User;
 
 class InvoiceService
 {
@@ -143,7 +144,7 @@ class InvoiceService
     /**
      * Distinct invoice creators (id + name) for filter dropdowns.
      *
-     * @return Collection<int, object{id:int,name:string}>
+     * @return Collection<int, User> creators with only id and name loaded
      */
     public function getCreators(): Collection
     {

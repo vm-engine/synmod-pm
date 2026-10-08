@@ -116,6 +116,14 @@ List components remember their filter/sort/pagination state in the session via t
 
 Applies to: Client list, User list, and all other list/table components.
 
+## Proposal Generator
+
+- Editor: Project → Documents → Proposal → **Proposal Generator** (`pm/project/{id}/proposal`, requires `pm.project.update`).
+- Template: `resources/templates/proposal/proposal.pptx`; slide roles are mapped in `src/Services/Proposal/Pptx/TemplateMap.php` (update the map when replacing the deck).
+- PDF static slides are images in `resources/templates/proposal/static/`. Regenerate them after changing the template with `php packages/synmod-pm/scripts/export-proposal-static.php` from the main project root (needs LibreOffice + poppler; dev machine only — production needs neither).
+- Defaults per proposal type, the website feature checklist and holidays live under Master Data.
+- Fonts: the deck uses Calibri and Arial Rounded MT Bold, which are commercial and not bundled. Copy `calibri.ttf`, `calibrib.ttf`, `calibrii.ttf`, `calibriz.ttf` and `ARLRDBD.TTF` (from `C:\Windows\Fonts`) into the main project's `storage/app/fonts/` (gitignored) and the PDF uses them; otherwise it falls back to the bundled Carlito and Varela Round. To get the same fonts in the PDF's static slide images, install them locally (`~/.local/share/fonts`) and rerun the export script.
+
 ## Commands
 
 ### Sync Client User Status

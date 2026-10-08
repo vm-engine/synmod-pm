@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Route;
 use VmEngine\Pm\Http\Controllers\DocumentController;
 use VmEngine\Pm\Http\Controllers\InvoiceController;
+use VmEngine\Pm\Http\Controllers\ProposalController;
 use VmEngine\Pm\Http\Controllers\ReceiptController;
 
 Route::group([], function () {
@@ -23,6 +24,15 @@ Route::group([], function () {
         ->name('document.download')->middleware('can-access:pm.project.read');
     Route::get('/document/{id}/print', [DocumentController::class, 'print'])
         ->name('document.print')->middleware('can-access:pm.project.read');
+    Route::get('/document/{id}/download-pptx', [ProposalController::class, 'downloadPptx'])
+        ->name('document.download_pptx')->middleware('can-access:pm.project.read');
+
+    // Proposal generator
+    Route::livewire('/project/{id}/proposal', 'pm::proposal.proposal-form')
+        ->name('proposal.edit')->middleware('can-access:pm.project.update');
+    Route::get('/project/{id}/proposal/preview/{format}', [ProposalController::class, 'preview'])
+        ->whereIn('format', ['pdf', 'pptx'])
+        ->name('proposal.preview')->middleware('can-access:pm.project.update');
 
     // Invoice routes
     Route::get('/invoice/{id}/download', [InvoiceController::class, 'download'])
@@ -59,6 +69,12 @@ Route::group([], function () {
         ->name('master.bank_account')->middleware('can-access:pm.master.bank_account');
     Route::livewire('/master/signature', 'pm::master.signature-list')
         ->name('master.signature')->middleware('can-access:pm.master.signature');
+    Route::livewire('/master/holiday', 'pm::master.holiday')
+        ->name('master.holiday')->middleware('can-access:pm.master.holiday');
+    Route::livewire('/master/proposal-feature', 'pm::master.proposal-feature')
+        ->name('master.proposal_feature')->middleware('can-access:pm.master.proposal_feature');
+    Route::livewire('/master/proposal-default', 'pm::master.proposal-default')
+        ->name('master.proposal_default')->middleware('can-access:pm.master.proposal_default');
 
     // Report routes
     Route::livewire('/report/project-document', 'pm::report.project-document')

@@ -6,3 +6,8 @@ parameters:
     paths:
         - src
     tmpDir: build/phpstan
+    ignoreErrors:
+        # Used only by Livewire single-file components under resources/views, which PHPStan does not analyse
+        -
+            identifier: trait.unused
+            path: src/Form/Concerns/EditsProposalSections.php

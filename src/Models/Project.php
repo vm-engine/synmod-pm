@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use VmEngine\Pm\Enums\Documents;
 use VmEngine\Pm\Enums\MaintenanceType;
@@ -71,6 +72,7 @@ use VmEngine\SynAuth\Traits\HasUpdater;
  * @property int|null $client_satisfaction
  * @property ProjectStatus $status
  * @property int|null $project_category_id
+ * @property-read ProjectProposal|null $proposal
  */
 class Project extends Model
 {
@@ -237,6 +239,14 @@ class Project extends Model
     public function documents(): HasMany
     {
         return $this->hasMany(ProjectDocument::class);
+    }
+
+    /**
+     * @return HasOne<ProjectProposal, $this>
+     */
+    public function proposal(): HasOne
+    {
+        return $this->hasOne(ProjectProposal::class);
     }
 
     /**

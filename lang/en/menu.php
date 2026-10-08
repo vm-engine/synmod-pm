@@ -25,6 +25,9 @@ return [
             'issuer' => 'Document Issuers',
             'bank_account' => 'Bank Accounts',
             'signature' => 'Signatures',
+            'holiday' => 'Holidays',
+            'proposal_feature' => 'Proposal Features',
+            'proposal_default' => 'Proposal Defaults',
         ],
         'config' => [
             'index' => 'Configuration',

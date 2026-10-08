@@ -35,6 +35,9 @@ return [
         'signature.create' => 'Create Signature',
         'signature.update' => 'Update Signature',
         'signature.delete' => 'Delete Signature',
+        'holiday' => 'Manage Holidays',
+        'proposal_feature' => 'Manage Proposal Features',
+        'proposal_default' => 'Manage Proposal Defaults',
     ],
     'report' => [
         'label' => 'Reports',
