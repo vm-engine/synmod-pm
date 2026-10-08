@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.0] - 2026-10-08
+
+### Added
+- **Proposal Generator** (`pm/project/{id}/proposal`, requires `pm.project.update`): build a project's proposal from structured data — website (feature checklist with editable text, goal, menu structure, layout mockups) or application (module → sub-item tree) — and generate the deck as **PPTX** (filled from the Think template deck, editable in PowerPoint) and **PDF** (dompdf).
+  - **Publish** stores both files as the next version of the project's Proposal document, assigns the document number on first publish (republishing keeps it) and sets the project nominal to the grand total.
+  - **Preview PDF / PPTX** shows exactly what will be published, including the next document number, without storing anything or consuming the number.
+  - Costing sections with a computed grand total and amount in words; hosting/domain options; deliverables and after-sales items with a `{months}` placeholder for the free-maintenance period.
+  - Long Feature & Module, goal and menu content continues on extra slides/pages with the same title; module headings never end a page.
+- **MS-Project-style timeline**: finish-to-start links, one nesting level, working days Mon–Fri, global holidays, per-proposal off days and "work this day" overrides, live Gantt preview in the editor; rendered as SVG in the PDF and as native, editable shapes in the PPTX.
+- Master data: **Holidays**, **Proposal Features** (website checklist) and **Proposal Defaults** (per-type costing, hosting, timeline, deliverables, after-sales), with ACL entries and menu items.
+- Proposal documents show a **PPTX** download next to the PDF in the project's document list.
+- PDF uses the deck's own fonts (Calibri, Arial Rounded MT Bold) when they are placed in the app's `storage/app/fonts/`, otherwise the bundled open look-alikes (Carlito, Varela Round — OFL).
+- `scripts/export-proposal-static.php` regenerates the PDF's static slide images from the template (dev only; needs LibreOffice + poppler).
+
+### Fixed
+- `InvoiceService::getCreators()` return type documented correctly (PHPStan level 7 clean).
+
 ## [0.9.1] - 2026-10-08
 
 ### Changed

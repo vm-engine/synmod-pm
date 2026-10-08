@@ -8,7 +8,7 @@
     },
     "name": "Pm",
     "description": "Pm Module",
-    "version": "0.9.1",
+    "version": "0.10.0",
     "author": "Adods",
     "email": "theadods@gmail.com",
     "url_prefix": "pm",
@@ -53,7 +53,7 @@
                     "name": "__pm::menu.be.master.parent",
                     "class": "",
                     "icon": "fa-solid fa-table",
-                    "acl": "pm.master.division.read|pm.master.client_category.read|pm.master.project_category.read|pm.master.issuer|pm.master.bank_account|pm.master.signature",
+                    "acl": "pm.master.division.read|pm.master.client_category.read|pm.master.project_category.read|pm.master.issuer|pm.master.bank_account|pm.master.signature|pm.master.holiday|pm.master.proposal_feature|pm.master.proposal_default",
                     "sub": {
                         "division": {
                             "id": "division",
@@ -102,6 +102,30 @@
                             "route": "pm.master.signature",
                             "icon": "fa-solid fa-signature",
                             "acl": "pm.master.signature"
+                        },
+                        "holiday": {
+                            "id": "holiday",
+                            "name": "__pm::menu.be.master.holiday",
+                            "class": "",
+                            "route": "pm.master.holiday",
+                            "icon": "fa-solid fa-calendar-xmark",
+                            "acl": "pm.master.holiday"
+                        },
+                        "proposal_feature": {
+                            "id": "proposal_feature",
+                            "name": "__pm::menu.be.master.proposal_feature",
+                            "class": "",
+                            "route": "pm.master.proposal_feature",
+                            "icon": "fa-solid fa-list-check",
+                            "acl": "pm.master.proposal_feature"
+                        },
+                        "proposal_default": {
+                            "id": "proposal_default",
+                            "name": "__pm::menu.be.master.proposal_default",
+                            "class": "",
+                            "route": "pm.master.proposal_default",
+                            "icon": "fa-solid fa-sliders",
+                            "acl": "pm.master.proposal_default"
                         }
                     }
                 },
@@ -204,6 +228,27 @@
                     "read": 1,
                     "update": 1,
                     "delete": 1
+                },
+                "holiday": {
+                    "label": "__pm::acl.master.holiday",
+                    "create": 1,
+                    "read": 1,
+                    "update": 1,
+                    "delete": 1
+                },
+                "proposal_feature": {
+                    "label": "__pm::acl.master.proposal_feature",
+                    "create": 1,
+                    "read": 1,
+                    "update": 1,
+                    "delete": 1
+                },
+                "proposal_default": {
+                    "label": "__pm::acl.master.proposal_default",
+                    "create": 0,
+                    "read": 1,
+                    "update": 1,
+                    "delete": 0
                 }
             }
         },
@@ -260,7 +305,23 @@
         }
     },
     "currencies": {
-        "IDR": { "symbol": "Rp", "decimals": 0, "thousands": ".", "decimal": ",", "taxable": true, "name": "Rupiah", "name_plural": "Rupiah" },
-        "USD": { "symbol": "$", "decimals": 2, "thousands": ",", "decimal": ".", "taxable": false, "name": "Dollar", "name_plural": "Dollars" }
+        "IDR": {
+            "symbol": "Rp",
+            "decimals": 0,
+            "thousands": ".",
+            "decimal": ",",
+            "taxable": true,
+            "name": "Rupiah",
+            "name_plural": "Rupiah"
+        },
+        "USD": {
+            "symbol": "$",
+            "decimals": 2,
+            "thousands": ",",
+            "decimal": ".",
+            "taxable": false,
+            "name": "Dollar",
+            "name_plural": "Dollars"
+        }
     }
 }
