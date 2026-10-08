@@ -27,7 +27,7 @@
 
             <!-- Quick Stats -->
             <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-4">
-                <div class="rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+                <div class="rounded-lg border border-brand-100 bg-brand-50 p-4 dark:border-brand-500/20 dark:bg-brand-500/10">
                     <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('pm::project.status') }}</div>
                     <div class="mt-1 text-lg font-semibold">
                         @php
@@ -40,7 +40,7 @@
                         </span>
                     </div>
                 </div>
-                <div class="rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+                <div class="rounded-lg border border-brand-100 bg-brand-50 p-4 dark:border-brand-500/20 dark:bg-brand-500/10">
                     <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('pm::project.progress') }}</div>
                     <div class="mt-1 text-lg font-semibold">{{ $project->progress }}%</div>
                     <div class="mt-2 h-2.5 w-full rounded-full bg-gray-200 dark:bg-gray-700">
@@ -50,7 +50,7 @@
                         ></div>
                     </div>
                 </div>
-                <div class="rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+                <div class="rounded-lg border border-brand-100 bg-brand-50 p-4 dark:border-brand-500/20 dark:bg-brand-500/10">
                     <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('pm::project.priority') }}</div>
                     <div class="mt-1 text-lg font-semibold">
                         @php
@@ -63,7 +63,7 @@
                         </span>
                     </div>
                 </div>
-                <div class="rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+                <div class="rounded-lg border border-brand-100 bg-brand-50 p-4 dark:border-brand-500/20 dark:bg-brand-500/10">
                     <div class="text-sm text-gray-600 dark:text-gray-400">{{ __('pm::project.budget_status') }}</div>
                     <div class="mt-1 text-lg font-semibold text-gray-900 dark:text-white">
                         Rp {{ number_format($project->nominal ?? 0, 0, ',', '.') }}

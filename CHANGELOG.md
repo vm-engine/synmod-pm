@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.1] - 2026-10-08
+
+### Changed
+- Project detail: the Status / Progress / Priority / Budget Status quick-stat tiles now use a light brand tint with a matching border (dark-mode variant included) instead of `bg-gray-50`, so they stand out from the white header card.
+
 ## [0.9.0] - 2026-10-06
 
 **Breaking:**
