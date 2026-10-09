@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+## [0.11.0] - 2026-10-09
+
+### Added
+- **SPH Generator** (`pm/project/{id}/sph`, requires `pm.project.update`): one Surat Penawaran Harga per project, generated as **PDF** (dompdf) and **DOCX** (filled from a template made from the CAA Telco SPH, editable in Word).
+  - Pre-filled from the project's proposal (its published version when there is one): costing sections become line items, features become bullet lines, timeline and tax note are copied; **Import from proposal** re-syncs later.
+  - Recipient, need, issuer (company name + letterhead) and signer (with optional signature image) are editable; item descriptions use a Markdown subset (nested bullet/numbered lists, bold, italic).
+  - Closing and signature block at the bottom right of the letter; the DP percentage is clamped to 0–100; text is stripped of characters XML forbids so a DOCX never comes out corrupt; a removed image lampiran's file is deleted only once the removal is saved.
+  - Optional sections: duration column, payment method (DP % with computed amounts), "Pelaksanaan Pekerjaan: N Hari Kerja", Timeplan (Gantt) lampiran and image lampiran (e.g. flowcharts).
+  - **Publish** stores both files as the next version of the project's SPH document with the SPH number format (assigned on first publish) and sets the project nominal to the grand total; SPH documents show a **DOCX** download in the document list.
+- Document issuers have an optional **footer image** (letterhead footer), used together with the header image on SPH documents.
+
+### Changed
+- Row and timeline editing moved from `EditsProposalSections` into the shared `EditsRowsAndTimeline` trait (used by the proposal form, proposal defaults and the SPH form).
+- `IssuerService` and `ImageProcessingService` accept any `UploadedFile` (Livewire's `TemporaryUploadedFile` still works).
+- Proposal mockup upload uses the styled Synapse file-drop zone (shared with the SPH attachments upload) instead of a bare file input.
+
+### Fixed
+- Proposal **Publish** did nothing: the apostrophe in the confirm message broke the button's inline JS string.
+
+### Security
+- The proposal and SPH forms lock their record id (`#[Locked]`), so a tampered request can no longer save or publish another project's proposal/SPH; the SPH is also looked up through its project.
+
 ## [0.10.0] - 2026-10-08
 
 ### Added
