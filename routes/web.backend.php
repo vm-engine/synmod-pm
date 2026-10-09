@@ -8,6 +8,7 @@ use VmEngine\Pm\Http\Controllers\InvoiceController;
 use VmEngine\Pm\Http\Controllers\ProposalController;
 use VmEngine\Pm\Http\Controllers\ReceiptController;
 use VmEngine\Pm\Http\Controllers\SphController;
+use VmEngine\Pm\Http\Controllers\SpkController;
 
 Route::group([], function () {
     // Project routes
@@ -43,6 +44,13 @@ Route::group([], function () {
     Route::get('/project/{id}/sph/preview/{format}', [SphController::class, 'preview'])
         ->whereIn('format', ['pdf', 'docx'])
         ->name('sph.preview')->middleware('can-access:pm.project.update');
+
+    // SPK generator
+    Route::livewire('/project/{id}/spk', 'pm::spk.spk-form')
+        ->name('spk.edit')->middleware('can-access:pm.project.update');
+    Route::get('/project/{id}/spk/preview/{format}', [SpkController::class, 'preview'])
+        ->whereIn('format', ['pdf', 'docx'])
+        ->name('spk.preview')->middleware('can-access:pm.project.update');
 
     // Invoice routes
     Route::get('/invoice/{id}/download', [InvoiceController::class, 'download'])

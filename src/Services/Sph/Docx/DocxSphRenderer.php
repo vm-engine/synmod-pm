@@ -66,7 +66,7 @@ class DocxSphRenderer
         if ($data->signaturePath !== null) {
             [$bytes, $extension, $width, $height] = self::image((string) file_get_contents($data->signaturePath));
             $signature = [
-                'rid' => $this->addMedia($zip, $relations, $bytes, $extension),
+                'rid' => self::addMedia($zip, $relations, $bytes, $extension),
                 'cx' => self::SIGNATURE_WIDTH_EMU,
                 'cy' => (int) round(self::SIGNATURE_WIDTH_EMU * $height / $width),
             ];
@@ -78,8 +78,8 @@ class DocxSphRenderer
                 $svg = $this->gantt->render($data->timeplan['gantt'], $page, PdfProposalRenderer::ARROWS);
                 [$width, $height] = self::svgSize($svg);
                 $ganttImages[] = [
-                    'rid' => $this->addMedia($zip, $relations, self::svgFallback($svg), 'png'),
-                    'svgRid' => $this->addMedia($zip, $relations, $svg, 'svg'),
+                    'rid' => self::addMedia($zip, $relations, self::svgFallback($svg), 'png'),
+                    'svgRid' => self::addMedia($zip, $relations, $svg, 'svg'),
                 ] + self::fit($width, $height);
             }
         }
@@ -87,7 +87,7 @@ class DocxSphRenderer
         $attachmentImages = [];
         foreach ($data->attachments as $i => $attachment) {
             [$bytes, $extension, $width, $height] = self::image((string) file_get_contents($attachment['path']));
-            $attachmentImages[$i] = ['rid' => $this->addMedia($zip, $relations, $bytes, $extension)] + self::fit($width, $height);
+            $attachmentImages[$i] = ['rid' => self::addMedia($zip, $relations, $bytes, $extension)] + self::fit($width, $height);
         }
 
         $body = view('pm::docx.sph.document', [
@@ -105,9 +105,9 @@ class DocxSphRenderer
         $rels = (string) $zip->getFromName('word/_rels/document.xml.rels');
         $zip->addFromString('word/_rels/document.xml.rels', str_replace('</Relationships>', $extra.'</Relationships>', $rels));
 
-        $this->letterhead($zip, 'header1', $data->headerImagePath, self::HEADER_WIDTH_EMU);
-        $this->letterhead($zip, 'footer1', $data->footerImagePath, self::FOOTER_WIDTH_EMU);
-        $this->ensureContentTypes($zip, ['png' => 'image/png', 'jpeg' => 'image/jpeg', 'svg' => 'image/svg+xml']);
+        self::letterhead($zip, 'header1', $data->headerImagePath, self::HEADER_WIDTH_EMU);
+        self::letterhead($zip, 'footer1', $data->footerImagePath, self::FOOTER_WIDTH_EMU);
+        self::ensureContentTypes($zip, ['png' => 'image/png', 'jpeg' => 'image/jpeg', 'svg' => 'image/svg+xml']);
 
         $zip->close();
     }
@@ -143,7 +143,7 @@ class DocxSphRenderer
     /**
      * @param  array<string, string>  $relations
      */
-    private function addMedia(ZipArchive $zip, array &$relations, string $bytes, string $extension): string
+    public static function addMedia(ZipArchive $zip, array &$relations, string $bytes, string $extension): string
     {
         $number = count($relations) + 1;
         $rid = 'rIdSph'.$number;
@@ -158,7 +158,7 @@ class DocxSphRenderer
      *
      * @return array{cx: int, cy: int}
      */
-    private static function fit(float $width, float $height): array
+    public static function fit(float $width, float $height): array
     {
         $cx = max(1.0, $width) * self::PIXEL_EMU;
         $cy = max(1.0, $height) * self::PIXEL_EMU;
@@ -201,7 +201,7 @@ class DocxSphRenderer
      * Put the issuer's letterhead image in the template header/footer at the template's width, height by
      * aspect ratio. A footer stays anchored to the page bottom. No image empties the part.
      */
-    private function letterhead(ZipArchive $zip, string $part, ?string $path, int $width): void
+    public static function letterhead(ZipArchive $zip, string $part, ?string $path, int $width): void
     {
         $xmlName = 'word/'.$part.'.xml';
         $relsName = 'word/_rels/'.$part.'.xml.rels';
@@ -234,7 +234,7 @@ class DocxSphRenderer
     /**
      * @param  array<string, string>  $types  extension => content type
      */
-    private function ensureContentTypes(ZipArchive $zip, array $types): void
+    public static function ensureContentTypes(ZipArchive $zip, array $types): void
     {
         $xml = (string) $zip->getFromName('[Content_Types].xml');
         foreach ($types as $extension => $mime) {
