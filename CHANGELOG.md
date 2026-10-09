@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-10-09
+
+### Added
+- **SPK Generator** (`pm/project/{id}/spk`, requires `pm.project.update`): one Surat Perjanjian Kerja Sama per project, generated as **PDF** and **DOCX** (same letterhead/template as the SPH).
+  - Tabs follow the Pasal: General (parties, issuer, signer), Asas & Pokok, Jangka Waktu & Hak dan Kewajiban, Pembayaran (+ optional Server & Domain), Ketentuan (Kerahasiaan, Perselisihan, optional Korespondensi, Lain-lain), Pasal Tambahan and Lampiran; tab labels show the live Pasal numbers.
+  - Pasal are numbered automatically; optional Pasal and custom extra Pasal (placed before Lain-lain) renumber the rest.
+  - Typed fields where values are computed: date and durations in words, contract value with terbilang, installment rows (% or fixed amount, repeat count) with a sum check, bank account and contact tables. Boilerplate Pasal are editable Markdown prefilled with defaults.
+  - Prefilled from the client, the proposal (scope, duration, reference number) and the SPH (contract value, DP); party two, signer and bank carry over from the last published SPK; **Import from SPH** re-syncs.
+  - **Publish** stores both files as the next version of the project's SPK document (number assigned on first publish) and sets the project nominal to the contract value. Publishing does not mark the SPK as signed: upload the signed copy as before.
+
+### Changed
+- `DocxSphRenderer` media/letterhead helpers (`addMedia`, `fit`, `letterhead`, `ensureContentTypes`) are public static so the SPK DOCX renderer reuses the SPH template and letterhead handling.
+
 ## [0.11.0] - 2026-10-09
 
 ### Added
