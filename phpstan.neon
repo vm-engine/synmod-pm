@@ -11,3 +11,6 @@ parameters:
         -
             identifier: trait.unused
             path: src/Form/Concerns/EditsProposalSections.php
+        -
+            identifier: trait.unused
+            path: src/Form/Concerns/EditsRowsAndTimeline.php

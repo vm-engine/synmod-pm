@@ -7,6 +7,7 @@ use VmEngine\Pm\Http\Controllers\DocumentController;
 use VmEngine\Pm\Http\Controllers\InvoiceController;
 use VmEngine\Pm\Http\Controllers\ProposalController;
 use VmEngine\Pm\Http\Controllers\ReceiptController;
+use VmEngine\Pm\Http\Controllers\SphController;
 
 Route::group([], function () {
     // Project routes
@@ -26,6 +27,8 @@ Route::group([], function () {
         ->name('document.print')->middleware('can-access:pm.project.read');
     Route::get('/document/{id}/download-pptx', [ProposalController::class, 'downloadPptx'])
         ->name('document.download_pptx')->middleware('can-access:pm.project.read');
+    Route::get('/document/{id}/download-docx', [SphController::class, 'downloadDocx'])
+        ->name('document.download_docx')->middleware('can-access:pm.project.read');
 
     // Proposal generator
     Route::livewire('/project/{id}/proposal', 'pm::proposal.proposal-form')
@@ -33,6 +36,13 @@ Route::group([], function () {
     Route::get('/project/{id}/proposal/preview/{format}', [ProposalController::class, 'preview'])
         ->whereIn('format', ['pdf', 'pptx'])
         ->name('proposal.preview')->middleware('can-access:pm.project.update');
+
+    // SPH generator
+    Route::livewire('/project/{id}/sph', 'pm::sph.sph-form')
+        ->name('sph.edit')->middleware('can-access:pm.project.update');
+    Route::get('/project/{id}/sph/preview/{format}', [SphController::class, 'preview'])
+        ->whereIn('format', ['pdf', 'docx'])
+        ->name('sph.preview')->middleware('can-access:pm.project.update');
 
     // Invoice routes
     Route::get('/invoice/{id}/download', [InvoiceController::class, 'download'])

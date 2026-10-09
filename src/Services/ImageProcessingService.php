@@ -6,8 +6,8 @@ namespace VmEngine\Pm\Services;
 
 use Exception;
 use GdImage;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class ImageProcessingService
 {
@@ -15,7 +15,7 @@ class ImageProcessingService
      * Process and resize an image (JPEG, PNG, WebP).
      */
     public function processImage(
-        TemporaryUploadedFile $file,
+        UploadedFile $file,
         int $maxWidth = 500,
         string $storagePath = 'images',
         string $disk = 'public'

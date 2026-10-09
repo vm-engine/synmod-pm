@@ -12,6 +12,7 @@ test('document issuer has correct fillable fields', function () {
     $fillable = [
         'name',
         'header_image',
+        'footer_image',
         'tax_id_name',
         'tax_id_address',
         'tax_id_number',

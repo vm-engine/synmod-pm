@@ -73,6 +73,7 @@ use VmEngine\SynAuth\Traits\HasUpdater;
  * @property ProjectStatus $status
  * @property int|null $project_category_id
  * @property-read ProjectProposal|null $proposal
+ * @property-read ProjectSph|null $sph
  */
 class Project extends Model
 {
@@ -247,6 +248,14 @@ class Project extends Model
     public function proposal(): HasOne
     {
         return $this->hasOne(ProjectProposal::class);
+    }
+
+    /**
+     * @return HasOne<ProjectSph, $this>
+     */
+    public function sph(): HasOne
+    {
+        return $this->hasOne(ProjectSph::class);
     }
 
     /**

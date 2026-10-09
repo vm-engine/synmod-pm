@@ -23,6 +23,20 @@
             </div>
             @endcanAccess
         @endif
+        @if ($documentTypeValue === \VmEngine\Pm\Enums\Documents::SPH->value && !$readonly)
+            @canAccess('pm.project.update')
+            <div class="mb-3 flex justify-end">
+                <a
+                    class="btn secondary sm"
+                    href="{{ backend_route('pm.sph.edit', ['id' => $project->id]) }}"
+                    wire:navigate
+                >
+                    <span class="ph ph-file-text mr-1"></span>
+                    {{ __('pm::sph.generator_button') }}
+                </a>
+            </div>
+            @endcanAccess
+        @endif
         <x-pm::document-revision-list
             :documents="$this->documents"
             :type="$this->documentType"

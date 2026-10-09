@@ -17,6 +17,7 @@ use VmEngine\SynAuth\Traits\HasUpdater;
  * @property int $id
  * @property string $name
  * @property string $header_image
+ * @property string|null $footer_image
  * @property string $tax_id_name
  * @property string $tax_id_address
  * @property string $tax_id_number
@@ -38,6 +39,7 @@ class DocumentIssuer extends Model
     protected $fillable = [
         'name',
         'header_image',
+        'footer_image',
         'tax_id_name',
         'tax_id_address',
         'tax_id_number',

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Services;
 
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
-use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use VmEngine\Pm\Models\DocumentIssuer;
 use VmEngine\Pm\Services\Concerns\RecordsActivity;
 
@@ -22,7 +22,7 @@ class IssuerService
      *
      * @param  array<string, mixed>  $issuerData
      */
-    public function create(array $issuerData, ?TemporaryUploadedFile $headerImage = null): DocumentIssuer
+    public function create(array $issuerData, ?UploadedFile $headerImage = null, ?UploadedFile $footerImage = null): DocumentIssuer
     {
         $data = [...$issuerData];
 
@@ -32,6 +32,15 @@ class IssuerService
                 $headerImage,
                 maxWidth: 1200,
                 storagePath: 'issuers/headers',
+                disk: 'public'
+            );
+        }
+
+        if ($footerImage) {
+            $data['footer_image'] = $this->imageService->processImage(
+                $footerImage,
+                maxWidth: 2400,
+                storagePath: 'issuers/footers',
                 disk: 'public'
             );
         }
@@ -49,7 +58,7 @@ class IssuerService
      *
      * @param  array<string, mixed>  $issuerData
      */
-    public function update(DocumentIssuer $issuer, array $issuerData, ?TemporaryUploadedFile $headerImage = null): DocumentIssuer
+    public function update(DocumentIssuer $issuer, array $issuerData, ?UploadedFile $headerImage = null, ?UploadedFile $footerImage = null): DocumentIssuer
     {
         $oldData = $issuer->toArray();
         $data = [...$issuerData];
@@ -65,6 +74,19 @@ class IssuerService
                 $headerImage,
                 maxWidth: 1200,
                 storagePath: 'issuers/headers',
+                disk: 'public'
+            );
+        }
+
+        if ($footerImage) {
+            if ($issuer->footer_image) {
+                $this->imageService->deleteImage($issuer->footer_image, 'public');
+            }
+
+            $data['footer_image'] = $this->imageService->processImage(
+                $footerImage,
+                maxWidth: 2400,
+                storagePath: 'issuers/footers',
                 disk: 'public'
             );
         }
@@ -87,6 +109,10 @@ class IssuerService
         // Delete header image if exists
         if ($issuer->header_image) {
             $this->imageService->deleteImage($issuer->header_image, 'public');
+        }
+
+        if ($issuer->footer_image) {
+            $this->imageService->deleteImage($issuer->footer_image, 'public');
         }
 
         $deleted = $issuer->delete();

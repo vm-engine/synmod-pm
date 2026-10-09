@@ -20,6 +20,11 @@ class IssuerFormObject extends Form
      */
     public $header_image = null;
 
+    /**
+     * @var TemporaryUploadedFile|null
+     */
+    public $footer_image = null;
+
     public string $tax_id_name = '';
 
     public string $tax_id_address = '';
@@ -27,6 +32,8 @@ class IssuerFormObject extends Form
     public string $tax_id_number = '';
 
     public ?string $existing_header_image = null;
+
+    public ?string $existing_footer_image = null;
 
     public function setIssuer(DocumentIssuer $issuer): void
     {
@@ -36,6 +43,7 @@ class IssuerFormObject extends Form
         $this->tax_id_address = $issuer->tax_id_address;
         $this->tax_id_number = $issuer->tax_id_number;
         $this->existing_header_image = $issuer->header_image;
+        $this->existing_footer_image = $issuer->footer_image;
     }
 
     /**
@@ -51,6 +59,7 @@ class IssuerFormObject extends Form
                 'mimes:jpeg,png,webp',
                 'max:5120',
             ],
+            'footer_image' => ['nullable', 'file', 'mimes:jpeg,png,webp', 'max:5120'],
             'tax_id_name' => 'required|string|max:255',
             'tax_id_address' => 'required|string',
             'tax_id_number' => ['required', 'numeric', 'digits:16'],
@@ -68,6 +77,9 @@ class IssuerFormObject extends Form
             'header_image.file' => __('pm::issuer.validation.header_image_file'),
             'header_image.mimes' => __('pm::issuer.validation.header_image_mimes'),
             'header_image.max' => __('pm::issuer.validation.header_image_max'),
+            'footer_image.file' => __('pm::issuer.validation.footer_image_file'),
+            'footer_image.mimes' => __('pm::issuer.validation.footer_image_mimes'),
+            'footer_image.max' => __('pm::issuer.validation.footer_image_max'),
             'tax_id_name.required' => __('pm::issuer.validation.tax_id_name_required'),
             'tax_id_address.required' => __('pm::issuer.validation.tax_id_address_required'),
             'tax_id_number.required' => __('pm::issuer.validation.tax_id_number_required'),
@@ -89,7 +101,7 @@ class IssuerFormObject extends Form
             'tax_id_number' => $this->tax_id_number,
         ];
 
-        $issuerService->create($data, $this->header_image);
+        $issuerService->create($data, $this->header_image, $this->footer_image);
 
         $this->reset();
     }
@@ -107,6 +119,6 @@ class IssuerFormObject extends Form
             'tax_id_number' => $this->tax_id_number,
         ];
 
-        $this->issuer = $issuerService->update($this->issuer, $data, $this->header_image);
+        $this->issuer = $issuerService->update($this->issuer, $data, $this->header_image, $this->footer_image);
     }
 }

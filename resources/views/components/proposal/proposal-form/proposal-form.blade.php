@@ -108,7 +108,7 @@
                 wire:target="publish"
                 wire:click="$dispatch('confirm-dialog', {
                     title: '{{ __('pm::proposal.publish_title') }}',
-                    message: '{{ __('pm::proposal.publish_confirm') }}',
+                    message: '{{ addslashes(__('pm::proposal.publish_confirm')) }}',
                     confirmColor: 'primary',
                     icon: 'fa-solid fa-paper-plane',
                     wireMethod: 'publish',

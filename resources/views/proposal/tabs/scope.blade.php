@@ -99,20 +99,15 @@
                     ><span class="ph ph-trash"></span></button>
                 </div>
             @endforeach
-            <input
-                type="file"
-                accept="image/png,image/jpeg"
+            <x-synapse-file-drop
+                wire-model="mockupUploads"
                 multiple
-                wire:model="mockupUploads"
+                :allowed-types="['jpg', 'jpeg', 'png']"
+                :max-size-kb="5120"
             />
             @error('mockupUploads.*')
                 <p class="form-error-message">{{ $message }}</p>
             @enderror
-            <div
-                class="form-help"
-                wire:loading
-                wire:target="mockupUploads"
-            ><span class="ph ph-spinner syn-spin mr-1"></span></div>
         </div>
     </div>
 </div>

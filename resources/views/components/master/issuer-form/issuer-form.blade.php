@@ -72,6 +72,39 @@
             @enderror
         </div>
 
+        <!-- Footer Image Upload -->
+        <div class="form-box">
+            <label>{{ __('pm::issuer.footer_image') }}</label>
+
+            @if ($form->existing_footer_image && !$form->footer_image)
+                <div class="mb-4">
+                    <img
+                        class="h-auto max-w-full rounded-lg shadow-md"
+                        src="{{ Storage::url($form->existing_footer_image) }}"
+                        alt="Current footer"
+                    >
+                    <p class="mt-2 text-sm text-gray-500">{{ __('pm::issuer.current_footer_image') }}</p>
+                </div>
+            @endif
+
+            <x-synapse-drag-n-drop
+                name="footer_image"
+                wire-model="form.footer_image"
+                accept="image/png,image/jpeg,image/webp"
+                :max-size="5120"
+                :preview="true"
+                :label="__('pm::issuer.drop_image_here')"
+                :description="__('pm::issuer.image_description')"
+                :browse-text="__('pm::labels.browse')"
+                :error="$errors->first('form.footer_image')"
+            />
+            <p class="form-help">{{ __('pm::issuer.letterhead_hint') }}</p>
+
+            @error('form.footer_image')
+                <p class="form-error-message">{{ $message }}</p>
+            @enderror
+        </div>
+
         <!-- Tax ID Name -->
         <div class="form-box required">
             <label for="tax_id_name">{{ __('pm::issuer.tax_id_name') }}</label>

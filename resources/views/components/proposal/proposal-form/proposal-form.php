@@ -2,22 +2,19 @@
 
 declare(strict_types=1);
 
-use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use VmEngine\Pm\Enums\ProposalType;
 use VmEngine\Pm\Form\Concerns\EditsProposalSections;
-use VmEngine\Pm\Models\Holiday;
 use VmEngine\Pm\Models\Project;
 use VmEngine\Pm\Models\ProjectProposal;
 use VmEngine\Pm\Services\Proposal\Exceptions\ProposalValidationException;
-use VmEngine\Pm\Services\Proposal\Gantt\GanttLayout;
 use VmEngine\Pm\Services\Proposal\Gantt\GanttScheduler;
-use VmEngine\Pm\Services\Proposal\Gantt\GanttSvgRenderer;
 use VmEngine\Pm\Services\Proposal\ProposalFactory;
 use VmEngine\Pm\Services\Proposal\ProposalPublisher;
 use VmEngine\Pm\Services\Proposal\ProposalValidator;
@@ -30,6 +27,7 @@ new class extends Component
 
     public Project $project;
 
+    #[Locked]
     public ?int $proposalId = null;
 
     public int $type = 1;
@@ -67,8 +65,6 @@ new class extends Component
 
     /** @var array<int, TemporaryUploadedFile> */
     public array $mockupUploads = [];
-
-    public string $newOffDay = '';
 
     public function mount(int $id): void
     {
@@ -180,74 +176,6 @@ new class extends Component
         }
         unset($this->scope['mockups'][$index]);
         $this->scope['mockups'] = array_values($this->scope['mockups']);
-    }
-
-    public function addOffDay(): void
-    {
-        $this->validate(['newOffDay' => 'required|date']);
-        $date = CarbonImmutable::parse($this->newOffDay)->toDateString();
-        $this->timeline['extra_holidays'] = array_values(array_unique([...$this->timeline['extra_holidays'], $date]));
-        sort($this->timeline['extra_holidays']);
-        $this->newOffDay = '';
-        unset($this->scheduledTasks, $this->ganttPreview, $this->holidaysInSpan);
-    }
-
-    public function removeOffDay(int $index): void
-    {
-        unset($this->timeline['extra_holidays'][$index]);
-        $this->timeline['extra_holidays'] = array_values($this->timeline['extra_holidays']);
-        unset($this->scheduledTasks, $this->ganttPreview, $this->holidaysInSpan);
-    }
-
-    public function toggleWorkedHoliday(string $date): void
-    {
-        $worked = $this->timeline['worked_holidays'];
-        $this->timeline['worked_holidays'] = in_array($date, $worked, true)
-            ? array_values(array_diff($worked, [$date]))
-            : [...$worked, $date];
-        unset($this->scheduledTasks, $this->ganttPreview, $this->holidaysInSpan);
-    }
-
-    /**
-     * @return list<string> one SVG per Gantt page
-     */
-    #[Computed]
-    public function ganttPreview(): array
-    {
-        $layout = GanttLayout::build($this->scheduledTasks, $this->workCalendar());
-        $renderer = new GanttSvgRenderer;
-
-        return array_map(fn (int $page): string => $renderer->render($layout, $page), array_keys($layout->pages));
-    }
-
-    /**
-     * Global holidays between the first start and the last finish, with their "work this day" state.
-     *
-     * @return list<array{date: string, name: string, worked: bool}>
-     */
-    #[Computed]
-    public function holidaysInSpan(): array
-    {
-        $tasks = $this->scheduledTasks;
-        if ($tasks === []) {
-            return [];
-        }
-        $start = min(array_map(fn ($t): string => $t->start->toDateString(), $tasks));
-        $finish = max(array_map(fn ($t): string => $t->finish->toDateString(), $tasks));
-        $worked = $this->timeline['worked_holidays'] ?? [];
-
-        // Include worked holidays outside the computed span too, so they can be toggled back
-        return Holiday::query()
-            ->where(fn ($q) => $q->whereBetween('date', [$start, $finish])->orWhereIn('date', $worked))
-            ->orderBy('date')
-            ->get()
-            ->map(fn (Holiday $h): array => [
-                'date' => $h->date->toDateString(),
-                'name' => $h->name,
-                'worked' => in_array($h->date->toDateString(), $worked, true),
-            ])
-            ->values()
-            ->all();
     }
 
     #[Computed]

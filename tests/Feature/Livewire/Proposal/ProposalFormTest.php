@@ -115,3 +115,10 @@ test('changing type replaces the features', function () {
         ->assertSet('type', ProposalType::Website->value)
         ->assertCount('features', 8);
 });
+
+test('the publish confirm message is escaped for the inline JS string', function () {
+    $proposal = ProjectProposal::factory()->create();
+
+    Livewire::test('pm::proposal.proposal-form', ['id' => $proposal->project_id])
+        ->assertSeeHtml("message: '".e(addslashes(__('pm::proposal.publish_confirm')))."'");
+});

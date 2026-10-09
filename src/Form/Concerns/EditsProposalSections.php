@@ -4,53 +4,23 @@ declare(strict_types=1);
 
 namespace VmEngine\Pm\Form\Concerns;
 
-use Carbon\CarbonImmutable;
 use Livewire\Attributes\Computed;
-use VmEngine\Pm\Models\Holiday;
 use VmEngine\Pm\Models\ProjectProposal;
 use VmEngine\Pm\Services\Proposal\Gantt\GanttScheduler;
-use VmEngine\Pm\Services\Proposal\Gantt\ScheduledTask;
-use VmEngine\Pm\Services\Proposal\Gantt\WorkCalendar;
 use VmEngine\Pm\Services\Proposal\ProposalFactory;
 
 /**
- * Row editing for proposal sections, shared by the proposal form and the defaults editor.
+ * Proposal-specific sections (costing, hosting, deliverables, after-sales, features, menu), shared by the
+ * proposal form and the defaults editor; rows and timeline come from EditsRowsAndTimeline.
  * The using component declares $costing, $hosting, $deliverables, $afterSales, $timeline
  * (and, for the proposal form, $features and $scope).
  */
 trait EditsProposalSections
 {
+    use EditsRowsAndTimeline;
+
     /** @var array<string, list<string>> */
     public array $tabErrors = [];
-
-    public function addRow(string $list): void
-    {
-        $rows = $this->getList($list);
-        $row = ['id' => ProposalFactory::newRowId()] + $this->blankRow($list);
-        if ($list === 'timeline.tasks' && $rows !== []) {
-            $row['predecessor_id'] = $rows[array_key_last($rows)]['id'];
-        }
-        $rows[] = $row;
-        $this->setList($list, $rows);
-    }
-
-    public function removeRow(string $list, int $index): void
-    {
-        $rows = $this->getList($list);
-        unset($rows[$index]);
-        $this->setList($list, $rows);
-    }
-
-    public function moveRow(string $list, int $index, int $direction): void
-    {
-        $rows = $this->getList($list);
-        $target = $index + ($direction < 0 ? -1 : 1);
-        if (! isset($rows[$index], $rows[$target])) {
-            return;
-        }
-        [$rows[$index], $rows[$target]] = [$rows[$target], $rows[$index]];
-        $this->setList($list, $rows);
-    }
 
     public function addChild(string $list, int $index): void
     {
@@ -70,26 +40,6 @@ trait EditsProposalSections
         $this->setList($list, $rows);
     }
 
-    public function indentTask(int $index): void
-    {
-        $tasks = $this->timeline['tasks'] ?? [];
-        if (! isset($tasks[$index])) {
-            return;
-        }
-        $tasks[$index]['parent_id'] = 'indent';
-        $this->timeline['tasks'] = GanttScheduler::normalize($tasks);
-    }
-
-    public function outdentTask(int $index): void
-    {
-        $tasks = $this->timeline['tasks'] ?? [];
-        if (! isset($tasks[$index])) {
-            return;
-        }
-        $tasks[$index]['parent_id'] = null;
-        $this->timeline['tasks'] = GanttScheduler::normalize($tasks);
-    }
-
     #[Computed]
     public function grandTotal(): float
     {
@@ -97,46 +47,6 @@ trait EditsProposalSections
             fn (array $row): array => ['price' => self::parseAmount($row['price'] ?? 0)],
             $this->costing,
         ));
-    }
-
-    /**
-     * @return list<ScheduledTask>
-     */
-    #[Computed]
-    public function scheduledTasks(): array
-    {
-        $start = (string) ($this->timeline['start_date'] ?? '');
-
-        return (new GanttScheduler)->schedule(
-            $this->timeline['tasks'] ?? [],
-            $start !== '' ? $start : CarbonImmutable::now()->toDateString(),
-            $this->workCalendar(),
-        );
-    }
-
-    /** Amount from a number or an Indonesian-formatted string ("Rp. 15.000.000,50"). */
-    public static function parseAmount(mixed $value): float
-    {
-        if (is_int($value) || is_float($value)) {
-            return (float) $value;
-        }
-        $clean = preg_replace('/[^0-9,.\-]/', '', (string) $value) ?? '';
-        if (str_contains($clean, ',')) {
-            $clean = str_replace(['.', ','], ['', '.'], $clean);
-        } elseif (substr_count($clean, '.') > 1 || preg_match('/\.\d{3}$/', $clean) === 1) {
-            $clean = str_replace('.', '', $clean);
-        }
-
-        return (float) $clean;
-    }
-
-    protected function workCalendar(): WorkCalendar
-    {
-        return WorkCalendar::fromSets(
-            Holiday::dates(),
-            $this->timeline['extra_holidays'] ?? [],
-            $this->timeline['worked_holidays'] ?? [],
-        );
     }
 
     /**
@@ -215,7 +125,7 @@ trait EditsProposalSections
     /**
      * @return array<string, mixed>
      */
-    private function blankRow(string $list): array
+    protected function blankRow(string $list): array
     {
         return match ($list) {
             'costing' => ['section' => '', 'features' => '', 'price' => 0],
@@ -223,44 +133,8 @@ trait EditsProposalSections
             'deliverables' => ['item' => '', 'description' => ''],
             'afterSales' => ['label' => ''],
             'features', 'scope.menu' => ['name' => '', 'description' => '', 'children' => []],
-            'timeline.tasks' => ['name' => '', 'parent_id' => null, 'duration' => 1, 'predecessor_id' => null],
+            'timeline.tasks' => $this->blankTaskRow(),
             default => abort(400),
         };
-    }
-
-    /**
-     * @return list<array<string, mixed>>
-     */
-    private function getList(string $list): array
-    {
-        return match ($list) {
-            'costing' => $this->costing,
-            'hosting' => $this->hosting,
-            'deliverables' => $this->deliverables,
-            'afterSales' => $this->afterSales,
-            'features' => $this->features,
-            'timeline.tasks' => $this->timeline['tasks'] ?? [],
-            'scope.menu' => $this->scope['menu'] ?? [],
-            default => abort(400),
-        };
-    }
-
-    /**
-     * @param  array<int, array<string, mixed>>  $rows
-     */
-    private function setList(string $list, array $rows): void
-    {
-        $rows = array_values($rows);
-        match ($list) {
-            'costing' => $this->costing = $rows,
-            'hosting' => $this->hosting = $rows,
-            'deliverables' => $this->deliverables = $rows,
-            'afterSales' => $this->afterSales = $rows,
-            'features' => $this->features = $rows,
-            'timeline.tasks' => $this->timeline['tasks'] = GanttScheduler::normalize($rows),
-            'scope.menu' => $this->scope['menu'] = $rows,
-            default => abort(400),
-        };
-        unset($this->grandTotal, $this->scheduledTasks);
     }
 }

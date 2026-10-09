@@ -97,6 +97,15 @@
                             <span class="ph ph-presentation mr-1"></span>{{ __('pm::proposal.download_pptx') }}
                         </a>
                     @endif
+                    @if (!empty($first->file_info['docx']))
+                        <a
+                            class="btn secondary sm"
+                            href="{{ backend_route('pm.document.download_docx', ['id' => $first->id]) }}"
+                            title="{{ __('pm::sph.download_docx') }}"
+                        >
+                            <span class="ph ph-file-doc mr-1"></span>{{ __('pm::sph.download_docx') }}
+                        </a>
+                    @endif
                     <button
                         class="btn secondary sm"
                         @click="showVersions = !showVersions"
@@ -193,6 +202,15 @@
                                                 title="{{ __('pm::proposal.download_pptx') }}"
                                             >
                                                 <span class="ph ph-presentation"></span>
+                                            </a>
+                                        @endif
+                                        @if (!empty($oldVersion->file_info['docx']))
+                                            <a
+                                                class="text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                                                href="{{ backend_route('pm.document.download_docx', ['id' => $oldVersion->id]) }}"
+                                                title="{{ __('pm::sph.download_docx') }}"
+                                            >
+                                                <span class="ph ph-file-doc"></span>
                                             </a>
                                         @endif
                                     </div>
