@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.12.1] - 2026-10-12
+
+### Added
+- `InvoiceService::invoiceListQuery(array $filters)`: the filtered, sorted, eager-loaded invoice query behind the list, exposed as a builder so consumers (e.g. an Excel export) can reuse the exact list filters without the 100-row page cap.
+
+### Changed
+- `InvoiceService::getInvoiceList()` now paginates `invoiceListQuery()`; filters, sorting and results are unchanged.
+
 ## [0.12.0] - 2026-10-09
 
 ### Added
