@@ -381,6 +381,19 @@ class InvoiceService
      */
     public function getInvoiceList(array $filters): LengthAwarePaginator
     {
+        $limit = min((int) ($filters['limit'] ?? 20), 100);
+
+        return $this->invoiceListQuery($filters)->paginate($limit);
+    }
+
+    /**
+     * Filtered, sorted, eager-loaded invoice query shared by the paginated list and exports.
+     *
+     * @param  array<string, mixed>  $filters
+     * @return Builder<ProjectInvoice>
+     */
+    public function invoiceListQuery(array $filters): Builder
+    {
         $allowedSortColumns = [
             'issue_date', 'due_date', 'total_amount',
             'invoice_number', 'created_at', 'is_paid',
@@ -397,7 +410,6 @@ class InvoiceService
         $q = isset($filters['q']) ? trim((string) $filters['q']) : null;
         $sortBy = $filters['sort_by'] ?? 'issue_date';
         $sortDesc = $filters['sort_desc'] ?? true;
-        $limit = min((int) ($filters['limit'] ?? 20), 100);
         $includeArchived = (bool) ($filters['include_archived'] ?? false);
 
         if (! in_array($sortBy, $allowedSortColumns, true)) {
@@ -459,7 +471,7 @@ class InvoiceService
         ])
             ->orderBy($sortBy, $sortDesc ? 'desc' : 'asc');
 
-        return $query->paginate($limit);
+        return $query;
     }
 
     /**
