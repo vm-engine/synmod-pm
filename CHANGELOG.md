@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.12.2] - 2026-10-13
+
+### Added
+- Indonesian (`id`) translations for every language file (`lang/id/`), including the Proposal, SPH and SPK generators; previously only `pdf.php` was translated.
+- `LangParityTest`: fails when an English language file or key has no Indonesian counterpart, or when a line's `:placeholders` differ.
+
 ## [0.12.1] - 2026-10-12
 
 ### Added
